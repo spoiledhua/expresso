@@ -2,11 +2,13 @@ import mysql.connector
 from mysql.connector import errorcode
 import pandas as pd
 
+
 # MAKE SURE TO GO BACK AND ADD IN MORE ERROR HANDLING CODE...
+# more handling
 
 def connect():
     try:
-        mydb = mysql.connector.connect(host="67.205.146.88", user="ccmobile_coffee",
+        mydb = mysql.connector.connect(host="198.199.71.236", user="ccmobile_coffee",
                                        passwd="1Latte2G0!", database="ccmobile_coffee_club")
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -37,14 +39,13 @@ def check_table_exists(mydb, table_name):
 
 
 def build_menu_table(mydb):
-
     check_table = check_table_exists(mydb, "menu")
 
     if not check_table:
 
         mycursor = mydb.cursor()
 
-        mycursor.execute("CREATE TABLE menu (item VARCHAR(255), price DECIMAL, availability BOOLEAN)")
+        mycursor.execute("CREATE TABLE menu (item VARCHAR(255), price DECIMAL(10,2), availability BOOLEAN)")
 
         menuItems = pd.read_excel("Menu Items.xlsx")
 
@@ -61,7 +62,6 @@ def build_menu_table(mydb):
 
 
 def build_order_history_table(mydb):
-
     check_table = check_table_exists(mydb, "order_history")
 
     if not check_table:
@@ -76,18 +76,16 @@ def build_order_history_table(mydb):
 
 
 def build_order_details_table(mydb):
-
     check_table = check_table_exists(mydb, "order_details")
 
     if not check_table:
         mycursor = mydb.cursor()
 
-        mycursor.execute("CREATE TABLE order_details (order_id INT, item VARCHAR(255))")
+        mycursor.execute("CREATE TABLE order_details (order_id INT, item_quantity INT, item VARCHAR(255))")
         mycursor.close()
 
 
 def main():
-
     mydb = connect()
     build_menu_table(mydb)
     build_order_history_table(mydb)
