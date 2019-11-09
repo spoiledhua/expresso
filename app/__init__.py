@@ -16,7 +16,7 @@ app.register_blueprint(customer)
 app.register_blueprint(barista)
 
 # connects to database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://ccmobile_coffee:1Latte2G0!@198.199.71.236/ccmobile_coffee_club'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://ccmobile_coffee:1Latte2G0!@198.199.71.236/ccmobile_coffee_club'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "coffeelovers4ever"
 
