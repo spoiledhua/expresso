@@ -4,10 +4,30 @@ import { Grid, Item, Header } from 'semantic-ui-react';
 import * as cappuccino from '../Assets/cappuccino.jpeg';
 import * as coffee from '../Assets/coffee.jpeg';
 import * as latte from '../Assets/latte.jpeg';
+import axios from 'axios';
 
 class MenuBar extends React.Component {
 
+  handleItemClick = (e) => {
+
+    var itemId;
+
+    axios.get('http://localhost:5000/customer/orderinfo').then(res => {
+      console.log(res.data);
+      itemId = res.data;
+    });
+
+    console.log('itemId :' + itemId);
+
+   axios.post('http://localhost:5000/customer/makeorder',{
+      items: ['Latte'],
+      quantity: '1',
+      orderid: '13'}).then(res => {
+        console.log(res);
+      });
+  }
   render() {
+
 
     {/* Pull images from database */}
     return (
@@ -42,7 +62,7 @@ class MenuBar extends React.Component {
                 </Item.Content>
               </Item>
 
-              <Item>
+              <Item onClick={this.handleItemClick}>
                 <Item.Image src={latte} />
 
                 <Item.Content verticalAlign='middle'>

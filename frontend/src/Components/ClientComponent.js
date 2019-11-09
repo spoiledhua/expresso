@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Icon, Image, Container, Header, Grid } from 'semantic-ui-react';
 import MenuBar from './MenuBar';
+import axios from 'axios';
 
 import * as logo from '../Assets/logo.png';
 
@@ -17,6 +18,10 @@ class ClientComponent extends React.Component {
 
   handleOrderItemClick = (e) => {
     // redirect to Order page
+    axios.get('http://localhost:5000/customer/orderinfo')
+      .then(res => {
+        console.log(res.data);
+      });
     this.setState({ selectedItem: 'Order' });
   }
 
