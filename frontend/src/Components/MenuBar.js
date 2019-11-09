@@ -8,14 +8,13 @@ import axios from 'axios';
 
 class MenuBar extends React.Component {
 
+  getNumber = async() => {
+    return await axios.get('http://localhost:5000/customer/orderinfo');
+  }
+
   handleItemClick = (e) => {
 
-    var itemId;
-
-    axios.get('http://localhost:5000/customer/orderinfo').then(res => {
-      console.log(res.data);
-      itemId = res.data;
-    });
+    var itemId = this.getNumber();
 
     console.log('itemId :' + itemId);
 
@@ -26,8 +25,8 @@ class MenuBar extends React.Component {
         console.log(res);
       });
   }
-  render() {
 
+  render() {
 
     {/* Pull images from database */}
     return (
