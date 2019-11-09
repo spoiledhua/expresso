@@ -9,6 +9,7 @@ from .models import db, ma
 import flask_login
 import os
 
+#------------------------------------------------------------------------------
 app = Flask(__name__, template_folder = '../frontend/public/')
 CORS(app)
 app.register_blueprint(customer)
@@ -25,9 +26,6 @@ ma.init_app(app)
 
 app.config['CAS_SERVER'] = 'https://fed.princeton.edu'
 app.config['CAS_AFTER_LOGIN'] = '/customer'
-
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
 
 from app import models
 

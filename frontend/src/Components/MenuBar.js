@@ -10,12 +10,10 @@ class MenuBar extends React.Component {
 
   handleItemClick = (e) => {
 
-    itemId = axios.get('http://localhost:5000/customer/orderinfo').then(res => {
-      r);
-      return value;
+     axios.get('http://localhost:5000/customer/orderinfo').then(res => {
+      console.log(res);
     });
 
-    console.log('itemId: ' + itemId);
 
    axios.post('http://localhost:5000/customer/makeorder',{
       items: ['Latte'],
