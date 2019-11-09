@@ -6,25 +6,13 @@ import os
 import datetime as d
 from .models import db, Menu, History, Details, MenuSchema, HistorySchema, DetailsSchema
 #-------------------------------------------------------------------------------
-
+# Sets up the barista routes
 barista = Blueprint('barista', 'barista')
 CORS(barista)
 # used to serialize queries from different models
 menu_schema = MenuSchema()
 history_schema = HistorySchema()
 details_schema = DetailsSchema()
-
-#-------------------------------------------------------------------------------
-
-@barista.route('/barista/login', methods = ['GET' ,'POST'])
-def login_barista():
-    error = None
-    if request.method == 'POST':
-        if request.form['username'] != 'coffeeclub' or request.form['password']!= 'kaplan123':
-            error = 'Invalid Credentials. Please Try Again'
-        else:
-            return redirect(url_for('barista_home'))
-    return render_template('index.html', error = error)
 
 #-------------------------------------------------------------------------------
 # GET HTTP Request that gets incomplete orders from History and returns orders
