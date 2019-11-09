@@ -9,13 +9,14 @@ from .models import db, ma
 import flask_login
 import os
 
+#------------------------------------------------------------------------------
 app = Flask(__name__, template_folder = '../frontend/public/')
 CORS(app)
 app.register_blueprint(customer)
 app.register_blueprint(barista)
 
 # connects to database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://ccmobile_coffee:1Latte2G0!@198.199.71.236/ccmobile_coffee_club'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://ccmobile_coffee:1Latte2G0!@198.199.71.236/ccmobile_coffee_club'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "coffeelovers4ever"
 
@@ -25,9 +26,6 @@ ma.init_app(app)
 
 app.config['CAS_SERVER'] = 'https://fed.princeton.edu'
 app.config['CAS_AFTER_LOGIN'] = '/customer'
-
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
 
 from app import models
 
