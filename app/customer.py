@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
 from flask_cas import CAS, login_required
+from flask_caching import Cache
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -9,6 +10,7 @@ from .models import db, Menu, History, Details, MenuSchema, HistorySchema, Detai
 #-------------------------------------------------------------------------------
 customer = Blueprint('customer', 'customer')
 CORS(customer)
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 # used to serialize queries from different models
 menu_schema = MenuSchema()
 history_schema = HistorySchema()
@@ -22,10 +24,8 @@ incoming = {
     'status': False,
     'items': ['S Chai Latte']
 }
-
 # initialize CAS
 #cas = CAS()
-
 #-------------------------------------------------------------------------------
 # GET Request that returns all of the items on the menu
 @customer.route('/customer/menu', methods = ['GET'])
@@ -82,7 +82,7 @@ def place_order():
         incoming = request.get_json()
 
         if incoming is None:
-            return jsonify(error=True), 403
+            return jsonify(error=e), 403
 
         for object in incoming['items']:
             ordered_item = Details(

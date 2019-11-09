@@ -1,9 +1,21 @@
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
+from flask_cas import CAS, login_required
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+import os
+import datetime as d
 from .models import db, Menu, History, Details, MenuSchema, HistorySchema, DetailsSchema
+#-------------------------------------------------------------------------------
 
 barista = Blueprint('barista', 'barista')
+CORS(barista)
+# used to serialize queries from different models
+menu_schema = MenuSchema()
+history_schema = HistorySchema()
+details_schema = DetailsSchema()
 
 #-------------------------------------------------------------------------------
+
 @barista.route('/barista/login', methods = ['GET' ,'POST'])
 def login_barista():
     error = None
@@ -15,101 +27,96 @@ def login_barista():
     return render_template('index.html', error = error)
 
 #-------------------------------------------------------------------------------
+# GET HTTP Request that gets incomplete orders from History and returns orders
 @barista.route('/barista/getorders', methods=['GET'])
 def get_orders():
-    # pull the orders from Order Details that are not complete
+    orders = []
     if request.method == 'GET':
-        query = db.session.query(Details).filter_by(orderstatus != 2).all()
-        return jsonify(details_schema.dump(query))
+        query = db.session.query(History).filter(History.order_status!=2).all()
+        for items in query:
+            orders.append(history_schema.dump(items))
+        return jsonify(orders)
     else:
         return jsonify(error=True), 403
 
 #-------------------------------------------------------------------------------
+# Change status of an item from not started or in progress to complete. Return item
 @barista.route('/barista/<id>/complete', methods=['POST'])
 def complete_order(id):
-    # if method is Post, change order status to complete
     if request.method == 'POST':
-        query = db.session.query(Details).get(orderid=id)
-        if query.orderstatus is 1 or query.orderstatus is 0:
-            query.orderstatus = 2
+        query = db.session.query(History).get(id)
+        if query.order_status == 1 or query.order_status == 0:
+            query.order_status = 2
             try:
                 db.session.commit()
             except Exception as e:
                 return jsonify(error=True), 408
         else:
             return jsonify(error=True), 408
-        query = db.session.query(Details).get(orderid=id)
-        return jsonify(details_schema.dump(query))
+        query = db.session.query(History).get(id)
+        return jsonify(history_schema.dump(query))
     else:
         return jsonify(error=True), 403
 
 #-------------------------------------------------------------------------------
+# Changes status of item from not started to in progress. Returns item.
 @barista.route('/barista/<orderid>/inprogress', methods=['POST'])
-def in_progress():
-    # if method is Post, change order status to complete
+def in_progress(orderid):
     if request.method == 'POST':
-        query = db.session.query(Details).get(orderid=id)
-        if query.orderstatus is 0:
-            query.orderstatus = 1
+        query = db.session.query(History).get(orderid)
+        if query.order_status is 0:
+            query.order_status = 1
             try:
                 db.session.commit()
             except Exception as e:
                 return jsonify(error=True), 408
         else:
             return jsonify(error=True), 408
-        query = db.session.query(Details).get(orderid=id)
-        return jsonify(details_schema.dump(query))
+        query = db.session.query(History).get(orderid)
+        return jsonify(history_schema.dump(query))
     else:
         return jsonify(error=True), 403
 
 #-------------------------------------------------------------------------------
+# Changes stock of item to the opposite of current state and returns item.
 @barista.route('/barista/<item_name>/changestock', methods=['POST'])
 def change_stock(item_name):
-    # check if username and password are barista or F3hnYbADmkiNs67Y
-    # if method is post, change the Items database stock depending on 0 or 1
-    # 0 means OOS and 1 means in stock
-    stock_option = request.get_json()['stock']
     if request.method == 'POST':
-        query = db.session.query(Items).get(item=item_name)
-        if stock_option is 0:
-            query.availability = 1
+        query = db.session.query(Menu).get(item_name)
+        # if the item is not in the Menu, return an error
+        if query is None:
+            return jsonify(error=True), 405
+        # changing the availability of the selected item
+        stock_option = query.availability
+        print(stock_option)
+        if stock_option is False:
+            query.availability = True
             try:
                 db.session.commit()
             except Exception as e:
                 return jsonify(error=True), 408
-        elif stock_option is 1:
-            query.availability = 0
+            return jsonify(menu_schema.dumps(query)), 201
+        elif stock_option is True:
+            query.availability = False
             try:
                 db.session.commit()
             except Exception as e:
                 return jsonify(error=True), 408
+            return jsonify(menu_schema.dumps(query)), 201
         else:
             return jsonify(error=True), 403
     else:
         return jsonify(error=True), 403
-
 #-------------------------------------------------------------------------------
-@barista.route('/barista/changeinventory', methods=['GET', 'POST', 'DELETE'])
-def update_inventory():
-    # check if username and password are admin, if not exist
-    # if get, return the inventory
-    # if post, update inventory item
-    if request.method == 'POST':
-        incoming = request.get_json()
-        if incoming is None:
-            return jsonify(error=True), 403
-        new_item = Menu (
-            item = incoming['item'],
-            price = incoming['price'],
-            availability = incoming['availability'],
-            category = incoming['category']
-        )
-        return jsonify(menu_schema.dumps(new_item))
-    elif request.method == 'GET':
+# Gets the inventory and returns the inventory.
+@barista.route('/barista/loadinventory', methods = ['GET'])
+def load_inventory():
+    items = []
+    if request.method == 'GET':
         query = db.session.query(Menu).all()
         for item in query:
             item = menu_schema.dumps(item)
             items.append(item)
         return jsonify(items), 200
     else:
-        return jsonify(error=True), 403
+        return jsonify(error=True), 405
