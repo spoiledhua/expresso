@@ -87,6 +87,7 @@ def place_order():
         for object in incoming['items']:
             ordered_item = Details(
                 id = incoming['orderid'],
+                quantity = incoming['quantity'],
                 item = object
             )
             db.session.add(ordered_item)

@@ -1,28 +1,30 @@
 import React from 'react';
 import { Menu, Icon, Image, Container, Header, Grid } from 'semantic-ui-react';
 import MenuBar from './MenuBar';
-import axios from 'axios';
+import { getOrderInfo } from '../Axios/axios_getter';
 
 import * as logo from '../Assets/logo.png';
 
 class ClientComponent extends React.Component {
 
   state = {
-    selectedItem: 'Menu'
+    selectedItem: 'Menu',
+    orderNumber: null
   }
 
   handleMenuItemClick = (e) => {
     // redirect to Menu Page
     this.setState({ selectedItem: 'Menu' });
+    this.setState({ orderNumber: null });
   }
 
   handleOrderItemClick = (e) => {
     // redirect to Order page
-    axios.get('http://localhost:5000/customer/orderinfo')
-      .then(res => {
-        console.log(res.data);
-      });
     this.setState({ selectedItem: 'Order' });
+    getOrderInfo('orderid').then(orderid => {
+      const display = 'Order ID: ' + orderid + ' Net ID: Victor Hua Cost: 3.5';
+      this.setState({ orderNumber: <Header>{display}</Header> });
+      });
   }
 
   handleLogoItemClick = (e) => {
@@ -134,6 +136,7 @@ class ClientComponent extends React.Component {
 
         {/* Main Content */}
         <div style={{ height: '15vh' }} />
+        {this.state.orderNumber}
         <Grid>
           <Grid.Row>
             <Grid.Column width={4}>
