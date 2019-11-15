@@ -60,7 +60,7 @@ class LandingPage extends React.Component {
           onClick={this.handlePusher}
         >
           <Grid columns='equal' style={{height: '100vh', margin:'0'}}>
-                    <Grid.Row verticalAlign='middle' style={{height: '91px', background: '#F98F69', padding:'0'}}>
+                    <Grid.Row verticalAlign='middle' style={{height: '80px', background: '#F98F69', padding:'0'}}>
                         <Grid.Column width={1} style={{textAlign: "center"}}>
                             <Button onClick={this.setVisible} circular icon='sidebar' size='huge' style={{background: '#F98F69'}}>
                             </Button>

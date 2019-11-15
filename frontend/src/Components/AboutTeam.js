@@ -27,8 +27,8 @@ class AboutTeam extends React.Component {
     render () {
         return (
             <React.Fragment>
-                <Grid verticalAlign='middle' style={{height: '100vh'}}>
-                    <Grid.Row style={{height: '91px', background: '#F98F69', padding:'0px'}}>
+                <Grid verticalAlign='middle' style={{height: '100vh', margin:'0'}}>
+                    <Grid.Row style={{height: '80px', background: '#F98F69', padding:'0px'}}>
                         <Grid.Column width={1} style={{textAlign: "center"}}>
                             <Icon size='big' name='sidebar'/>
                         </Grid.Column>
