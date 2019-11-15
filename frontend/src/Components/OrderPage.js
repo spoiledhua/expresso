@@ -32,7 +32,7 @@ class OrderPage extends React.Component {
             <Grid>
               <Grid.Row>
                 <Grid.Column>
-                  <Header as='h2' color='black'>1. ORDER</Header>
+                  <Header as='h2' color='black' style={{fontFamily:'Didot'}}>1. ORDER</Header>
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
@@ -73,7 +73,7 @@ class OrderPage extends React.Component {
             <Grid>
               <Grid.Row>
                 <Grid.Column>
-                  <Header as='h2' color='black'>2. PAYMENT</Header>
+                  <Header as='h2' color='black' style={{fontFamily:'Didot'}}>2. PAYMENT</Header>
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
@@ -101,7 +101,7 @@ class OrderPage extends React.Component {
             </Grid>
           </Card.Content>
           <div>
-            <Button floated='right'>
+            <Button circular floated='right' basic color='black'>
               PLACE ORDER
             </Button>
           </div>

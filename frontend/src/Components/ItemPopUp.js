@@ -23,7 +23,7 @@ class ItemPopUp extends React.Component {
             <Grid>
               <Grid.Row textAlign='right'>
                 <Grid.Column>
-                  <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleClose}/>
+                  <Button circular basic color='black' icon='close' size='medium' floated='right' onClick={this.props.handleClose}/>
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
@@ -33,7 +33,6 @@ class ItemPopUp extends React.Component {
                   <Item.Group>
                     <Item>
                       <Item.Image src={cappuccino} />
-
                       <Item.Content verticalAlign='middle'>
                         <Item.Header as='a' onClick={this.props.handleClick}>Cappuccino</Item.Header>
                         <Item.Meta>Imported from Italy.</Item.Meta>
@@ -52,7 +51,7 @@ class ItemPopUp extends React.Component {
                 <Grid.Column width='4'>
                 </Grid.Column>
                 <Grid.Column width='8' textAlign='left'>
-                  <Header as='h3'>SIZE</Header>
+                  <Header as='h3' style={{fontFamily:'Didot'}}>SIZE</Header>
                   <Form>
                     <Form.Field>
                       <Radio
@@ -79,7 +78,7 @@ class ItemPopUp extends React.Component {
                 <Grid.Column width='4'>
                 </Grid.Column>
                 <Grid.Column width='8' textAlign='left'>
-                  <Header as='h3'>ADD-ONS</Header>
+                  <Header as='h3' style={{fontFamily:'Didot'}}>ADD-ONS</Header>
                   <Form>
                     <Form.Field>
                       <Checkbox
@@ -109,7 +108,7 @@ class ItemPopUp extends React.Component {
                   <Header as='h3' color='grey'>$5.00</Header>
                 </Grid.Column>
                 <Grid.Column width='4' textAlign='center' verticalAlign='middle'>
-                  <Button>
+                  <Button circular basic color='black'>
                     ADD ITEM
                   </Button>
                 </Grid.Column>
