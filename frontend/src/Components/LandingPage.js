@@ -39,19 +39,24 @@ class LandingPage extends React.Component {
           visible={this.state.visible}
           width='thin'
           style={{background: 'white'}}
-          
         > 
-          <Menu.Item as='a' style={{background: '#F98F69'}}>
-            <Icon name='home'/>
-            <strong>Home</strong>
+          <Menu.Item as='a' style={{background: '#F98F69', textAlign: 'center'}}>
+            <Header as='h4'>
+              <Icon name='home'/>
+              HOME
+            </Header>
           </Menu.Item>
           <Menu.Item as='a' style={{background: '#F98F69'}}>
-            <Icon name='users'/>
-            <strong>About The Team</strong>
+            <Header as='h4'>
+              <Icon name='users'/>
+              ABOUT THE TEAM
+            </Header>
           </Menu.Item>
           <Menu.Item as='a' style={{background: '#F98F69'}}>
-            <Icon name='coffee'/>
-            <strong>About Coffee Club</strong>
+            <Header as='h4'>
+              <Icon name='coffee'/>
+              ABOUT COFFEE CLUB
+            </Header>
           </Menu.Item>
         </Sidebar>
 
