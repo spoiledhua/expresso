@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown} from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Grid, Button, Dropdown} from 'semantic-ui-react';
 
 import MenuPage from './MenuPage';
 import OrderPage from './OrderPage';
@@ -52,41 +52,7 @@ class ClientHeader extends React.Component {
     };
 
     return (
-      
       <React.Fragment>
-        <Responsive minWidth={Responsive.onlyTablet.minWidth}>
-        {/* Top Menu */}
-        <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
-          <Menu.Item >
-            <Header as='h3' style={{ cursor: 'pointer' }}>
-              <Icon name='th list'/>
-              MENU
-            </Header>
-          </Menu.Item>
-          <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
-            <Header as='h3'>
-              <Icon name='shopping bag'/>
-              MY ORDER
-            </Header>
-          </Menu.Item>
-          <Menu.Item>
-          </Menu.Item>
-          <Menu.Item>
-            <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
-          </Menu.Item>
-          <Menu.Item>
-          </Menu.Item>
-          <Menu.Item>
-          </Menu.Item>
-          <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
-            <Header as='h3'>
-              <Icon name='user'/>
-              VICTOR HUA
-            </Header>
-          </Menu.Item>
-        </Menu> 
-        </Responsive>
-        <Responsive {...Responsive.onlyMobile}>
         <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
           <Menu.Item position='left'>
             <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
@@ -95,19 +61,19 @@ class ClientHeader extends React.Component {
             {/* Dropdown menu */}
             <Dropdown icon='sidebar' style={{color:'black'}}>
               <Dropdown.Menu direction='left' style={{background: '#F98F69' }}>
-                <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
+                <Dropdown.Item>
                   <Header as='h3' style={{ cursor: 'pointer' }}>
                     <Icon name='th list'/>
                     MENU
                   </Header>
                 </Dropdown.Item>
-                <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
+                <Dropdown.Item>
                   <Header as='h3'>
                     <Icon name='shopping bag'/>
                     MY ORDER
                   </Header>
                 </Dropdown.Item>
-                <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
+                <Dropdown.Item>
                   <Header as='h3'>
                     <Icon name='user'/>
                     VICTOR HUA
@@ -117,12 +83,7 @@ class ClientHeader extends React.Component {
             </Dropdown>
           </Menu.Item>
         </Menu>
-        </Responsive>
-        <div style={{ height: '15vh' }} />
-        {appPages[this.state.selectedPage]}
       </React.Fragment>
-      
-      
     );
   }
 }
