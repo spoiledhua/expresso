@@ -58,7 +58,7 @@ class ClientHeader extends React.Component {
         <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
           <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
             <Header as='h3' style={{ cursor: 'pointer' }}>
-              <Icon name='home'/>
+              <Icon name='th list'/>
               MENU
             </Header>
           </Menu.Item>

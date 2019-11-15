@@ -36,8 +36,8 @@ class LandingPage extends React.Component {
           icon='labeled'
           vertical
           visible={this.state.visible}
-          width='thin'
-          style={{background: 'white'}}
+          width='wide'
+          style={{background: '#F98F69'}}
         > 
           <Menu.Item as='a' style={{background: '#F98F69', textAlign: 'center'}}>
             <Header as='h4'>
@@ -48,7 +48,7 @@ class LandingPage extends React.Component {
           <Menu.Item as='a' style={{background: '#F98F69'}}>
             <Header as='h4'>
               <Icon name='users'/>
-              ABOUT THE TEAM
+              MEET THE TEAM
             </Header>
           </Menu.Item>
           <Menu.Item as='a' style={{background: '#F98F69'}}>

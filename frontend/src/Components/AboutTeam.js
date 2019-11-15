@@ -46,7 +46,7 @@ class AboutTeam extends React.Component {
                     <Grid.Row style={{padding:'0px'}}>
                         <Grid.Column width={2}></Grid.Column>
                         <Grid.Column width={14}>
-                            <h1 style={{fontFamily:'Didot'}}>The Team</h1>
+                            <h1 >The Team</h1>
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row centered>
@@ -69,7 +69,7 @@ class AboutTeam extends React.Component {
                     <Grid.Row>
                         <Grid.Column width={2}></Grid.Column>
                         <Grid.Column width={14}>
-                            <h2 style={{fontFamily:'Didot'}}>Acknowledgements</h2>
+                            <h2 >Acknowledgements</h2>
                             <p>Expresso was designed and developed for <em>COS 333: Advanced Programming Techniques</em> during the Fall '19 semester for The Coffee Club.<br/>
                             Thanks to COS 333 course head Professor Dondero, Director of Student Agencies Dean Fisher, and IT Manager Greg Blaha. Also special thanks to our project advisor Jace Luo.
                             </p>
