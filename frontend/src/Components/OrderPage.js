@@ -32,7 +32,7 @@ class OrderPage extends React.Component {
             <Grid>
               <Grid.Row>
                 <Grid.Column>
-                  <Header as='h2' color='black'>1. ORDER</Header>
+                  <Header as='h2' color='black' >1. ORDER</Header>
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
@@ -43,6 +43,11 @@ class OrderPage extends React.Component {
                 <Grid.Column width='3' />
                 <Grid.Column>
                   <Header as='h3' color='grey'>{/*price*/}$3.50</Header>
+                </Grid.Column>
+                <Grid.Column width='2'></Grid.Column>
+                <Grid.Column width='2' verticalAlign='bottom'>
+                  
+                  <Button circular basic color='red' icon='close'></Button>
                 </Grid.Column>
               </Grid.Row>
               {/* for each addon per item*/}
@@ -101,7 +106,7 @@ class OrderPage extends React.Component {
             </Grid>
           </Card.Content>
           <div>
-            <Button floated='right'>
+            <Button circular floated='right' basic color='black'>
               PLACE ORDER
             </Button>
           </div>

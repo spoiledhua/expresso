@@ -55,23 +55,23 @@ class ClientHeader extends React.Component {
 
       <React.Fragment>
         {/* Top Menu */}
-        <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#D3D3D3' }}>
+        <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
           <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
             <Header as='h3' style={{ cursor: 'pointer' }}>
-              <Icon name='home'/>
+              <Icon name='th list'/>
               MENU
             </Header>
           </Menu.Item>
           <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
             <Header as='h3'>
-              <Icon name='unordered list'/>
+              <Icon name='shopping bag'/>
               MY ORDER
             </Header>
           </Menu.Item>
           <Menu.Item>
           </Menu.Item>
           <Menu.Item>
-            <Image src={logo} size='tiny' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
+            <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
           </Menu.Item>
           <Menu.Item>
           </Menu.Item>
