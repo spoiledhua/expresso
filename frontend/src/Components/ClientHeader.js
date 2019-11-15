@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid } from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown} from 'semantic-ui-react';
 
 import MenuPage from './MenuPage';
 import OrderPage from './OrderPage';
@@ -52,8 +52,9 @@ class ClientHeader extends React.Component {
     };
 
     return (
-
+      
       <React.Fragment>
+        <Responsive minWidth={Responsive.onlyTablet.minWidth}>
         {/* Top Menu */}
         <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
           <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
@@ -86,7 +87,42 @@ class ClientHeader extends React.Component {
         </Menu>
         <div style={{ height: '15vh' }} />
         {appPages[this.state.selectedPage]}
+        </Responsive>
+        <Responsive {...Responsive.onlyMobile}>
+        <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
+          <Menu.Item position='left'>
+            <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
+          </Menu.Item>
+          <Menu.Item position='right'>
+            {/* Dropdown menu */}
+            <Dropdown icon='sidebar' style={{color:'black'}}>
+              <Dropdown.Menu direction='left' style={{background: '#F98F69' }}>
+                <Dropdown.Item>
+                  <Header as='h3' style={{ cursor: 'pointer' }}>
+                    <Icon name='th list'/>
+                    MENU
+                  </Header>
+                </Dropdown.Item>
+                <Dropdown.Item>
+                  <Header as='h3'>
+                    <Icon name='shopping bag'/>
+                    MY ORDER
+                  </Header>
+                </Dropdown.Item>
+                <Dropdown.Item>
+                  <Header as='h3'>
+                    <Icon name='user'/>
+                    VICTOR HUA
+                  </Header>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Menu.Item>
+        </Menu>
+        </Responsive>
       </React.Fragment>
+      
+      
     );
   }
 }
