@@ -44,6 +44,10 @@ class OrderPage extends React.Component {
                 <Grid.Column>
                   <Header as='h3' color='grey'>{/*price*/}$3.50</Header>
                 </Grid.Column>
+                <Grid.Column width='2'></Grid.Column>
+                <Grid.Column width='2' verticalAlign='bottom'>
+                  <Button circular basic color='red'>DELETE</Button>
+                </Grid.Column>
               </Grid.Row>
               {/* for each addon per item*/}
               <Grid.Row>
