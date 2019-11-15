@@ -84,9 +84,7 @@ class ClientHeader extends React.Component {
               VICTOR HUA
             </Header>
           </Menu.Item>
-        </Menu>
-        <div style={{ height: '15vh' }} />
-        {appPages[this.state.selectedPage]}
+        </Menu> 
         </Responsive>
         <Responsive {...Responsive.onlyMobile}>
         <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
@@ -120,6 +118,8 @@ class ClientHeader extends React.Component {
           </Menu.Item>
         </Menu>
         </Responsive>
+        <div style={{ height: '15vh' }} />
+        {appPages[this.state.selectedPage]}
       </React.Fragment>
       
       
