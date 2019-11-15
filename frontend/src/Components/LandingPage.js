@@ -17,7 +17,6 @@ class LandingPage extends React.Component {
   setVisible() {
     const { visible } = this.state;
     const change = !visible
-    console.log(visible)
     this.setState({ visible: change });
   }
 

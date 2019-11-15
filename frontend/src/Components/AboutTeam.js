@@ -10,7 +10,7 @@ import { Grid, Image, Icon, Button} from 'semantic-ui-react';
 
 const Profile = ({ image, name, major, role }) => {
 	return (
-		<Grid verticalAlign='middle' style={{marginLeft:'15px', marginRight:'15px'}}>
+		<Grid verticalAlign='middle' style={{marginLeft:'14px', marginRight:'14px'}}>
             <Grid.Row>
                 <Image src={image} circular size='medium'/>
             </Grid.Row>
@@ -39,7 +39,7 @@ class AboutTeam extends React.Component {
                         <Grid.Column width={5}></Grid.Column>
                         <Grid.Column width={2}>
                             <Button circular basic color='black'>
-                                <strong>Barista Login</strong>
+                                <strong>BARISTA LOGIN</strong>
                             </Button>
                         </Grid.Column>
                     </Grid.Row>
