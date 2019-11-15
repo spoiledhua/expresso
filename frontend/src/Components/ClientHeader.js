@@ -121,8 +121,6 @@ class ClientHeader extends React.Component {
         <div style={{ height: '15vh' }} />
         {appPages[this.state.selectedPage]}
       </React.Fragment>
-      
-      
     );
   }
 }
