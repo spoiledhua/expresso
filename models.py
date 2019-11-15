@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
+#---------------------------------------------------------------------------
 db = SQLAlchemy()
 ma = Marshmallow()
-
+#---------------------------------------------------------------------------
 # sets SQL Alchemy Models
 class History(db.Model):
     __tablename__ = 'order_history'
@@ -27,7 +28,7 @@ class Menu(db.Model):
     price = db.Column('price', db.Float)
     availability = db.Column('availability', db.Boolean)
     category = db.Column('category', db.String)
-
+#---------------------------------------------------------------------------
 # sets Flask Marshmallow Schemas
 class HistorySchema(ma.ModelSchema):
     class Meta:
