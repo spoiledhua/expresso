@@ -10,7 +10,7 @@ import { Grid, Image, Icon, Button} from 'semantic-ui-react';
 
 const Profile = ({ image, name, major, role }) => {
 	return (
-		<Grid verticalAlign='middle' style={{marginLeft:'14px', marginRight:'14px'}}>
+		<Grid verticalAlign='middle' style={{marginLeft:'12px', marginRight:'12px'}}>
             <Grid.Row>
                 <Image src={image} circular size='medium'/>
             </Grid.Row>
