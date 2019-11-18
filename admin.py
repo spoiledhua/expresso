@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
 from flask_cas import CAS, login_required
 from flask_cors import CORS
+from flask_jwt_extended import jwt_required
 from flask_sqlalchemy import SQLAlchemy
 import os
 import datetime as d
@@ -19,6 +20,7 @@ details_schema = DetailsSchema()
 # POST request that will either upload an item and return the item
 # needs to do check that the user is called admin
 @admin.route('/admin/addinventory', methods=['POST'])
+@jwt_required
 def add_inventory():
     incoming = request.get_json()
     if incoming is None:
@@ -42,6 +44,7 @@ def add_inventory():
 #-------------------------------------------------------------------------------
 # DELETE request that takes item and deletes it from Menu, returns deleted item
 @admin.route('/admin/deleteinventory', methods=['DELETE'])
+@jwt_required
 def delete_inventory():
     if request.method == 'DELETE':
         query = db.session.query(Menu).filter_by(item=incoming['item'])
