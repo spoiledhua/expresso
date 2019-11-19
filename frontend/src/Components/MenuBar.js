@@ -8,11 +8,10 @@ import { getLastOrder, postMakeOrder } from '../Axios/axios_getter';
 
 class MenuBar extends React.Component {
 
-  handleItemClick = (e) => {
+  handleItemClick = () => {
 
     getLastOrder()
     .then(lastOrder => {
-      console.log(lastOrder.cost);
       //const nextid = orderid + 1;
       const update = {
          items: ['Latte'],
@@ -34,14 +33,17 @@ class MenuBar extends React.Component {
 
   render() {
 
+    const { item } = this.props;
+
     {/* Pull images from database */}
     return (
+
       <Item>
-        <Item.Image src={coffee} />
+        <Item.Image src={coffee} onClick={() => this.props.handleItemClick(item)} style={{ cursor: 'pointer' }}/>
 
         <Item.Content verticalAlign='middle'>
-          <Item.Header as='a' onClick={this.handleItemClick} >Hot Coffee</Item.Header>
-          <Item.Meta>Not your everyday cup of Joe.</Item.Meta>
+          <Item.Header as='a' onClick={() => this.props.handleItemClick(item)}>{item.name}</Item.Header>
+          <Item.Meta>{item.description}</Item.Meta>
         </Item.Content>
       </Item>
     );
