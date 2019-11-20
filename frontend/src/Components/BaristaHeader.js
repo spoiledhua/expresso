@@ -7,10 +7,11 @@ import BaristaHistory from './BaristaHistory'
 
 
 class BaristaHeader extends React.Component {
+
     state = {
         selectedPage: 'BaristaOrders',
     }
-    
+
     handleOrdersClick = (e) => {
         // redirect to current orders page
         this.setState({selectedPage: 'BaristaOrders'})
@@ -20,7 +21,7 @@ class BaristaHeader extends React.Component {
         // redirect to current orders page
         this.setState({selectedPage: 'BaristaHistory'})
     }
-    
+
     render() {
         var appPages = {
             'BaristaOrders': <BaristaOrders />,
@@ -41,11 +42,12 @@ class BaristaHeader extends React.Component {
                             <Header as='h3'>
                                 HISTORY
                             </Header>
-                        </Menu.Item>    
+                        </Menu.Item>
                         <Menu.Item position='right'>
                             <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
                         </Menu.Item>
-                    </Menu> 
+                    </Menu>
+
                 </Responsive>
                 <Responsive {...Responsive.onlyMobile}>
                     <Menu inverted fixed="top" fluid secondary style={{ height: '10vh', background: '#F98F69' }}>
@@ -78,4 +80,6 @@ class BaristaHeader extends React.Component {
 }
 
 
-export default BaristaHeader
+export default BaristaHeader;
+
+

@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/front1116/static/css/main.b100e6da.chunk.css",
+    "main.js": "/front1116/static/js/main.eebad63a.chunk.js",
+    "main.js.map": "/front1116/static/js/main.eebad63a.chunk.js.map",
+    "runtime-main.js": "/front1116/static/js/runtime-main.4706729f.js",
+    "runtime-main.js.map": "/front1116/static/js/runtime-main.4706729f.js.map",
+    "static/css/2.34630254.chunk.css": "/front1116/static/css/2.34630254.chunk.css",
+    "static/js/2.a934657e.chunk.js": "/front1116/static/js/2.a934657e.chunk.js",
+    "static/js/2.a934657e.chunk.js.map": "/front1116/static/js/2.a934657e.chunk.js.map",
+    "index.html": "/front1116/index.html",
+    "precache-manifest.b96cd43a51b8cd834a8bbea5e67f9910.js": "/front1116/precache-manifest.b96cd43a51b8cd834a8bbea5e67f9910.js",
+    "service-worker.js": "/front1116/service-worker.js",
+    "static/css/2.34630254.chunk.css.map": "/front1116/static/css/2.34630254.chunk.css.map",
+    "static/css/main.b100e6da.chunk.css.map": "/front1116/static/css/main.b100e6da.chunk.css.map",
+    "static/media/semantic.min.css": "/front1116/static/media/outline-icons.ef60a4f6.woff",
+    "static/media/logo.png": "/front1116/static/media/logo.966411e6.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.4706729f.js",
+    "static/css/2.34630254.chunk.css",
+    "static/js/2.a934657e.chunk.js",
+    "static/css/main.b100e6da.chunk.css",
+    "static/js/main.eebad63a.chunk.js"
+  ]
+}

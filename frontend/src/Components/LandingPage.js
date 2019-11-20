@@ -13,7 +13,7 @@ class LandingPage extends React.Component {
     this.setVisible = this.setVisible.bind(this);
     this.handlePusher = this.handlePusher.bind(this);
   }
-  
+
   setVisible() {
     const { visible } = this.state;
     const change = !visible
@@ -38,7 +38,7 @@ class LandingPage extends React.Component {
           visible={this.state.visible}
           width='wide'
           style={{background: '#F98F69'}}
-        > 
+        >
           <Menu.Item as='a' style={{background: '#F98F69', textAlign: 'center'}}>
             <Header as='h4'>
               <Icon name='home'/>
@@ -84,10 +84,11 @@ class LandingPage extends React.Component {
                             </Grid.Row>
                             <Grid.Row style={{height: '5%'}}></Grid.Row>
                             <Grid.Row style={{height: '40%'}}>
-                               
+
                                 <h1 style={{textAlign:'center', fontSize: '55px', fontFamily:'Didot'}}>
-                                    Fair Trade.<br/> 
-                                    Student Owned.<br/> 
+                                    Fair Trade.<br/>
+                                    Student Owned.<br/>
+
                                     Coffee Club.
                                 </h1>
                             </Grid.Row>
@@ -109,4 +110,5 @@ class LandingPage extends React.Component {
   }
 }
 
-export default LandingPage
+export default LandingPage;
+

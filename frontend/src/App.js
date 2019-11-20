@@ -10,6 +10,10 @@ import Test from './Components/Test';
 import LandingPage from './Components/LandingPage'
 import AboutTeam from './Components/AboutTeam'
 
+import BaristaHeader from './Components/BaristaHeader';
+import LandingPage from './Components/LandingPage';
+import AboutTeam from './Components/AboutTeam';
+
 class App extends React.Component {
 
   render() {

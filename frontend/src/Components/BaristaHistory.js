@@ -44,14 +44,12 @@ class BaristaHistory extends React.Component {
                             <p>Student-Charge</p>
                         </Grid.Column>
                     </Grid.Row>
-                
-                    
                 </Grid>
             </React.Fragment>
-          
+
         );
     };
 }
 
-
 export default BaristaHistory
+

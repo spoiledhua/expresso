@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown} from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader } from 'semantic-ui-react';
 
 import MenuPage from './MenuPage';
 import OrderPage from './OrderPage';
@@ -12,32 +12,56 @@ class ClientHeader extends React.Component {
 
   state = {
     selectedPage: 'MenuPage',
-    orderNumber: null
+    shoppingCart: [],
+    id: 0,
+    loading: false
   }
 
   handleMenuItemClick = (e) => {
     // redirect to Menu Page
+    this.setState({ loading: true })
     this.setState({ selectedPage: 'MenuPage' });
-    this.setState({ orderNumber: null });
+    this.setState({ loading: false })
   }
 
   handleOrderItemClick = (e) => {
     // redirect to Order page
+    this.setState({ loading: true })
     this.setState({ selectedPage: 'OrderPage' });
-    getLastOrder().then(orderid => {
-      const display = 'Order ID: ' + orderid + ' Net ID: Victor Hua Cost: 3.5';
-      this.setState({ orderNumber: <Header>{display}</Header> });
-      });
-  }
-
-  handleLogoItemClick = (e) => {
-    // redirect to company website
-    this.setState({ selectedItem: 'Logo' });
+    this.setState({ loading: false })
   }
 
   handleUserItemClick = (e) => {
     // redirect to User page
+    this.setState({ loading: true })
     this.setState({ selectedItem: 'User' });
+    this.setState({ loading: false })
+  }
+
+  handleItemSubmit = async (item) => {
+    this.setState({ loading: true });
+    item.id = this.state.id;
+    await this.setState({ id: this.state.id + 1 });
+    await this.setState(prevState => {
+      let shoppingCart = prevState.shoppingCart;
+      shoppingCart.push(item);
+      return { shoppingCart }
+    });
+    this.setState({ loading: false });
+  }
+
+  handleRemoveItem = async (id) => {
+    this.setState({ loading: true });
+    await this.setState(prevState => {
+      let shoppingCart = prevState.shoppingCart;
+      shoppingCart = shoppingCart.filter(item => item.id != id);
+      return { shoppingCart }
+    });
+    this.setState({ loading: false });
+  }
+
+  emptyCart = () => {
+    this.setState({ shoppingCart: [] });
   }
 
   render() {
@@ -45,19 +69,20 @@ class ClientHeader extends React.Component {
     const { selectedItem } = this.state
 
     var appPages = {
-      'MenuPage': <MenuPage />,
-      'OrderPage': <OrderPage />,
-      'ItemPopUp': <ItemPopUp />,
+      'MenuPage': <MenuPage handleItemSubmit={this.handleItemSubmit}/>,
+      'OrderPage': <OrderPage shoppingCart={this.state.shoppingCart} handleRemoveItem={this.handleRemoveItem} emptyCart={this.emptyCart}/>,
       'User': <div>User</div>
     };
 
     return (
       
       <React.Fragment>
-        <Responsive minWidth={Responsive.onlyTablet.minWidth}>
+        <Dimmer active={this.state.loading} page inverted>
+          <Loader inverted>Loading</Loader>
+        </Dimmer>
         {/* Top Menu */}
         <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
-          <Menu.Item >
+          <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
             <Header as='h3' style={{ cursor: 'pointer' }}>
               <Icon name='th list'/>
               MENU
@@ -69,15 +94,12 @@ class ClientHeader extends React.Component {
               MY ORDER
             </Header>
           </Menu.Item>
+          <Menu.Item />
           <Menu.Item>
+            <Image src={logo} href="https://pucoffeeclub.com" size='tiny' style={{ cursor: 'pointer' }} />
           </Menu.Item>
-          <Menu.Item>
-            <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
-          </Menu.Item>
-          <Menu.Item>
-          </Menu.Item>
-          <Menu.Item>
-          </Menu.Item>
+          <Menu.Item />
+          <Menu.Item />
           <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
             <Header as='h3'>
               <Icon name='user'/>

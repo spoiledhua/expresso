@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Item, List } from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader, Item, List } from 'semantic-ui-react';
 
 import MenuBar from './MenuBar';
 import ClientHeader from './ClientHeader';
@@ -11,30 +11,71 @@ class MenuPage extends React.Component {
 
   state = {
     active: false,
-    drinks: []
-  }
-
-  renderMenu = () => {
-    getAllItems()
-      .then(menu => {
-        let drinks = [];
-        let food = [];
-        console.log(menu)
-        for (let i = 0; i < menu.length; i++) {
-          if (menu[i].category == 'Drink') drinks.push(menu[i]);
-          if (menu[i].category == 'Food') food.push(menu[i]);
-        }
-      this.setState({ drinks: drinks });
-      this.setState({ food: food });
-    });
+    selected: null,
+    loading: false,
+    drinks: [],
+    food: [],
+    add: []
   }
 
   componentDidMount = () => {
-    this.renderMenu();
+    this.setState({ loading: true });
+
+    getAllItems()
+      .then(menu => {
+        let allItems = new Map();
+        let addons = [];
+        for (let i = 0; i < menu.length; i++) {
+          let current = menu[i];
+          // if item is add-on, handle it differently
+          if (current.category == 'Add') {
+            let newItem = {
+              name: current.item,
+              price: current.price
+            }
+            addons.push(newItem);
+          }
+          // if item is already in dict, add the new size and price
+          if (allItems.has(current.item)) {
+            let sp = [current.size, current.price];
+            let temp = allItems.get(current.item);
+            temp.sp.push(sp);
+            allItems.set(current.item, temp);
+          }
+          // otherwise add a completely new item
+          else {
+            let newItem = {
+              name: current.item,
+              sp: [[current.size, current.price]],
+              description: current.description,
+              category: current.category
+            }
+            allItems.set(current.item, newItem);
+          }
+        }
+        // separate items into drinks or food
+        let drinks = [];
+        let food = [];
+        for (const [key, value] of allItems) {
+          if (allItems.get(key).category == 'Drink') {
+            drinks.push(allItems.get(key));
+          }
+          if (allItems.get(key).category == 'Food') {
+            food.push(allItems.get(key));
+          }
+        }
+        this.setState({ drinks: drinks });
+        this.setState({ food: food });
+        this.setState({ add: addons });
+      }
+    );
+    this.setState({ loading: false });
   }
 
-  handleClose = (e, { active }) => {
-    this.setState({ active: false });
+  handleClose = async () => {
+    this.setState({ loading: true });
+    await this.setState({ active: false });
+    this.setState({ loading: false });
   }
 
   handleDrinksMenuClick = (e) => {
@@ -45,17 +86,30 @@ class MenuPage extends React.Component {
     // speed scroll to Food
   }
 
-  handleItemClick = (e) => {
-    this.setState({ active: true })
+  handleItemClick = async (item) => {
+    this.setState({ loading: true });
+    await this.setState({ selected: item });
+    await this.setState({ active: true });
+    this.setState({ loading: false });
+
     // speed scroll to Add-ons
+  }
+
+  handleItemSubmit = async (item) => {
+    this.setState({ loading: true });
+    this.props.handleItemSubmit(item);
+    this.handleClose()
   }
 
   render() {
 
     return (
       <React.Fragment>
+        <Dimmer active={this.state.loading} inverted page>
+          <Loader inverted>Loading</Loader>
+        </Dimmer>
         <Dimmer active={this.state.active} onClickOutside={this.handleClose} page>
-          <ItemPopUp handleClose={this.handleClose}/>
+          <ItemPopUp handleClose={this.handleClose} handleItemSubmit={this.handleItemSubmit} item={this.state.selected} add={this.state.add} />
         </Dimmer>
 
         {/* Side menu
@@ -85,7 +139,7 @@ class MenuPage extends React.Component {
         */}
 
         {/* Main Content */}
-        <Grid>
+        <Grid stackable>
           <Grid.Row>
             <Grid.Column width='4'>
             </Grid.Column>
@@ -93,7 +147,7 @@ class MenuPage extends React.Component {
               <Grid divided='vertically'>
                 <Grid.Row>
                   <div style={{ height: '3vh' }} />
-                  <Header style={{ 'font-size': '3em' }}>
+                  <Header style={{ 'fontSize': '3em' }}>
                     MENU
                   </Header>
                 </Grid.Row>
@@ -105,7 +159,7 @@ class MenuPage extends React.Component {
                     <Grid>
                       {/* Drinks Section */}
                       <Grid.Row>
-                        <Header style={{ 'font-size': '2em' }}>Drinks</Header>
+                        <Header style={{ 'fontSize': '2em' }}>Drinks</Header>
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column width='1'>
@@ -113,9 +167,14 @@ class MenuPage extends React.Component {
                         <Grid.Column width='15'>
 
                           <Item.Group>
-                            {this.state.drinks.map(item => {
-                              return <MenuBar name={item} price={item} />
-                            })}
+                            {this.state.drinks.map(drink => {
+                              return (
+                                <MenuBar
+                                  id={drink.name}
+                                  handleItemClick={this.handleItemClick}
+                                  item={drink}
+                                />
+                              )})}
                           </Item.Group>
 
                         </Grid.Column>
@@ -124,7 +183,7 @@ class MenuPage extends React.Component {
                       <div style={{ height: '2em' }} />
                       {/* Food Section */}
                       <Grid.Row>
-                        <Header style={{ 'font-size': '2em' }}>Food</Header>
+                        <Header style={{ 'fontSize': '2em' }}>Food</Header>
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column width='1'>
@@ -132,9 +191,13 @@ class MenuPage extends React.Component {
                         <Grid.Column width='15'>
 
                           <Item.Group>
-                            {this.state.drinks.map(item => {
-                              return <MenuBar name={item} price={item} />
-                            })}
+                            {this.state.food.map(food => {
+                              return (
+                                <MenuBar
+                                  id={food.name}
+                                  handleItemClick={this.handleItemClick}
+                                  item={food}/>
+                              )})}
                           </Item.Group>
 
                         </Grid.Column>
