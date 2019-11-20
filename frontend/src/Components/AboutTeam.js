@@ -80,4 +80,6 @@ class AboutTeam extends React.Component {
         );
     }
 }
+
 export default AboutTeam
+

@@ -75,7 +75,7 @@ class ClientHeader extends React.Component {
     };
 
     return (
-
+      
       <React.Fragment>
         <Dimmer active={this.state.loading} page inverted>
           <Loader inverted>Loading</Loader>
@@ -84,13 +84,13 @@ class ClientHeader extends React.Component {
         <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
           <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
             <Header as='h3' style={{ cursor: 'pointer' }}>
-              <Icon name='home'/>
+              <Icon name='th list'/>
               MENU
             </Header>
           </Menu.Item>
           <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
             <Header as='h3'>
-              <Icon name='unordered list'/>
+              <Icon name='shopping bag'/>
               MY ORDER
             </Header>
           </Menu.Item>
@@ -106,7 +106,40 @@ class ClientHeader extends React.Component {
               VICTOR HUA
             </Header>
           </Menu.Item>
+        </Menu> 
+        </Responsive>
+        <Responsive {...Responsive.onlyMobile}>
+        <Menu inverted fixed="top" fluid widths={7} secondary style={{ height: '10vh', background: '#F98F69' }}>
+          <Menu.Item position='left'>
+            <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
+          </Menu.Item>
+          <Menu.Item position='right'>
+            {/* Dropdown menu */}
+            <Dropdown icon='sidebar' style={{color:'black'}}>
+              <Dropdown.Menu direction='left' style={{background: '#F98F69' }}>
+                <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
+                  <Header as='h3' style={{ cursor: 'pointer' }}>
+                    <Icon name='th list'/>
+                    MENU
+                  </Header>
+                </Dropdown.Item>
+                <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
+                  <Header as='h3'>
+                    <Icon name='shopping bag'/>
+                    MY ORDER
+                  </Header>
+                </Dropdown.Item>
+                <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
+                  <Header as='h3'>
+                    <Icon name='user'/>
+                    VICTOR HUA
+                  </Header>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Menu.Item>
         </Menu>
+        </Responsive>
         <div style={{ height: '15vh' }} />
         {appPages[this.state.selectedPage]}
       </React.Fragment>

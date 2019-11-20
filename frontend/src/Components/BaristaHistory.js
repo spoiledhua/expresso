@@ -3,7 +3,7 @@ import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Butto
 
 class BaristaHistory extends React.Component {
     render() {
-
+      
         return (
             <React.Fragment>
                 <Grid divided='vertically'>
@@ -44,8 +44,6 @@ class BaristaHistory extends React.Component {
                             <p>Student-Charge</p>
                         </Grid.Column>
                     </Grid.Row>
-
-
                 </Grid>
             </React.Fragment>
 
@@ -53,5 +51,5 @@ class BaristaHistory extends React.Component {
     };
 }
 
-
 export default BaristaHistory
+

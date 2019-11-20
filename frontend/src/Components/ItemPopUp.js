@@ -165,6 +165,7 @@ class ItemPopUp extends React.Component {
           </Card>
         </Container>
       </React.Fragment>
+
     );
   }
 }

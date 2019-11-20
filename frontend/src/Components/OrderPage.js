@@ -143,6 +143,7 @@ class OrderPage extends React.Component {
           </Grid.Row>
           {item.addons.map(addon => {
             return (
+
               <Grid.Row>
                 <Grid.Column width='1' />
                 <Grid.Column width='5'>
@@ -275,6 +276,7 @@ class OrderPage extends React.Component {
           </Card>
         </Container>
       </React.Fragment>
+
     );
   }
 }

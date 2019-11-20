@@ -47,6 +47,7 @@ class BaristaHeader extends React.Component {
                             <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoItemClick}/>
                         </Menu.Item>
                     </Menu>
+
                 </Responsive>
                 <Responsive {...Responsive.onlyMobile}>
                     <Menu inverted fixed="top" fluid secondary style={{ height: '10vh', background: '#F98F69' }}>
@@ -80,3 +81,5 @@ class BaristaHeader extends React.Component {
 
 
 export default BaristaHeader;
+
+

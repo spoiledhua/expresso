@@ -88,6 +88,7 @@ class LandingPage extends React.Component {
                                 <h1 style={{textAlign:'center', fontSize: '55px', fontFamily:'Didot'}}>
                                     Fair Trade.<br/>
                                     Student Owned.<br/>
+
                                     Coffee Club.
                                 </h1>
                             </Grid.Row>
@@ -110,3 +111,4 @@ class LandingPage extends React.Component {
 }
 
 export default LandingPage;
+
