@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-
 #---------------------------------------------------------------------------
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -19,15 +18,22 @@ class History(db.Model):
 class Details(db.Model):
     __tablename__ = 'order_details'
     id = db.Column('order_id', db.Integer, primary_key=True)
-    quantity = db.Column('item_quantity', db.Integer)
     item = db.Column('item', db.String, primary_key=True)
 
 class Menu(db.Model):
     __tablename__ = 'menu'
+    size = db.Column('size', db.String, primary_key=True)
     item = db.Column('item', db.String, primary_key=True)
     price = db.Column('price', db.Float)
     availability = db.Column('availability', db.Boolean)
     category = db.Column('category', db.String)
+    description = db.Column('description', db.String)
+
+class Images(db.Model):
+    __tablename__= 'images'
+    name = db.Column('name', db.String, primary_key=True)
+    picture = db.Column('picture', db.BLOB)
+
 #---------------------------------------------------------------------------
 # sets Flask Marshmallow Schemas
 class HistorySchema(ma.ModelSchema):
