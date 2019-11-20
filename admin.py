@@ -1,10 +1,8 @@
 from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
-from flask_cas import CAS, login_required
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import jwt_required
 from flask_sqlalchemy import SQLAlchemy
-import os
-import datetime as d
 from models import db, Menu, History, Details, MenuSchema, HistorySchema, DetailsSchema
 
 #-------------------------------------------------------------------------------
@@ -17,6 +15,31 @@ history_schema = HistorySchema()
 details_schema = DetailsSchema()
 
 #-------------------------------------------------------------------------------
+@admin.route('/admin/authenticate', methods=['POST'])
+def admin_authenticate():
+    if request.method != 'POST':
+        return jsonify(error=True), 405
+
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+
+    #username = request.json.get('username', None)
+    #password = request.json.get('password', None)
+    username = 'coffeeclub_admin'
+    password = 'SingleOrigin123'
+    __password = 'SingleOrigin123'
+    if not username:
+        return jsonify(username=None), 400
+    if not password:
+        return jsonify(username=None), 400
+    password = generate_password_hash(password)
+    if username == 'coffeeclub_admin' or check_password_hash(password, __password):
+        # Identity can be any data that is json serializable
+        return jsonify(username=username), 200
+    else:
+        return jsonify(username=None), 401
+
+#-------------------------------------------------------------------------------
 # POST request that will either upload an item and return the item
 # needs to do check that the user is called admin
 @admin.route('/admin/addinventory', methods=['POST'])
@@ -26,14 +49,14 @@ def add_inventory():
     if incoming is None:
         return jsonify(error=True), 403
     if request.method == 'POST':
-        new_item = Menu (
-            item = incoming['item'],
-            price = incoming['price'],
-            availability = incoming['availability'],
-            category = incoming['category']
-        )
-        db.session.add(new_item)
         try:
+            new_item = Menu (
+                item = incoming['item'],
+                price = incoming['price'],
+                availability = incoming['availability'],
+                category = incoming['category']
+                )
+            db.session.add(new_item)
             db.session.commit()
         except Exception as e:
             return jsonify(error=True), 408

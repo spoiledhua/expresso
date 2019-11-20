@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, jsonify, url_for, redirect, g
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 from flask_sqlalchemy import SQLAlchemy
-import os, pytz, base64
+import pytz, base64
 import datetime as d
 from models import db, Menu, History, Images, Details, MenuSchema, HistorySchema, DetailsSchema
 
@@ -25,12 +25,6 @@ incoming = {
 # initialize CAS
 #cas = CAS()
 #-------------------------------------------------------------------------------
-@customer.route('/', defaults={'path':''}, methods=['GET'])
-@customer.route('/<path:path>')
-#@login_required
-def index(path):
-    return render_template('index.html')
-#-------------------------------------------------------------------------------
 # GET Request that returns all of the items on the menu
 @customer.route('/customer/menu', methods = ['GET'])
 #@jwt_required
@@ -38,6 +32,8 @@ def populate_menu():
     items = []
     if request.method == 'GET':
         query = db.session.query(Menu).filter(Menu.category != 'Add').all()
+        if query is None:
+            return jsonify(error=True), 403
         for item in query:
             menu_item = menu_schema.dump(item)
             #print(db.session.query(Images).all())
@@ -51,12 +47,14 @@ def populate_menu():
 #-------------------------------------------------------------------------------
 #GET Request that returns all of the information about specified item
 @customer.route('/customer/menu/<item>', methods=['GET'])
-@jwt_required
+#@jwt_required
 def menu_get(item):
     items = []
     if request.method == 'GET':
         item_name = item
         query = db.session.query(Menu).filter(Menu.item==item_name).all()
+        if query is None:
+            return jsonify(error=True), 403
         for item in query:
             items.append(menu_schema.dump(item))
         return jsonify(items), 200
@@ -83,8 +81,8 @@ def place_order():
     print(incoming)
     if request.method == 'POST':
         try:
-            print(1)
-            #incoming = request.get_json()
+            #print(1)
+            incoming = request.get_json()
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
@@ -95,9 +93,8 @@ def place_order():
                 id = incoming['orderid'],
                 item = i
             )
-            db.session.add(object)
-
             try:
+                db.session.add(object)
                 db.session.commit()
                 ordered.append(object)
             except Exception as e:
@@ -114,9 +111,8 @@ def place_order():
             status = incoming['status'],
             order_status = 0
         )
-
-        db.session.add(order)
         try:
+            db.session.add(order)
             db.session.commit()
         except Exception as e:
             return jsonify(error=True), 408
@@ -132,7 +128,6 @@ def get_information():
     history = []
     if request.method == 'GET':
         try:
-            #user = CASClient().authenticate()
             user = 'dorothyz'
             order = db.session.query(History).filter_by(netid=user).\
             order_by(History.orderid.desc()).limit(1).all()

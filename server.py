@@ -8,8 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from models import db, ma, Menu, History, Details, MenuSchema, HistorySchema, DetailsSchema
-import flask_login
-import os
+import os, pytz
 import datetime as d
 
 #------------------------------------------------------------------------------

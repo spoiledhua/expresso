@@ -1,3 +1,5 @@
+
+#------------------------------------------------------------------------------
 from flask import Flask, request, render_template, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_sqlalchemy import SQLAlchemy
@@ -10,8 +12,6 @@ from admin import admin
 from models import db, ma
 import os
 from CASClient import CASClient
-
-
 #------------------------------------------------------------------------------
 app = Flask(__name__, template_folder = '.')
 CORS(app)
@@ -61,7 +61,7 @@ def get_token():
 @app.route('/<path:path>')
 #@login_required
 def index(path):
-    return render_template('index.html')
+    return jsonify(msg='You put in an invalid endpoint. Try again.'), 403
 #------------------------------------------------------------------------------
 @app.route('/authenticate', methods=['GET'])
 def authenticate():

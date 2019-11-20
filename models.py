@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-
 #---------------------------------------------------------------------------
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -34,6 +33,7 @@ class Images(db.Model):
     __tablename__= 'images'
     name = db.Column('name', db.String, primary_key=True)
     picture = db.Column('picture', db.BLOB)
+
 #---------------------------------------------------------------------------
 # sets Flask Marshmallow Schemas
 class HistorySchema(ma.ModelSchema):
