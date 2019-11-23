@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
+from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint, session
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import jwt_required
@@ -17,28 +17,71 @@ details_schema = DetailsSchema()
 
 #-------------------------------------------------------------------------------
 # POST request that reads in username and password, returns username if correct.
-@barista.route('/barista/authenticate', methods=['POST'])
+@barista.route('/barista/authenticate', methods=['GET'])
 #@jwt.authenticate
 def barista_authenticate():
-    if request.method != 'POST':
+    if request.method == 'GET':
+        incoming = request.get_json()
+        #username = incoming['username']
+        #password = incoming['password']
+        username = 'dora'
+        password = 'dora'
+        password = generate_password_hash(password)
+        __password = 'dora'
+
+        if 'user' in session:
+            return jsonify(user = session.get('username'), url = None)
+
+        else:
+            if username == 'dora' and check_password_hash(password, __password):
+                print('here')
+                session['user'] = 'dora'
+                return redirect('http://coffeeclub.princeton.edu')
+    else:
         return jsonify(error=True), 405
 
-    if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
-
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
-    __password = 'WeLoveCoffee123'
-    if not username:
-        return jsonify(username=None), 400
-    if not password:
-        return jsonify(username=None), 400
-    password = generate_password_hash(password)
-    if username == 'coffeeclub_barista' or check_password_hash(password, __password):
-        # Identity can be any data that is json serializable
-        return jsonify(username=username), 200
+#-------------------------------------------------------------------------------
+# POST request that reads in username and password, returns username if correct.
+@barista.route('/barista/getuser', methods=['GET'])
+#@jwt.authenticate
+def barista_getuser():
+    if request.method == 'GET':
+        if 'user' in session:
+            return jsonify(user=session.get('user')), 200
+        else:
+            return jsonify(user=None), 200
     else:
-        return jsonify(username=None), 401
+        return jsonify(error=True), 405
+#-------------------------------------------------------------------------------
+# GET request that returns barista username if in session
+@barista.route('/barista/getuser', methods=['GET'])
+#@jwt.authenticate
+def get_barista_user():
+    if request.method != 'GET':
+        return jsonify(error=True), 405
+    if len(session) == 0:
+        return jsonify(username = None), 200
+    if session['username'] != None:
+        return jsonify(username=session['username']), 200
+    else:
+        return jsonify(username=None), 200
+
+
+#-------------------------------------------------------------------------------
+# POST request that reads in username and password, returns username if correct.
+@barista.route('/barista/logout', methods=['GET'])
+#@jwt.authenticate
+def barista_logout():
+    if request.method != 'GET':
+        return jsonify(error=True), 405
+    try:
+        if 'user' in session:
+            session.clear()
+            return jsonify(user=None), 200
+        else:
+            return jsonify(error=True), 401
+    except Exception as e:
+        return jsonify(error=True), 403
 
 #-------------------------------------------------------------------------------
 # GET HTTP Request that gets incomplete orders from History and returns orders
@@ -46,12 +89,25 @@ def barista_authenticate():
 @barista.route('/barista/getorders', methods=['GET'])
 #@jwt_required
 def get_orders():
-    orders = []
+    current_orders = []
     if request.method == 'GET':
         query = db.session.query(History).filter(History.order_status!=2).order_by(History.time.asc()).all()
-        for items in query:
-            orders.append(history_schema.dump(items))
-        return jsonify(orders), 200
+        for orders in query:
+            items = db.session.query(Details).filter(Details.id==orders.orderid).all()
+            item_names = []
+            for item in items:
+                item_names.append(item.item)
+            barista_row = {}
+            barista_row['item'] = item_names
+            barista_row['netid'] = orders.netid
+            barista_row['time'] = orders.time
+            barista_row['orderid'] = orders.orderid
+            barista_row['status'] = orders.status
+            barista_row['cost'] = orders.cost
+            barista_row['payment'] = orders.payment
+            #print(barista_row)
+            current_orders.append(barista_row)
+        return jsonify(current_orders), 200
     else:
         return jsonify(error=True), 405
 
@@ -85,6 +141,7 @@ def paid_order(id):
         query = db.session.query(History).get(id)
         if (query.order_status == 1 or query.order_status == 0) and query.payment == 1:
             query.order_status = 2
+            query.status = 1
             try:
                 db.session.commit()
             except Exception as e:
@@ -170,13 +227,22 @@ def load_inventory():
 def get_allhistory():
     history = []
     if request.method == 'GET':
-        """incoming = request.get_json()['netid']
-        if __isauthenticated(incoming) is False:
-            return jsonify(error=True), 401"""
         query = db.session.query(History).all()
-        for item in query:
-            item = history_schema.dump(item)
-            history.append(item)
+        for orders in query:
+            items = db.session.query(Details).filter(Details.id==orders.orderid).all()
+            item_names = []
+            for item in items:
+                item_names.append(item.item)
+            barista_row = {}
+            barista_row['item'] = item_names
+            barista_row['netid'] = orders.netid
+            barista_row['time'] = orders.time
+            barista_row['orderid'] = orders.orderid
+            barista_row['status'] = orders.status
+            barista_row['cost'] = orders.cost
+            barista_row['payment'] = orders.payment
+            #print(barista_row)
+            history.append(barista_row)
         return jsonify(history), 200
     else:
         return jsonify(error=True), 405
@@ -187,15 +253,24 @@ def get_allhistory():
 #@jwt_required
 def get_dayhistory():
     history = []
-    yesterday = datetime.date.fromordinal(datetime.date.today().toordinal()-1)
+    yesterday = datetime.date.fromordinal(datetime.date.today().toordinal())
     if request.method == 'GET':
-        """incoming = request.get_json()['netid']
-        if __isauthenticated(incoming) is False:
-            return jsonify(error=True), 401"""
         query = db.session.query(History).filter(History.time > yesterday).all()
-        for item in query:
-            item = history_schema.dump(item)
-            history.append(item)
+        for orders in query:
+            items = db.session.query(Details).filter(Details.id==orders.orderid).all()
+            item_names = []
+            for item in items:
+                item_names.append(item.item)
+            barista_row = {}
+            barista_row['item'] = item_names
+            barista_row['netid'] = orders.netid
+            barista_row['time'] = orders.time
+            barista_row['orderid'] = orders.orderid
+            barista_row['status'] = orders.status
+            barista_row['cost'] = orders.cost
+            barista_row['payment'] = orders.payment
+            #print(barista_row)
+            history.append(barista_row)
         return jsonify(history), 200
     else:
         return jsonify(error=True), 405
