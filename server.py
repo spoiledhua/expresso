@@ -64,12 +64,13 @@ def get_token():
 #-------------------------------------------------------------------------------
 @app.route('/', defaults={'path':''}, methods=['GET'])
 @app.route('/<path:path>')
-#@login_required
+@login_required
 def index(path):
     return jsonify(msg='You put in an invalid endpoint. Try again.'), 403
 
 #------------------------------------------------------------------------------
 @app.route('/logout', methods=['GET'])
+@login_required
 def logout():
     if request.method == 'GET':
         return jsonify(url=CASClient().logout()), 201
@@ -78,6 +79,7 @@ def logout():
         return jsonify(error=True), 403
 #------------------------------------------------------------------------------
 @app.route('/getuser', methods=['GET', 'OPTIONS'])
+@login_required
 def getuser():
     if request.method == 'GET':
         ret = CASClient().get_user()
@@ -91,6 +93,7 @@ def getuser():
         return jsonify(error=True), 403
 #------------------------------------------------------------------------------
 @app.route('/authenticate', methods=['GET', 'OPTIONS'])
+@login_required
 def authenticate():
     if request.method == 'GET':
         ret = CASClient().authenticate()
@@ -160,14 +163,14 @@ def place_order():
     ordered = []
     if request.method == 'POST':
         try:
-            incoming = request.get_json()
+            #incoming = request.get_json()
             print(incoming)
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
             return jsonify(error=True), 400
 
-        currenttime = datetime.datetime.now()
+        currenttime = d.datetime.now()
         timezone = pytz.timezone("America/New_York")
         d_aware = timezone.localize(currenttime)
         order = History(
@@ -194,9 +197,14 @@ def place_order():
                     addon_list += ', ' + add['name']
                 count += 1
             if i['sp'][0] == 'Small' or i['sp'][0] == 'Large':
-                item_detail = i['sp'][0] + ' ' + i['item']['name'] + ' w/ ' + addon_list
+                item_detail = i['sp'][0] + ' ' + i['item']['name']
+                if len(addon_list) > 0:
+                    item_detail += ' w/ ' + addon_list
             else:
-                item_detail = i['item']['name'] + ' w/' + addon_list
+                item_detail = i['item']['name']
+                if len(addon_list) > 0:
+                    item_detail += ' w/ ' + addon_list
+            print(item_detail)
             object = Details(
                 id = query.orderid,
                 item = item_detail
