@@ -1,6 +1,5 @@
-
 #------------------------------------------------------------------------------
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, redirect
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
@@ -14,7 +13,7 @@ import os
 from CASClient import CASClient
 #------------------------------------------------------------------------------
 app = Flask(__name__, template_folder = '.')
-CORS(app)
+CORS(app, supports_credentials=True)
 app.register_blueprint(customer)
 app.register_blueprint(barista)
 app.register_blueprint(admin)
@@ -25,8 +24,6 @@ config = {
     'SQLALCHEMY_DATABASE_URI': 'mysql+pymysql://ccmobile_ccmobile_dora:COS333Account@198.199.71.236/ccmobile_coffee_club',
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
     'JWT_SECRET_KEY': 'testkey',
-    'CAS_SERVER': 'https://fed.princeton.edu',
-    'CAS_AFTER_LOGIN': '/customer'
 }
 
 app.secret_key = "coffeelovers4ever"
@@ -62,20 +59,39 @@ def get_token():
 #@login_required
 def index(path):
     return jsonify(msg='You put in an invalid endpoint. Try again.'), 403
-#------------------------------------------------------------------------------
-@app.route('/authenticate', methods=['GET'])
-def authenticate():
-    if request.method == 'GET':
-        username = CASClient().authenticate()
-        return jsonify(netid=username), 200
-    else:
-        return jsonify(error=True), 403
+
 #------------------------------------------------------------------------------
 @app.route('/logout', methods=['GET'])
 def logout():
     if request.method == 'GET':
-        username = CASClient().logout()
-        return jsonify(logout = True), 200
+        return jsonify(url=CASClient().logout()), 201
+        #return jsonify(logout = True), 200
+    else:
+        return jsonify(error=True), 403
+#------------------------------------------------------------------------------
+@app.route('/getuser', methods=['GET', 'OPTIONS'])
+def getuser():
+    if request.method == 'GET':
+        ret = CASClient().get_user()
+        user = None
+        if ret[0] is not None:
+            user = ret[0]
+        elif ret[1] is not None:
+            return jsonify(error=True), 400
+        return jsonify(user=user), 200
+    else:
+        return jsonify(error=True), 403
+#------------------------------------------------------------------------------
+@app.route('/authenticate', methods=['GET', 'OPTIONS'])
+def authenticate():
+    if request.method == 'GET':
+        ret = CASClient().authenticate()
+        if ret[0] is None and ret[1] is not None:
+            return jsonify(user = ret[0], url = ret[1]), 200
+        elif ret[0] is not None and ret[1] is not None:
+            return jsonify(user = ret[0], url = 'http://localhost:3000'), 200
+        else:
+            return redirect('http://localhost:3000/menu')
     else:
         return jsonify(error=True), 403
 #------------------------------------------------------------------------------
