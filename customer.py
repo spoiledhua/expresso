@@ -15,13 +15,23 @@ history_schema = HistorySchema()
 details_schema = DetailsSchema()
 
 incoming = {
-    'netid': 'dorothyz',
+    'netid': 'vhua',
     'orderid': 11,
     'cost': 8.50,
     'payment': True,
     'status': False,
-    'items': ['S Chai Latte', 'Hot Coffee']
-}
+    'items': [
+        {  'item': {
+                'name': 'Coffee'
+            },
+            'addons': [
+                {
+                'name': ''
+                }],
+            'sp': 'Small'
+        }]
+    }
+
 # initialize CAS
 #cas = CAS()
 #-------------------------------------------------------------------------------
@@ -31,14 +41,14 @@ incoming = {
 def populate_menu():
     items = []
     if request.method == 'GET':
-        query = db.session.query(Menu).filter(Menu.category != 'Add').all()
+        query = db.session.query(Menu).all()
         if query is None:
             return jsonify(error=True), 403
         for item in query:
             menu_item = menu_schema.dump(item)
             #print(db.session.query(Images).all())
-            picture = db.session.query(Images).filter(Images.name==item.item).all()[0].picture
-            menu_item['image'] = base64.b64encode(picture).decode('utf-8')
+            #picture = db.session.query(Images).filter(Images.name==item.item).all()[0].picture
+            #menu_item['image'] = base64.b64encode(picture).decode('utf-8')
             items.append(menu_item)
         return jsonify(items), 200
     else:
@@ -78,33 +88,20 @@ def order_id():
 #@jwt_required
 def place_order():
     ordered = []
-    print(incoming)
     if request.method == 'POST':
         try:
-            #print(1)
             incoming = request.get_json()
+            print(incoming)
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
             return jsonify(error=True), 400
 
-        for i in incoming['items']:
-            object = Details(
-                id = incoming['orderid'],
-                item = i
-            )
-            try:
-                db.session.add(object)
-                db.session.commit()
-                ordered.append(object)
-            except Exception as e:
-                return jsonify(error=True), 408
         currenttime = d.datetime.now()
         timezone = pytz.timezone("America/New_York")
         d_aware = timezone.localize(currenttime)
         order = History(
             netid = incoming['netid'],
-            orderid = incoming['orderid'],
             time = d_aware,
             cost = incoming['cost'],
             payment = incoming['payment'],
@@ -116,6 +113,35 @@ def place_order():
             db.session.commit()
         except Exception as e:
             return jsonify(error=True), 408
+        query = db.session.query(History).order_by(History.orderid.desc()).first()
+        for i in incoming['items']:
+            addon_list = ''
+            count = 0
+            for add in i['addons']:
+                if count is 0:
+                    addon_list += add['name']
+                else:
+                    addon_list += ', ' + add['name']
+                count += 1
+            if i['sp'][0] == 'Small' or i['sp'][0] == 'Large':
+                item_detail = i['sp'][0] + ' ' + i['item']['name']
+                if len(addon_list) > 0:
+                    item_detail += ' w/ ' + addon_list
+            else:
+                item_detail = i['item']['name']
+                if len(addon_list) > 0:
+                    item_detail += ' w/ ' + addon_list
+            print(item_detail)
+            object = Details(
+                id = query.orderid,
+                item = item_detail
+            )
+            try:
+                db.session.add(object)
+                db.session.commit()
+                ordered.append(object)
+            except Exception as e:
+                return jsonify(error='True'), 408
         return jsonify(history_schema.dump(order)), 201
     else:
         return jsonify(error=True), 405
@@ -128,7 +154,7 @@ def get_information():
     history = []
     if request.method == 'GET':
         try:
-            user = 'dorothyz'
+            user = 'vhua'
             order = db.session.query(History).filter_by(netid=user).\
             order_by(History.orderid.desc()).limit(1).all()
             for item in order:
@@ -142,24 +168,27 @@ def get_information():
 
 #-------------------------------------------------------------------------------
 # GET Request that returns last order
-@customer.route('/customer/orderhistory', methods = ['GET'])
-@jwt_required
-def get_history():
-    history = []
+@customer.route('/customer/<netid>/orderhistory', methods = ['GET'])
+#@jwt_required
+def get_history(netid):
+    past_orders = []
     if request.method == 'GET':
-        try:
-            user = CASClient().authenticate()
-        except Exception as e:
-            return jsonify(error=True), 400
-        #user = 'victorhua'
-        try:
-            order = db.session.query(History).filter_by(netid=user).\
-            order_by(History.orderid.desc()).all()
-            for item in order:
-                item = history_schema.dump(item)
-                history.append(item)
-            return jsonify(history), 200
-        except Exception as e:
-            return jsonify(error=True), 408
+        query = db.session.query(History).filter_by(netid=netid).order_by(History.orderid.desc()).all()
+        for orders in query:
+            items = db.session.query(Details).filter(Details.id==orders.orderid).all()
+            item_names = []
+            for item in items:
+                item_names.append(item.item)
+            barista_row = {}
+            barista_row['item'] = item_names
+            barista_row['netid'] = orders.netid
+            barista_row['time'] = orders.time
+            barista_row['orderid'] = orders.orderid
+            barista_row['status'] = orders.status
+            barista_row['cost'] = orders.cost
+            barista_row['payment'] = orders.payment
+            #print(barista_row)
+            past_orders.append(barista_row)
+        return jsonify(past_orders), 200
     else:
         return jsonify(error=True), 405

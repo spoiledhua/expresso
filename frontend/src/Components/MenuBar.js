@@ -4,32 +4,9 @@ import { Grid, Item, Header, List } from 'semantic-ui-react';
 import * as cappuccino from '../Assets/cappuccino.jpeg';
 import * as coffee from '../Assets/coffee.jpeg';
 import * as latte from '../Assets/latte.jpeg';
-import { getLastOrder, postMakeOrder } from '../Axios/axios_getter';
+import { postMakeOrder } from '../Axios/axios_getter';
 
 class MenuBar extends React.Component {
-
-  handleItemClick = () => {
-
-    getLastOrder()
-    .then(lastOrder => {
-      //const nextid = orderid + 1;
-      const update = {
-         items: ['Latte'],
-         quantity: '1',
-         orderid: '0'
-       };
-      postMakeOrder(update);
-    })
-    .catch(error => {
-      const firstOrder = {
-        items: ['Latte'],
-        quantity: '1',
-        orderid: 1
-      };
-      postMakeOrder(firstOrder);
-    });
-
-  }
 
   render() {
 

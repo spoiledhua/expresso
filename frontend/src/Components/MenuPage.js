@@ -2,10 +2,9 @@ import React from 'react';
 import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader, Item, List } from 'semantic-ui-react';
 
 import MenuBar from './MenuBar';
-import ClientHeader from './ClientHeader';
 import ItemPopUp from './ItemPopUp';
 
-import { getAllItems } from '../Axios/axios_getter';
+import { getAllItems, authenticate } from '../Axios/axios_getter';
 
 class MenuPage extends React.Component {
 
@@ -109,7 +108,9 @@ class MenuPage extends React.Component {
           <Loader inverted>Loading</Loader>
         </Dimmer>
         <Dimmer active={this.state.active} onClickOutside={this.handleClose} page>
-          <ItemPopUp handleClose={this.handleClose} handleItemSubmit={this.handleItemSubmit} item={this.state.selected} add={this.state.add} />
+          <Container style={{ width: '720px' }}>
+            <ItemPopUp handleClose={this.handleClose} handleItemSubmit={this.handleItemSubmit} item={this.state.selected} add={this.state.add} />
+          </Container>
         </Dimmer>
 
         {/* Side menu

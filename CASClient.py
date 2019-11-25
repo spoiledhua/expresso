@@ -2,7 +2,6 @@
 # CASClient.py
 # Authors: Alex Halderman, Scott Karlin, Brian Kernighan, Bob Dondero
 #-----------------------------------------------------------------------
-
 from urllib.request import urlopen
 from urllib.parse import quote
 from re import sub, match
@@ -43,6 +42,7 @@ class CASClient:
         val_url = self.cas_url + "validate" + \
             '?service=' + quote(self.stripTicket()) + \
             '&ticket=' + quote(ticket)
+        print(val_url)
         r = urlopen(val_url).readlines()   # returns 2 lines
         if len(r) != 2:
             return None
@@ -58,12 +58,11 @@ class CASClient:
     # Do not return unless the user is successfully authenticated.
 
     def authenticate(self):
-
+        print(session)
+        if 'username' in session:
+            return (session.get('username'), None)
         # If the user's username is in the session, then the user was
         # authenticated previously.  So return the user's username.
-        if 'username' in session:
-            return session.get('username')
-
         # If the request contains a login ticket, then try to
         # validate it.
         ticket = request.args.get('ticket')
@@ -73,23 +72,31 @@ class CASClient:
                 # The user is authenticated, so store the user's
                 # username in the session.
                 session['username'] = username
-                return username
+                return (username, None)
 
         # The request does not contain a valid login ticket, so
         # redirect the browser to the login page to get one.
         login_url = self.cas_url + 'login' \
             + '?service=' + quote(self.stripTicket())
-
-        abort(redirect(login_url))
+            #quote('http://localhost:3000')
+            #quote(self.stripTicket())
+        return (None, login_url)
 
     #-------------------------------------------------------------------
-
 
     def logout(self):
         session.clear()
         login_url = self.cas_url + 'logout'
+        return login_url
 
-        abort(redirect(login_url))
+    #-------------------------------------------------------------------
+
+    def get_user(self):
+        if 'username' in session:
+            return (session.get('username'),None)
+        else:
+            return (None, None)
+
 
 #-----------------------------------------------------------------------
 

@@ -66,104 +66,102 @@ class ItemPopUp extends React.Component {
 
     return (
       <React.Fragment>
-        <Container style={{ width: '720px' }}>
-          <Card fluid>
-            <Card.Content>
-              <Grid stackable>
-                <Grid.Row textAlign='right'>
-                  <Grid.Column>
-                    <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleClose}/>
-                  </Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column width='3'>
-                  </Grid.Column>
-                  <Grid.Column width='10'>
-                    <Item.Group>
-                      <Item>
-                        <Item.Image src={cappuccino} />
+        <Card fluid>
+          <Card.Content>
+            <Grid stackable>
+              <Grid.Row textAlign='right'>
+                <Grid.Column>
+                  <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleClose}/>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column width='3'>
+                </Grid.Column>
+                <Grid.Column width='10'>
+                  <Item.Group>
+                    <Item>
+                      <Item.Image src={cappuccino} />
 
-                        <Item.Content verticalAlign='middle'>
-                          <Item.Header as='a'>{this.props.item.name}</Item.Header>
-                          <Item.Meta>{this.props.item.description}</Item.Meta>
-                        </Item.Content>
-                      </Item>
-                    </Item.Group>
-                  </Grid.Column>
-                  <Grid.Column width='3'>
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Card.Content>
-            <Card.Content>
-              <Grid stackable>
-                <Grid.Row>
-                  <Grid.Column width='4'>
-                  </Grid.Column>
-                  <Grid.Column width='8' textAlign='left'>
-                    <Header as='h3'>SIZE</Header>
-                    <Form>
-                      {item.sp.map(sizePrice => {
-                        return (
-                          <Form.Field>
-                            <Radio
-                              id={sizePrice[0]}
-                              label={sizePrice[0] + " ($" + Number(sizePrice[1]).toFixed(2) + ")"}
-                              name='size'
-                              checked={this.state.sizePrice[0] == sizePrice[0]}
-                              onChange={() => this.selectSize(sizePrice)} />
-                          </Form.Field>
-                        )
-                      })}
-                    </Form>
-                  </Grid.Column>
-                  <Grid.Column width='4'>
-                  </Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column width='4'>
-                  </Grid.Column>
-                  <Grid.Column width='8' textAlign='left'>
-                    <Header as='h3'>ADD-ONS</Header>
-                    <Form>
-                      {add.map(add => {
-                        return (
-                          <Form.Field>
-                            <Checkbox
-                              id={add.name}
-                              label={add.name + " (+ $" + Number(add.price).toFixed(2) + ")"}
-                              name='add'
-                              onClick={() => this.handleAddon(add)} />
-                          </Form.Field>
-                        )
-                      })}
-                    </Form>
-                  </Grid.Column>
-                  <Grid.Column width='4'>
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Card.Content>
-            <Card.Content>
-              <Grid stackable padded>
-                <Grid.Row>
-                  <Grid.Column width='4'>
-                  </Grid.Column>
-                  <Grid.Column width='4' textAlign='left' verticalAlign='middle'>
-                    <Header as='h3' color='grey'>{"$" + this.state.totalPrice.toFixed(2)}</Header>
-                  </Grid.Column>
-                  <Grid.Column width='4' textAlign='center' verticalAlign='middle'>
-                    <Button onClick={() => this.props.handleItemSubmit(this.state.finalOrder)}>
-                      ADD ITEM
-                    </Button>
-                  </Grid.Column>
-                  <Grid.Column width='4'>
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Card.Content>
-          </Card>
-        </Container>
+                      <Item.Content verticalAlign='middle'>
+                        <Item.Header as='a'>{this.props.item.name}</Item.Header>
+                        <Item.Meta>{this.props.item.description}</Item.Meta>
+                      </Item.Content>
+                    </Item>
+                  </Item.Group>
+                </Grid.Column>
+                <Grid.Column width='3'>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Card.Content>
+          <Card.Content>
+            <Grid stackable>
+              <Grid.Row>
+                <Grid.Column width='4'>
+                </Grid.Column>
+                <Grid.Column width='8' textAlign='left'>
+                  <Header as='h3'>SIZE</Header>
+                  <Form>
+                    {item.sp.map(sizePrice => {
+                      return (
+                        <Form.Field>
+                          <Radio
+                            id={sizePrice[0]}
+                            label={sizePrice[0] + " ($" + Number(sizePrice[1]).toFixed(2) + ")"}
+                            name='size'
+                            checked={this.state.sizePrice[0] == sizePrice[0]}
+                            onChange={() => this.selectSize(sizePrice)} />
+                        </Form.Field>
+                      )
+                    })}
+                  </Form>
+                </Grid.Column>
+                <Grid.Column width='4'>
+                </Grid.Column>
+              </Grid.Row>
+              <Grid.Row>
+                <Grid.Column width='4'>
+                </Grid.Column>
+                <Grid.Column width='8' textAlign='left'>
+                  <Header as='h3'>ADD-ONS</Header>
+                  <Form>
+                    {add.map(add => {
+                      return (
+                        <Form.Field>
+                          <Checkbox
+                            id={add.name}
+                            label={add.name + " (+ $" + Number(add.price).toFixed(2) + ")"}
+                            name='add'
+                            onClick={() => this.handleAddon(add)} />
+                        </Form.Field>
+                      )
+                    })}
+                  </Form>
+                </Grid.Column>
+                <Grid.Column width='4'>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Card.Content>
+          <Card.Content>
+            <Grid stackable padded>
+              <Grid.Row>
+                <Grid.Column width='4'>
+                </Grid.Column>
+                <Grid.Column width='4' textAlign='left' verticalAlign='middle'>
+                  <Header as='h3' color='grey'>{"$" + this.state.totalPrice.toFixed(2)}</Header>
+                </Grid.Column>
+                <Grid.Column width='4' textAlign='center' verticalAlign='middle'>
+                  <Button onClick={() => this.props.handleItemSubmit(this.state.finalOrder)}>
+                    ADD ITEM
+                  </Button>
+                </Grid.Column>
+                <Grid.Column width='4'>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Card.Content>
+        </Card>
       </React.Fragment>
 
     );

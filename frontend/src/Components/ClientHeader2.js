@@ -6,7 +6,6 @@ import OrderPage from './OrderPage';
 import ItemPopUp from './ItemPopUp';
 
 import * as logo from '../Assets/logo.png';
-import { getLastOrder } from '../Axios/axios_getter';
 
 class ClientHeader extends React.Component {
 
@@ -19,15 +18,6 @@ class ClientHeader extends React.Component {
     // redirect to Menu Page
     this.setState({ selectedPage: 'MenuPage' });
     this.setState({ orderNumber: null });
-  }
-
-  handleOrderItemClick = (e) => {
-    // redirect to Order page
-    this.setState({ selectedPage: 'OrderPage' });
-    getLastOrder().then(orderid => {
-      const display = 'Order ID: ' + orderid + ' Net ID: Victor Hua Cost: 3.5';
-      this.setState({ orderNumber: <Header>{display}</Header> });
-      });
   }
 
   handleLogoItemClick = (e) => {

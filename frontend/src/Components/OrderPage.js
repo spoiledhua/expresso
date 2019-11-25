@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Icon, Image, Container, Header, Grid, Button, Radio, Form, Divider, Dimmer, Loader, Segment } from 'semantic-ui-react';
 
-import { getLastOrder, postMakeOrder } from '../Axios/axios_getter';
+import { getLastOrder } from '../Axios/axios_getter';
 
 class OrderPage extends React.Component {
 
@@ -18,7 +18,7 @@ class OrderPage extends React.Component {
     }
 
     this.state = {
-      payment: null,
+      payment: true,
       totalPrice: price,
       toBeRemoved: null,
       emptyPopUp: false,
@@ -51,60 +51,26 @@ class OrderPage extends React.Component {
     this.handleCloseConfirmRemove();
   }
 
-  selectPayment = (e, { label }) => {
-    this.setState({ payment: label});
+  selectPayment = (payment) => {
+    this.setState({ payment: payment });
   }
 
   handlePlaceOrder = () => {
     this.setState({ confirm: true });
   }
 
-  handleConfirm = () => {
+  handleConfirm = async () => {
     let { shoppingCart } = this.props;
     this.setState({ loading: true });
-    if (shoppingCart.length == 0) {
+    if (this.props.shoppingCart.length == 0)
       this.setState({ emptyPopUp: true });
-    }
     else {
-      getLastOrder()
-      .then(lastOrder => {
-        const orderid = Number(lastOrder.orderid);
-        const nextid = orderid + 1;
-        let itemNames = [];
-        for (let i = 0; i < shoppingCart.length; i++) {
-          itemNames.push(shoppingCart[i].item.name);
-        }
-        const update = {
-          netid: 'vhua',
-          orderid: nextid,
-          cost: this.state.totalPrice,
-          payment: true,
-          status: false,
-          items: itemNames
-        };
-        postMakeOrder(update);
-      })
-      .catch(error => {
-        console.log(error)
-        let itemNames = [];
-        for (let i = 0; i < shoppingCart.length; i++) {
-          itemNames.push(shoppingCart[i].item.name);
-        }
-        const firstOrder = {
-          netid: 'vhua',
-          orderid: 1,
-          cost: this.state.totalPrice,
-          payment: true,
-          status: false,
-          items: itemNames
-        };
-        postMakeOrder(firstOrder);
-      });
+      await this.props.postOrder(this.state.payment);
     }
-    this.handleCloseConfirm();
-    this.props.emptyCart();
-    this.setState({ totalPrice: 0 })
-    this.setState({ loading: false });
+    await this.handleCloseConfirm();
+    await this.props.emptyCart();
+    await this.setState({ totalPrice: 0 })
+    await this.setState({ loading: false });
   }
 
   handleCloseEmpty = () => {
@@ -123,9 +89,9 @@ class OrderPage extends React.Component {
   render() {
 
     let currentOrder = (this.props.shoppingCart == 0) ?
-    <React.Fragment>
+    <Header as='h3'>
       Your order will show up here!
-    </React.Fragment> :
+    </Header> :
 
     this.props.shoppingCart.map(item => {
       return (
@@ -214,6 +180,8 @@ class OrderPage extends React.Component {
         <Dimmer active={this.state.loading} page inverted>
           <Loader inverted>Loading</Loader>
         </Dimmer>
+
+        {/* Main component */}
         <Container style={{ width: '720px' }}>
           <Card fluid>
             <Card.Content>
@@ -251,16 +219,16 @@ class OrderPage extends React.Component {
                         <Radio
                           label='Student Charge'
                           name='payment'
-                          checked={this.state.payment === 'Student Charge'}
-                          onChange={this.selectPayment}
+                          checked={this.state.payment}
+                          onChange={() => this.selectPayment(true)}
                         />
                       </Form.Field>
                       <Form.Field>
                         <Radio
                           label='Pay at Store'
                           name='payment'
-                          checked={this.state.payment === 'Pay at Store'}
-                          onChange={this.selectPayment}
+                          checked={!this.state.payment}
+                          onChange={() => this.selectPayment(false)}
                         />
                       </Form.Field>
                     </Form>
