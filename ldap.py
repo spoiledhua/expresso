@@ -5,6 +5,7 @@ from sys import stderr
 
 # When adding new attributes, make sure to add a new get_'attribute' function and add it to get_all
 class LDAP:
+
     def __init__(self):
         self._connection = None
 
@@ -26,11 +27,12 @@ class LDAP:
     def disconnect_LDAP(self):
         self._connection.unbind()
 
-    def get_all(self, puid):
-        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % puid,
-                                          attributes=['universityid', 'displayname', 'sn', 'givenname', 'mail'])
+    def get_all(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
+                                          attributes=['universityid', 'displayname', 'sn', 'givenname', 'mail',
+                                                      'pustatus', 'puclassyear'])
 
-        attributeName = ('universityid', 'displayname', 'sn', 'givenname', 'mail')
+        attributeName = ('displayname', 'sn', 'givenname', 'mail', 'pustatus', 'puclassyear')
         result = []
 
         if success:
@@ -41,66 +43,98 @@ class LDAP:
 
         return result
 
-    def get_id(self, puid):
-        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % puid,
+    def get_id(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['universityid'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['universityid'][0])
+            result = self._connection.entries[0]['universityid'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
         return result
 
-    def get_displayname(self, puid):
-        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % puid,
+    def get_displayname(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['displayname'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['displayname'][0])
+            result = self._connection.entries[0]['displayname'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
         return result
 
-    def get_givenname(self, puid):
-        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % puid,
+    def get_givenname(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['givenname'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['givenname'][0])
+            result = self._connection.entries[0]['givenname'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
         return result
 
-    def get_sn(self, puid):
-        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % puid,
+    def get_sn(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['sn'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['sn'][0])
+            result = self._connection.entries[0]['sn'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
         return result
 
-    def get_mail(self, puid):
-        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % puid,
+    def get_mail(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['mail'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['mail'][0])
+            result = self._connection.entries[0]['mail'][0]
+            result = result.strip()
+        else:
+            print("Search failed", file=stderr)
+
+        return result
+
+    def get_pustatus(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
+                                          attributes=['pustatus'])
+
+        result = ''
+
+        if success:
+            result = self._connection.entries[0]['pustatus'][0]
+            result = result.strip()
+        else:
+            print("Search failed", file=stderr)
+
+        return result
+
+    def get_puclassyear(self, netid):
+        success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
+                                          attributes=['puclassyear'])
+
+        result = 0
+
+        if success:
+            result = self._connection.entries[0]['puclassyear'][0]
         else:
             print("Search failed", file=stderr)
 
@@ -112,8 +146,8 @@ def main():
     conn.connect_LDAP()
     searchResults = conn.get_all("jk30")
     print(searchResults)
-    searchResults = conn.get_id("jk30")
-    print(searchResults)
+    #searchResults = conn.get_id("jk30")
+    #print(searchResults)
     searchResults = conn.get_displayname("jk30")
     print(searchResults)
     searchResults = conn.get_givenname("jk30")
@@ -121,6 +155,8 @@ def main():
     searchResults = conn.get_sn("jk30")
     print(searchResults)
     searchResults = conn.get_mail("jk30")
+    print(searchResults)
+    searchResults = conn.get_puclassyear("jk30")
     print(searchResults)
     conn.disconnect_LDAP()
 
