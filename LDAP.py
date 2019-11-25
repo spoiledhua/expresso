@@ -47,10 +47,11 @@ class LDAP:
         success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['universityid'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['universityid'][0])
+            result = self._connection.entries[0]['universityid'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
@@ -60,10 +61,11 @@ class LDAP:
         success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['displayname'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['displayname'][0])
+            result = self._connection.entries[0]['displayname'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
@@ -73,10 +75,11 @@ class LDAP:
         success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['givenname'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['givenname'][0])
+            result = self._connection.entries[0]['givenname'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
@@ -86,10 +89,11 @@ class LDAP:
         success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['sn'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['sn'][0])
+            result = self._connection.entries[0]['sn'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
@@ -99,10 +103,11 @@ class LDAP:
         success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['mail'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['mail'][0])
+            result = self._connection.entries[0]['mail'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
@@ -112,10 +117,11 @@ class LDAP:
         success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['pustatus'])
 
-        result = []
+        result = ''
 
         if success:
-            result.append(self._connection.entries[0]['pustatus'][0])
+            result = self._connection.entries[0]['pustatus'][0]
+            result = result.strip()
         else:
             print("Search failed", file=stderr)
 
@@ -125,10 +131,10 @@ class LDAP:
         success = self._connection.search('o=Princeton University,c=US', '(uid=%s)' % netid,
                                           attributes=['puclassyear'])
 
-        result = []
+        result = 0
 
         if success:
-            result.append(self._connection.entries[0]['puclassyear'][0])
+            result = self._connection.entries[0]['puclassyear'][0]
         else:
             print("Search failed", file=stderr)
 
@@ -150,9 +156,6 @@ def main():
     print(searchResults)
     searchResults = conn.get_mail("jk30")
     print(searchResults)
-    searchResults = conn.get_pustatus("jk30")[0]
-    print(searchResults)
-    print(searchResults != 'undergraduate')
     searchResults = conn.get_puclassyear("jk30")
     print(searchResults)
     conn.disconnect_LDAP()

@@ -34,6 +34,7 @@ def charge(pay_file):
     last = date + " 23:59:59"
     sql = "SELECT * FROM order_history WHERE timestamp BETWEEN %s and %s"
     val = (first, last)
+    print(val)
     try:
         mycursor.execute(sql, val)
     except Exception as e:
@@ -44,8 +45,8 @@ def charge(pay_file):
     while row is not None:
         netid = row[0]
         paid = row[5]
-        puclassyear = conn.get_puclassyear()[0]
-        pustatus = conn.get_pustatus()[0]
+        puclassyear = conn.get_puclassyear(netid)
+        pustatus = conn.get_pustatus(netid)
 
         if pustatus != 'undergraduate':
             row = mycursor.fetchone()
@@ -64,7 +65,7 @@ def charge(pay_file):
         if not paid:
             cost = str(row[3])
             cost = cost.replace('.', '')
-            pay_file.write('C,%s,110,--%s, Coffee Club\n' % (netid, cost))
+            pay_file.write('C,%s,110,--%s,Coffee Club\n' % (netid, cost))
 
         row = mycursor.fetchone()
 
