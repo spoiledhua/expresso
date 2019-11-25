@@ -51,12 +51,14 @@ class BaristaOrders extends React.Component {
 
     const { allOrders } = this.state;
 
-    let pendingOrders = (allOrders.length == 0) ?
+    let pendingOrders = (allOrders.length === 0) ?
     <Header as='h3'>
       :)
     </Header> :
 
+  
     this.state.allOrders.map(order => {
+      if (order.payment) {
       return (
         <React.Fragment>
           <Grid.Row>
@@ -75,19 +77,65 @@ class BaristaOrders extends React.Component {
               <h3 style={{margin: '0'}}>{order.netid}</h3>
               <p>{order.time}</p>
             </Grid.Column>
-            <Grid.Column width='3' verticalAlign='middle'>
-              <Button circular onClick={() => this.handleInProgress(order.orderid)} style={{background: '#F98F69'}}>IN PROGRESS</Button>
+            <Grid.Column width='2' verticalAlign='middle'>
+              {/* disable in progress button after order is in progress*/}
+              <Button circular disabled={order.status === 1} onClick={() => this.handleInProgress(order.orderid)} style={{background: '#F98F69'}}>IN PROGRESS</Button>
             </Grid.Column>
-            <Grid.Column width='3' verticalAlign='middle'>
+            <Grid.Column width='2' verticalAlign='middle'>
               <Button circular onClick={() => this.handleComplete(order.orderid)} style={{background: '#B7E4A9'}}>COMPLETE</Button>
             </Grid.Column>
-            <Grid.Column width='2' verticalAlign='middle' >
-              <h3 style={{margin:'0', textAlign:'center'}}>{'$' + order.cost.toFixed(2)}</h3>
+           
+            <Grid.Column width='2'verticalAlign='middle' textAlign='center'> 
+              Student-Charge
+              <h3 style={{margin:'0'}}>{'$' + order.cost.toFixed(2)}</h3>
+            </Grid.Column>
+            <Grid.Column width='2' verticalAlign='middle' textAlign='center'>
+              <h2>PAID</h2>
+            </Grid.Column>
+          </Grid.Row>
+        </React.Fragment>
+      
+      ) }
+      else {
+        return (
+          <React.Fragment>
+          <Grid.Row>
+            <Grid.Column verticalAlign='middle' width='2' style={{textAlign:'center'}}>
+              <h1>{order.orderid}</h1>
+            </Grid.Column>
+            <Grid.Column width='6'>
+              {order.item.map(subitem => {
+                return (
+                  <React.Fragment>
+                    <h2 style={{margin: '0'}}>{subitem}</h2>
+                    <Divider />
+                  </React.Fragment>
+                )
+              })}
+              <h3 style={{margin: '0'}}>{order.netid}</h3>
+              <p>{order.time}</p>
+            </Grid.Column>
+            <Grid.Column width='2' verticalAlign='middle'>
+              {/* disable in progress button after order is in progress*/}
+              <Button circular disabled={order.status === 1} onClick={() => this.handleInProgress(order.orderid)} style={{background: '#F98F69'}}>IN PROGRESS</Button>
+            </Grid.Column>
+            <Grid.Column width='2' verticalAlign='middle'>
+              <Button circular onClick={() => this.handleComplete(order.orderid)} style={{background: '#B7E4A9'}}>COMPLETE</Button>
+            </Grid.Column>
+           
+            <Grid.Column width='2'verticalAlign='middle' textAlign='center'> 
+              Pay In-Store
+              <h3 style={{margin:'0'}}>{'$' + order.cost.toFixed(2)}</h3>
+            </Grid.Column>
+            <Grid.Column width='2' verticalAlign='middle' textAlign='center'>
+              
               <Button circular onClick={() => this.handlePaid(order.orderid)} color='red'>PAID</Button>
             </Grid.Column>
           </Grid.Row>
         </React.Fragment>
-      )
+        )
+      }
+    
     });
 
     return (
