@@ -23,10 +23,10 @@ config = {
     'DEBUG': True,          # some Flask specific configs
     'SQLALCHEMY_DATABASE_URI': 'mysql+pymysql://ccmobile_ccmobile_dora:COS333Account@198.199.71.236/ccmobile_coffee_club',
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-    'JWT_SECRET_KEY': 'testkey',
+    'JWT_SECRET_KEY': b'E\xa6\xb7%\xa5I\x0e\xce\x82(7\x14qG\x1e\xc9'
 }
 
-app.secret_key = "coffeelovers4ever"
+app.secret_key = b'\x06\x99\x99hR\x9a\x16\xae\x0f\xe6_\xf3\x0en\xe0\xda'
 app.config.from_mapping(config)
 db.init_app(app)
 ma.init_app(app)

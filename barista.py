@@ -17,22 +17,41 @@ details_schema = DetailsSchema()
 
 #-------------------------------------------------------------------------------
 # POST request that reads in username and password, returns username if correct.
-@barista.route('/barista/authenticate', methods=['POST'])
+@barista.route('/barista/authenticate', methods=['GET'])
 #@jwt.authenticate
 def barista_authenticate():
-    if request.method != 'POST' :
-        return jsonify(error=True), 405
-    incoming = request.get_json()
-    username = incoming['username']
-    password = incoming['password']
-    __password = 'dora'
+    if request.method == 'GET':
+        incoming = request.get_json()
+        #username = incoming['username']
+        #password = incoming['password']
+        username = 'dora'
+        password = 'dora'
+        password = generate_password_hash(password)
+        __password = 'dora'
 
-    password = generate_password_hash(password)
-    if username == 'dora' and check_password_hash(password, __password):
-        session['username'] = username
-        return jsonify(username=username, url = 'http://localhost:3000/barista'), 200
+        if 'user' in session:
+            return jsonify(user = session.get('username'), url = None)
+
+        else:
+            if username == 'dora' and check_password_hash(password, __password):
+                print('here')
+                session['user'] = 'dora'
+                return redirect('http://coffeeclub.princeton.edu')
     else:
-        return jsonify(username=None, url=None), 401
+        return jsonify(error=True), 405
+
+#-------------------------------------------------------------------------------
+# POST request that reads in username and password, returns username if correct.
+@barista.route('/barista/getuser', methods=['GET'])
+#@jwt.authenticate
+def barista_getuser():
+    if request.method == 'GET':
+        if 'user' in session:
+            return jsonify(user=session.get('user')), 200
+        else:
+            return jsonify(user=None), 200
+    else:
+        return jsonify(error=True), 405
 #-------------------------------------------------------------------------------
 # GET request that returns barista username if in session
 @barista.route('/barista/getuser', methods=['GET'])
@@ -56,14 +75,11 @@ def barista_logout():
     if request.method != 'GET':
         return jsonify(error=True), 405
     try:
-        if len(session) > 0:
-            if session['username'] != None:
-                session.clear()
-                return jsonify(username=None), 200
-            else:
-                return jsonify(error=True), 401
+        if 'user' in session:
+            session.clear()
+            return jsonify(user=None), 200
         else:
-            return jsonify(username=None), 401
+            return jsonify(error=True), 401
     except Exception as e:
         return jsonify(error=True), 403
 

@@ -20,8 +20,18 @@ incoming = {
     'cost': 8.50,
     'payment': True,
     'status': False,
-    'items': ['S Chai Latte', 'Hot Coffee']
-}
+    'items': [
+        {  'item': {
+                'name': 'Coffee'
+            },
+            'addons': [
+                {
+                'name': ''
+                }],
+            'sp': 'Small'
+        }]
+    }
+
 # initialize CAS
 #cas = CAS()
 #-------------------------------------------------------------------------------
@@ -114,9 +124,14 @@ def place_order():
                     addon_list += ', ' + add['name']
                 count += 1
             if i['sp'][0] == 'Small' or i['sp'][0] == 'Large':
-                item_detail = i['sp'][0] + ' ' + i['item']['name'] + ' w/ ' + addon_list
+                item_detail = i['sp'][0] + ' ' + i['item']['name']
+                if len(addon_list) > 0:
+                    item_detail += ' w/ ' + addon_list
             else:
-                item_detail = i['item']['name'] + ' w/ ' + addon_list
+                item_detail = i['item']['name']
+                if len(addon_list) > 0:
+                    item_detail += ' w/ ' + addon_list
+            print(item_detail)
             object = Details(
                 id = query.orderid,
                 item = item_detail
