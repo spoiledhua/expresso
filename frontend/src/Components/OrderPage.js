@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Icon, Image, Container, Header, Grid, Button, Radio, Form, Divider, Dimmer, Loader, Segment } from 'semantic-ui-react';
+import { Card, Icon, Image, Container, Header, Grid, Button, Radio, Form, Divider, Dimmer, Loader, Segment, Dropdown } from 'semantic-ui-react';
 
 import { getLastOrder } from '../Axios/axios_getter';
 
@@ -27,6 +27,7 @@ class OrderPage extends React.Component {
       loading: false
     }
   }
+  
 
   getPrice = () => {
     let { shoppingCart } = this.props;
@@ -87,7 +88,12 @@ class OrderPage extends React.Component {
   }
 
   render() {
-
+    let timeOptions = [
+      {key: 1, text: '7:00 AM'},
+      {key: 2, text: '7:15 AM'},
+      {key: 3, text: '7:45 AM'},
+      {key: 4, text: '8:00 AM'}
+    ]
     let currentOrder = (this.props.shoppingCart == 0) ?
     <Header as='h3'>
       Your order will show up here!
@@ -236,6 +242,21 @@ class OrderPage extends React.Component {
                 </Grid.Row>
               </Grid>
             </Card.Content>
+            <Card.Content>
+              <Grid>
+                <Grid.Row>
+                  <Grid.Column>
+                    <Header as='h2' color='black'>3. PICKUP TIME</Header>
+                  </Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column>
+                  <Dropdown placeholder='Now' selection options={timeOptions} />
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Card.Content>
+
             <div>
               <Button floated='right' onClick={this.handlePlaceOrder}>
                 PLACE ORDER

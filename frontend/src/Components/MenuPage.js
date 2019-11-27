@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader, Item, List } from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader, Item, List, Responsive } from 'semantic-ui-react';
 
 import MenuBar from './MenuBar';
 import ItemPopUp from './ItemPopUp';
@@ -7,7 +7,13 @@ import ItemPopUp from './ItemPopUp';
 import { getAllItems, authenticate } from '../Axios/axios_getter';
 
 class MenuPage extends React.Component {
-
+  
+  constructor(props) {
+    super(props)
+    this.drinkRef = React.createRef()  
+    this.foodRef = React.createRef()  
+    }
+  
   state = {
     active: false,
     selected: null,
@@ -16,6 +22,8 @@ class MenuPage extends React.Component {
     food: [],
     add: []
   }
+
+  
 
   componentDidMount = () => {
     this.setState({ loading: true });
@@ -79,10 +87,12 @@ class MenuPage extends React.Component {
 
   handleDrinksMenuClick = (e) => {
     // speed scroll to Drinks
+    window.scrollTo(0, this.drinkRef.current.offsetTop)   
   }
 
   handleFoodMenuClick = (e) => {
     // speed scroll to Food
+    window.scrollTo(0, this.foodRef.current.offsetTop)   
   }
 
   handleItemClick = async (item) => {
@@ -104,6 +114,7 @@ class MenuPage extends React.Component {
 
     return (
       <React.Fragment>
+        <Responsive minWidth={Responsive.onlyTablet.minWidth}>
         <Dimmer active={this.state.loading} inverted page>
           <Loader inverted>Loading</Loader>
         </Dimmer>
@@ -113,7 +124,7 @@ class MenuPage extends React.Component {
           </Container>
         </Dimmer>
 
-        {/* Side menu
+  
           <Menu vertical secondary fixed='left' color='grey' size='massive'>
           <div style={{ height: '30vh' }} />
           <Menu.Item onClick={this.handleDrinksMenuClick}>
@@ -137,7 +148,7 @@ class MenuPage extends React.Component {
             <div style={{ height: '2vh'}} />
           </Menu.Item>
           </Menu>
-        */}
+        
 
         {/* Main Content */}
         <Grid stackable>
@@ -159,8 +170,9 @@ class MenuPage extends React.Component {
                     <div style={{ height: '2em' }} />
                     <Grid>
                       {/* Drinks Section */}
-                      <Grid.Row>
-                        <Header style={{ 'fontSize': '2em' }}>Drinks</Header>
+                      <div ref={this.drinkRef}></div> 
+                      <Grid.Row >
+                        <Header style={{ 'fontSize': '2em' }}>DRINKS</Header>
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column width='1'>
@@ -183,8 +195,9 @@ class MenuPage extends React.Component {
 
                       <div style={{ height: '2em' }} />
                       {/* Food Section */}
+                      <div ref={this.foodRef}></div> 
                       <Grid.Row>
-                        <Header style={{ 'fontSize': '2em' }}>Food</Header>
+                        <Header style={{ 'fontSize': '2em' }}>FOOD</Header>
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column width='1'>
@@ -212,6 +225,98 @@ class MenuPage extends React.Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
+        </Responsive>
+        <Responsive {...Responsive.onlyMobile}>
+        <Dimmer active={this.state.loading} inverted page>
+          <Loader inverted>Loading</Loader>
+        </Dimmer>
+        <Dimmer active={this.state.active} onClickOutside={this.handleClose} page>
+          <Container style={{ width: '720px' }}>
+            <ItemPopUp handleClose={this.handleClose} handleItemSubmit={this.handleItemSubmit} item={this.state.selected} add={this.state.add} />
+          </Container>
+        </Dimmer>
+
+  
+
+        
+
+        {/* Main Content */}
+        <Grid stackable>
+          <Grid.Row>
+            <Grid.Column width='4'>
+            </Grid.Column>
+            <Grid.Column width='10'>
+              <Grid divided='vertically'>
+                <Grid.Row>
+                  <div style={{ height: '3vh' }} />
+                  <Header style={{ 'fontSize': '3em' }}>
+                    MENU
+                  </Header>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Column width='1'>
+                  </Grid.Column>
+                  <Grid.Column width='15'>
+                    <div style={{ height: '2em' }} />
+                    <Grid>
+                      {/* Drinks Section */}
+                    
+                      <Grid.Row >
+                        <Header style={{ 'fontSize': '2em' }}>DRINKS</Header>
+                      </Grid.Row>
+                      <Grid.Row>
+                        <Grid.Column width='1'>
+                        </Grid.Column>
+                        <Grid.Column width='15'>
+
+                          <Item.Group>
+                            {this.state.drinks.map(drink => {
+                              return (
+                                <MenuBar
+                                  id={drink.name}
+                                  handleItemClick={this.handleItemClick}
+                                  item={drink}
+                                />
+                              )})}
+                          </Item.Group>
+
+                        </Grid.Column>
+                      </Grid.Row>
+
+                      <div style={{ height: '2em' }} />
+                      {/* Food Section */}
+                    
+                    
+                      <Grid.Row>
+                        <Header style={{ 'fontSize': '2em' }}>FOOD</Header>
+                      </Grid.Row>
+                      <Grid.Row>
+                        <Grid.Column width='1'>
+                        </Grid.Column>
+                        <Grid.Column width='15'>
+
+                          <Item.Group>
+                            {this.state.food.map(food => {
+                              return (
+                                <MenuBar
+                                  id={food.name}
+                                  handleItemClick={this.handleItemClick}
+                                  item={food}/>
+                              )})}
+                          </Item.Group>
+
+                        </Grid.Column>
+                      </Grid.Row>
+                    </Grid>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+            </Grid.Column>
+            <Grid.Column width='2'>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        </Responsive>
       </React.Fragment>
     );
   }

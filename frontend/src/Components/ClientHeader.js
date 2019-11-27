@@ -144,7 +144,7 @@ class ClientHeader extends React.Component {
             <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
               <Header as='h3'>
                 <Icon name='shopping bag'/>
-                MY ORDER
+                MY CART
               </Header>
             </Menu.Item>
             <Menu.Item />
@@ -179,7 +179,7 @@ class ClientHeader extends React.Component {
                   <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
                     <Header as='h3'>
                       <Icon name='shopping bag'/>
-                      MY ORDER
+                      MY CART
                     </Header>
                   </Dropdown.Item>
                   <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
