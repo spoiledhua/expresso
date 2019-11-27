@@ -41,7 +41,7 @@ class CustomerHistory extends React.Component {
 
     let showHistory = (history.length == 0) ?
     <Header as='h3'>
-      :)
+      No past orders
     </Header> :
 
     <React.Fragment>

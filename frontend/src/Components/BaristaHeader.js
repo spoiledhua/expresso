@@ -40,6 +40,10 @@ class BaristaHeader extends React.Component {
         this.setState({selectedPage: 'BaristaHistory'})
     }
 
+    handleLogoClick = () => {
+      this.props.history.push('/landing');
+    }
+
     render() {
         var appPages = {
             'BaristaOrders': <BaristaOrders />,
@@ -62,7 +66,7 @@ class BaristaHeader extends React.Component {
                     </Header>
                   </Menu.Item>
                   <Menu.Item position='right'>
-                    <Image src={logo} href="https://pucoffeeclub.com" size='mini' style={{ cursor: 'pointer' }}/>
+                    <Image src={logo} onClick={this.handleLogoClick} size='mini' style={{ cursor: 'pointer' }}/>
                   </Menu.Item>
                 </Menu>
 

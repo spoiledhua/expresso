@@ -53,7 +53,7 @@ class BaristaOrders extends React.Component {
 
     let pendingOrders = (allOrders.length === 0) ?
     <Header as='h3'>
-      :)
+      No pending orders
     </Header> :
 
   

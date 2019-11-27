@@ -113,7 +113,7 @@ class AboutTeam extends React.Component {
                   </Grid.Column>
                   <Grid.Column width={6}></Grid.Column>
                   <Grid.Column width={2}>
-                    <Image centered src={logo} size='mini'/>
+                    <Image centered src={logo} size='mini' onClick={this.landingRoute} style={{ cursor: 'pointer'}}/>
                   </Grid.Column>
                   <Grid.Column width={5}></Grid.Column>
                 </Grid.Row>

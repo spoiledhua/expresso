@@ -51,7 +51,7 @@ class BaristaHistory extends React.Component {
 
       let history = (historyType.length == 0) ?
       <Header as='h3'>
-        :)
+        No past orders
       </Header> :
 
       <React.Fragment>

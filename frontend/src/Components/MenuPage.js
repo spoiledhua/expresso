@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader, Item, List, Responsive } from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader, Item, List, Responsive, Card, Button, Sticky, Ref, Rail} from 'semantic-ui-react';
 
 import MenuBar from './MenuBar';
 import ItemPopUp from './ItemPopUp';
@@ -8,10 +8,12 @@ import { getAllItems, authenticate } from '../Axios/axios_getter';
 
 class MenuPage extends React.Component {
   
+  
   constructor(props) {
     super(props)
     this.drinkRef = React.createRef()  
-    this.foodRef = React.createRef()  
+    this.foodRef = React.createRef() 
+    this.contextRef = React.createRef() 
     }
   
   state = {
@@ -22,8 +24,6 @@ class MenuPage extends React.Component {
     food: [],
     add: []
   }
-
-  
 
   componentDidMount = () => {
     this.setState({ loading: true });
@@ -221,7 +221,20 @@ class MenuPage extends React.Component {
                 </Grid.Row>
               </Grid>
             </Grid.Column>
+            
             <Grid.Column width='2'>
+            {/*<Ref innerRef={this.contextRef}>
+            <Rail position='right'>
+            <Sticky context={this.contextRef}>*/}
+            <Card raised>
+                <Card.Content textAlign='center'>
+                  Loving online ordering? Leave us some feedback
+                  <Button circular size='mini' basic color='black'>HERE</Button>
+                </Card.Content>
+              </Card>
+            {/*</Sticky>
+            </Rail>
+            </Ref>*/}
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -235,11 +248,6 @@ class MenuPage extends React.Component {
             <ItemPopUp handleClose={this.handleClose} handleItemSubmit={this.handleItemSubmit} item={this.state.selected} add={this.state.add} />
           </Container>
         </Dimmer>
-
-  
-
-        
-
         {/* Main Content */}
         <Grid stackable>
           <Grid.Row>
@@ -313,6 +321,7 @@ class MenuPage extends React.Component {
               </Grid>
             </Grid.Column>
             <Grid.Column width='2'>
+            
             </Grid.Column>
           </Grid.Row>
         </Grid>
