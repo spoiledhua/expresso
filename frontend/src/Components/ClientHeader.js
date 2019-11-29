@@ -206,9 +206,15 @@ class ClientHeader extends React.Component {
                     </Header>
                   </Dropdown.Item>
                   <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
-                    <Header as='h3'>
+                  <Header as='h3'>
                       <Icon name='user'/>
-                      {this.state.user}
+                      ACCOUNT HISTORY
+                    </Header>
+                  </Dropdown.Item>
+                  <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleLogout}>
+                  <Header as='h3'>
+                      <Icon name='sign-out'/>
+                      LOGOUT
                     </Header>
                   </Dropdown.Item>
                 </Dropdown.Menu>
