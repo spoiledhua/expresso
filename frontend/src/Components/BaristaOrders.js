@@ -58,6 +58,7 @@ class BaristaOrders extends React.Component {
 
   
     this.state.allOrders.map(order => {
+      console.log(order)
       if (order.payment) {
       return (
         <React.Fragment>
@@ -79,7 +80,7 @@ class BaristaOrders extends React.Component {
             </Grid.Column>
             <Grid.Column width='2' verticalAlign='middle'>
               {/* disable in progress button after order is in progress*/}
-              <Button circular disabled={order.status === 1} onClick={() => this.handleInProgress(order.orderid)} style={{background: '#F98F69'}}>IN PROGRESS</Button>
+              <Button circular disable={order.progress === 1 || order.progress === 2} onClick={() => this.handleInProgress(order.orderid)} style={{background: '#F98F69'}}>IN PROGRESS</Button>
             </Grid.Column>
             <Grid.Column width='2' verticalAlign='middle'>
               <Button circular onClick={() => this.handleComplete(order.orderid)} style={{background: '#B7E4A9'}}>COMPLETE</Button>

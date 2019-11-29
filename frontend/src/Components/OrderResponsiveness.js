@@ -26,7 +26,7 @@ const Complete = () => {
     )
 }
 
-class PopupTest extends React.Component {
+class OrderResponsiveness extends React.Component {
     render() {
 
         return (
@@ -40,4 +40,4 @@ class PopupTest extends React.Component {
 
 }
 
-export default PopupTest;
+export default OrderResponsiveness;
