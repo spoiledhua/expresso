@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Button, Dimmer, Loader, Divider } from 'semantic-ui-react';
 
-import { getHistory, clientLogout } from '../Axios/axios_getter'
+import { getHistory } from '../Axios/axios_getter'
 
 class CustomerHistory extends React.Component {
 
@@ -28,12 +28,7 @@ class CustomerHistory extends React.Component {
       });
   }
 
-  handleLogout = async () => {
-    await clientLogout()
-      .then(data => {
-        window.location.href = data.url;
-      });
-  }
+ 
 
   render() {
 
@@ -87,9 +82,7 @@ class CustomerHistory extends React.Component {
                   <h2>Account History</h2>
                 </Grid.Column>
                 <Grid.Column width='2'>
-                  <Button circular basic color='black' size='huge' style={{textAlign: "center"}} onClick={this.handleLogout}>
-                    <strong>LOGOUT</strong>
-                  </Button>
+                  
                 </Grid.Column>
               </Grid.Row>
               {showHistory}

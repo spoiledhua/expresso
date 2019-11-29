@@ -8,7 +8,7 @@ import ClientHistory from './ClientHistory';
 
 import * as logo from '../Assets/logo.png';
 import { postMakeOrder } from '../Axios/axios_getter';
-import { getUser, authenticate } from '../Axios/axios_getter';
+import { getUser, authenticate, clientLogout } from '../Axios/axios_getter';
 
 class ClientHeader extends React.Component {
 
@@ -116,6 +116,13 @@ class ClientHeader extends React.Component {
     this.setState({ loading: false });
   }
 
+  handleLogout = async () => {
+    await clientLogout()
+      .then(data => {
+        window.location.href = data.url;
+      });
+  }
+
   render() {
 
     const { selectedItem } = this.state
@@ -152,12 +159,28 @@ class ClientHeader extends React.Component {
               <Image src={logo} onClick={this.handleLogoClick} size='mini' style={{ cursor: 'pointer' }} />
             </Menu.Item>
             <Menu.Item />
-            <Menu.Item />
-            <Menu.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
-              <Header as='h3'>
-                <Icon name='user'/>
-                {this.state.user}
-              </Header>
+            <Menu.Item >
+            </Menu.Item>
+            <Menu.Item>
+            <Header as='h3'>
+            <Icon name='user'/>
+                <Dropdown text={this.state.user}>
+                    <Dropdown.Menu inverted direction='left' style={{background: '#F98F69' }}>
+                        <Dropdown.Item>
+                        <Header as='h4' style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
+                            Account History
+                        </Header>
+                        </Dropdown.Item>
+                        <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleLogout}>
+                        <Header as='h4'>
+                            Logout
+                        </Header>
+                        </Dropdown.Item>
+                       
+                    </Dropdown.Menu>
+                </Dropdown>
+           
+                </Header>
             </Menu.Item>
           </Menu>
         </Responsive>
