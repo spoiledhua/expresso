@@ -4,6 +4,8 @@ import * as logo from '../Assets/logo.png';
 
 import BaristaOrders from './BaristaOrders';
 import BaristaHistory from './BaristaHistory';
+import BaristaInventory from './BaristaInventory';
+
 
 import { baristaGetUser } from '../Axios/axios_getter';
 
@@ -40,14 +42,21 @@ class BaristaHeader extends React.Component {
     this.setState({ selectedPage: 'BaristaHistory' })
   }
 
-  handleLogoClick = () => {
+  handleLogoClick = (e) => {
     this.props.history.push('/landing');
+  }
+
+  handleInventoryClick = (e) => {
+    // redirect to inventory page
+    this.setState({ selectedPage: 'BaristaInventory' })
+
   }
 
   render() {
     var appPages = {
       'BaristaOrders': <BaristaOrders />,
-      'BaristaHistory': <BaristaHistory />
+      'BaristaHistory': <BaristaHistory />,
+      'BaristaInventory' : <BaristaInventory />
     };
 
     return (
@@ -58,20 +67,25 @@ class BaristaHeader extends React.Component {
             <Menu.Item width='2' style={{ cursor: 'pointer' }} onClick={this.handleOrdersClick}>
               <Header as='h3'>
                 ORDERS
-                    </Header>
+              </Header>
             </Menu.Item>
             <Menu.Item width='2' style={{ cursor: 'pointer' }} onClick={this.handleHistoryClick}>
               <Header as='h3'>
                 HISTORY
-                    </Header>
+              </Header>
             </Menu.Item>
-            <Menu.Item >
+            <Menu.Item width='2' style={{ cursor: 'pointer' }} onClick={this.handleInventoryClick}>
+              <Header as='h3'>
+                INVENTORY
+              </Header>
+            </Menu.Item>
+            <Menu.Item width='6'/>
+            <Menu.Item width='2'>
               <Header as='h3'>
                 <Checkbox toggle label='Accepting Orders' />
               </Header>
             </Menu.Item>
             <Menu.Item position='right'>
-
               <Image src={logo} onClick={this.handleLogoClick} size='mini' style={{ cursor: 'pointer' }} />
             </Menu.Item>
           </Menu>
