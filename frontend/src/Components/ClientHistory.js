@@ -82,13 +82,11 @@ class CustomerHistory extends React.Component {
                   <h2>Account History</h2>
                 </Grid.Column>
                 <Grid.Column width='2'>
-                  
                 </Grid.Column>
               </Grid.Row>
               {showHistory}
             </Grid>
           </React.Fragment>
-
         );
     }
 }
