@@ -7,7 +7,6 @@ import { Switch, Route, Redirect, BrowserRouter } from 'react-router-dom';
 import MenuPage from './Components/MenuPage';
 import ItemPopUp from './Components/ItemPopUp';
 import OrderPage from './Components/OrderPage';
-import ClientHeader2 from './Components/ClientHeader2';
 import Test from './Components/Test';
 import LandingPage from './Components/LandingPage'
 import AboutTeam from './Components/AboutTeam'
