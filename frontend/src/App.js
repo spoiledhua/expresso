@@ -16,6 +16,8 @@ import BaristaHeader from './Components/BaristaHeader';
 import BaristaLogin from './Components/BaristaLogin';
 import ClientHistory from './Components/ClientHistory';
 
+import AddItem from './Components/AddItem'
+
 class App extends React.Component {
 
   render() {

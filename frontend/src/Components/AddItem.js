@@ -30,7 +30,7 @@ class AddItem extends React.Component {
                                         <input placeholder='$0.00' />
                                     </Form.Field>
                                     <label>Category</label>
-                                    <Form.Select placeholder='Category' options={[{ text: 'Drink'}, { text: 'Food'}, {text: 'Add-On'}]}>
+                                    <Form.Select placeholder='Category' options={[{key:1, text: 'Drink'}, {key:2, text: 'Food'}, {key:3,text: 'Add-On'}]}>
                                     </Form.Select>
                                 </Form>
                                 </Grid.Column>

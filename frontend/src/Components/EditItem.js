@@ -21,6 +21,7 @@ class EditItem extends React.Component {
                             <Grid.Row>
                                 <Form>
                                     <Label>Item Name</Label>
+                                    {/* Prepopulate with existing values*/}
                                     <Form.Input defaultValue={this.props.name}/>
                                     <Label>Price</Label>
                                     <Form.Input defaultValue='hi'/>

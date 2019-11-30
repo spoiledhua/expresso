@@ -11,7 +11,7 @@ class ItemPopUp extends React.Component {
     finalOrder: { item: this.props.item, sp: this.props.item.sp[0], addons: [] },
     totalPrice: Number(this.props.item.sp[0][1])
   }
-
+ 
   getPrice = async () => {
     let price = Number(this.state.finalOrder.sp[1]);
     for (let i = 0; i < this.state.finalOrder.addons.length; i++) {
