@@ -21,7 +21,7 @@ class BaristaOrders extends React.Component {
     await getBaristaOrders()
       .then(allOrders => {
         this.setState({ allOrders: allOrders });
-        console.log(this.state.allOrders);
+        // console.log(this.state.allOrders);
       })
       .catch(error => {
         console.log(error);

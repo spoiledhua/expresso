@@ -8,19 +8,17 @@ class AddItem extends React.Component {
         showLargePrice: false
     }
 
-    handleOSClick = () => {
-        console.log('hi')
-        console.log(this.state.showOSPrice)
+    handleOSChange = () => {
         const showOSPrice = !(this.state.showOSPrice);
         this.setState({showOSPrice}); 
     }
 
-    handleSmallClick = () => {
+    handleSmallChange = () => {
         const showSmallPrice = !(this.state.showSmallPrice);
         this.setState({showSmallPrice}); 
     }
 
-    handleLargeClick = () => {
+    handleLargeChange = () => {
         const showLargePrice = !(this.state.showLargePrice);
         this.setState({showLargePrice}); 
     }
@@ -54,9 +52,9 @@ class AddItem extends React.Component {
                                     
                                     <Form.Field>
                                         <label>Available sizes</label>
-                                        <Checkbox label='One size' onChange={this.handleOSClick}/> <br/>
-                                        <Checkbox label='Small' onChange={this.handleSmallClick}/> <br/>
-                                        <Checkbox label='Large' onChange={this.handleLargeClick}/> <br/>
+                                        <Checkbox label='One size' onChange={this.handleOSChange}/> <br/>
+                                        <Checkbox label='Small' onChange={this.handleSmallChange}/> <br/>
+                                        <Checkbox label='Large' onChange={this.handleLargeChange}/> <br/>
                                     </Form.Field>
                                     {this.state.showOSPrice ? (
                                         <Form.Field>

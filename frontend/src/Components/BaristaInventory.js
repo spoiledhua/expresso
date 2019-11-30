@@ -77,7 +77,7 @@ class BaristaInventory extends React.Component {
     this.setState({ loading: false });
   }
 
-  handleAddClick = async (item) => {
+  handleAddClick = async () => {
     this.setState({ loading: true });
     await this.setState({ addActive: true });
     this.setState({ loading: false });
@@ -90,7 +90,6 @@ class BaristaInventory extends React.Component {
   }
 
   handleEditClick = async (item) => {
-    console.log(item)
     this.setState({ loading: true });
     await this.setState({ selected: item });
     await this.setState({ editActive: true });
@@ -103,24 +102,24 @@ class BaristaInventory extends React.Component {
     this.setState({ loading: false });
   }
 
-
   handleDrinksMenuClick = (e) => {
-    // speed scroll to Drinks
     window.scrollTo(0, this.drinkRef.current.offsetTop)
   }
 
   handleFoodMenuClick = (e) => {
-    // speed scroll to Food
     window.scrollTo(0, this.foodRef.current.offsetTop)
   }
 
   handleAddOnsMenuClick = () => {
-    // speed scroll to Add Ons
     window.scrollTo(0, this.addonsRef.current.offsetTop)
   }
 
   handleFeedback = (e) => {
     // link to feedback form
+  }
+
+  handleStockChange = (item) => {
+    // change stock on item... prob some sort of axios call
   }
 
   render() {
@@ -217,7 +216,8 @@ class BaristaInventory extends React.Component {
                                             <h2>{drink.name}</h2>
                                         </Grid.Column>
                                         <Grid.Column width='4'>
-                                            <Checkbox toggle label='In Stock' />
+                                            {/* the default should be whatever is in the database */}
+                                            <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(drink)}/>
                                         </Grid.Column>
                                         <Grid.Column width='4'>
                                             <Button circular onClick={() => this.handleEditClick(drink)}>Edit Details</Button>
@@ -244,10 +244,11 @@ class BaristaInventory extends React.Component {
                                             <h2>{food.name}</h2>
                                         </Grid.Column>
                                         <Grid.Column width='4'>
-                                            <Checkbox toggle label='In Stock' />
+                                            {/* the default should be whatever is in the database */}
+                                            <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(food)}/>
                                         </Grid.Column>
                                         <Grid.Column width='4'>
-                                            <Button circular>Edit Details</Button>
+                                            <Button circular onClick={() => this.handleEditClick(food)}>Edit Details</Button>
                                         </Grid.Column>
                                         <Divider></Divider>
                                     </Grid.Row>
@@ -269,10 +270,11 @@ class BaristaInventory extends React.Component {
                                             <h2>{addon.name}</h2>
                                         </Grid.Column>
                                         <Grid.Column width='4'>
-                                            <Checkbox toggle label='In Stock' />
+                                            {/* the default should be whatever is in the database */}
+                                            <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(addon)}/>
                                         </Grid.Column>
                                         <Grid.Column width='4'>
-                                            <Button circular>Edit Details</Button>
+                                            <Button circular onClick={() => this.handleEditClick(addon)}>Edit Details</Button>
                                         </Grid.Column>
                                         <Divider></Divider>
                                     </Grid.Row>
