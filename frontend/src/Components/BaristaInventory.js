@@ -221,7 +221,7 @@ class BaristaInventory extends React.Component {
                                         <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(drink)}/>
                                       </Grid.Column>
                                       <Grid.Column width='4'>
-                                        <Button circular onClick={() => this.handleEditClick(drink)}>Edit Details</Button>
+                                        <Button circular onClick={() => this.handleEditClick(drink)} basic color='black'>Edit Details</Button>
                                       </Grid.Column>
                                     </Grid.Row>
                                   )
@@ -250,7 +250,7 @@ class BaristaInventory extends React.Component {
                                       <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(food)}/>
                                     </Grid.Column>
                                     <Grid.Column width='4'>
-                                      <Button circular onClick={() => this.handleEditClick(food)}>Edit Details</Button>
+                                      <Button circular onClick={() => this.handleEditClick(food)} basic color='black'>Edit Details</Button>
                                     </Grid.Column>
                                   </Grid.Row>
                                 )
@@ -277,7 +277,7 @@ class BaristaInventory extends React.Component {
                                       <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(addon)}/>
                                     </Grid.Column>
                                     <Grid.Column width='4'>
-                                      <Button circular onClick={() => this.handleEditClick(addon)}>Edit Details</Button>
+                                      <Button circular onClick={() => this.handleEditClick(addon)} basic color='black'>Edit Details</Button>
                                     </Grid.Column>
                                   </Grid.Row>
                                 )
