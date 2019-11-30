@@ -209,23 +209,24 @@ class BaristaInventory extends React.Component {
                         <Grid.Row>
                             <Grid.Column width='1' />
                             <Grid.Column width='15'>
-                            {this.state.drinks.map(drink => {
-                                return (
+                              <Grid divided='vertically'>
+                                {this.state.drinks.map(drink => {
+                                  return (
                                     <Grid.Row>
-                                        <Grid.Column width='2'>
-                                            <h2>{drink.name}</h2>
-                                        </Grid.Column>
-                                        <Grid.Column width='4'>
-                                            {/* the default should be whatever is in the database */}
-                                            <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(drink)}/>
-                                        </Grid.Column>
-                                        <Grid.Column width='4'>
-                                            <Button circular onClick={() => this.handleEditClick(drink)}>Edit Details</Button>
-                                        </Grid.Column>
-                                        <Divider></Divider>
+                                      <Grid.Column width='8'>
+                                        <h2>{drink.name}</h2>
+                                      </Grid.Column>
+                                      <Grid.Column width='4'>
+                                        {/* the default should be whatever is in the database */}
+                                        <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(drink)}/>
+                                      </Grid.Column>
+                                      <Grid.Column width='4'>
+                                        <Button circular onClick={() => this.handleEditClick(drink)}>Edit Details</Button>
+                                      </Grid.Column>
                                     </Grid.Row>
-                                )
-                              })}
+                                  )
+                                })}
+                              </Grid>
                             </Grid.Column>
                         </Grid.Row>
                         <div style={{ height: '2em' }} />
@@ -237,23 +238,24 @@ class BaristaInventory extends React.Component {
                         <Grid.Row>
                           <Grid.Column width='1' />
                           <Grid.Column width='15'>
-                            {this.state.food.map(food => {
+                            <Grid divided='vertically'>
+                              {this.state.food.map(food => {
                                 return (
-                                    <Grid.Row>
-                                        <Grid.Column width='2'>
-                                            <h2>{food.name}</h2>
-                                        </Grid.Column>
-                                        <Grid.Column width='4'>
-                                            {/* the default should be whatever is in the database */}
-                                            <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(food)}/>
-                                        </Grid.Column>
-                                        <Grid.Column width='4'>
-                                            <Button circular onClick={() => this.handleEditClick(food)}>Edit Details</Button>
-                                        </Grid.Column>
-                                        <Divider></Divider>
-                                    </Grid.Row>
+                                  <Grid.Row>
+                                    <Grid.Column width='8'>
+                                      <h2>{food.name}</h2>
+                                    </Grid.Column>
+                                    <Grid.Column width='4'>
+                                      {/* the default should be whatever is in the database */}
+                                      <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(food)}/>
+                                    </Grid.Column>
+                                    <Grid.Column width='4'>
+                                      <Button circular onClick={() => this.handleEditClick(food)}>Edit Details</Button>
+                                    </Grid.Column>
+                                  </Grid.Row>
                                 )
-                            })}
+                              })}
+                            </Grid>
                           </Grid.Column>
                         </Grid.Row>
                         <div ref={this.addonsRef}></div>
@@ -263,23 +265,24 @@ class BaristaInventory extends React.Component {
                         <Grid.Row>
                           <Grid.Column width='1' />
                           <Grid.Column width='15'>
-                            {this.state.add.map(addon => {
+                            <Grid divided='vertically'>
+                              {this.state.add.map(addon => {
                                 return (
-                                    <Grid.Row>
-                                        <Grid.Column width='2'>
-                                            <h2>{addon.name}</h2>
-                                        </Grid.Column>
-                                        <Grid.Column width='4'>
-                                            {/* the default should be whatever is in the database */}
-                                            <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(addon)}/>
-                                        </Grid.Column>
-                                        <Grid.Column width='4'>
-                                            <Button circular onClick={() => this.handleEditClick(addon)}>Edit Details</Button>
-                                        </Grid.Column>
-                                        <Divider></Divider>
-                                    </Grid.Row>
+                                  <Grid.Row>
+                                    <Grid.Column width='8'>
+                                      <h2>{addon.name}</h2>
+                                    </Grid.Column>
+                                    <Grid.Column width='4'>
+                                      {/* the default should be whatever is in the database */}
+                                      <Checkbox toggle label='In Stock' onChange={() => this.handleStockChange(addon)}/>
+                                    </Grid.Column>
+                                    <Grid.Column width='4'>
+                                      <Button circular onClick={() => this.handleEditClick(addon)}>Edit Details</Button>
+                                    </Grid.Column>
+                                  </Grid.Row>
                                 )
-                            })}
+                              })}
+                            </Grid>
                           </Grid.Column>
                         </Grid.Row>
                       </Grid>
