@@ -79,13 +79,12 @@ class BaristaHeader extends React.Component {
                 INVENTORY
               </Header>
             </Menu.Item>
-            <Menu.Item width='6'/>
-            <Menu.Item width='2'>
+            <Menu.Item width='2' position='right'>
               <Header as='h3'>
                 <Checkbox toggle label='Accepting Orders' />
               </Header>
             </Menu.Item>
-            <Menu.Item position='right'>
+            <Menu.Item position='right' width='2'>
               <Image src={logo} onClick={this.handleLogoClick} size='mini' style={{ cursor: 'pointer' }} />
             </Menu.Item>
           </Menu>
