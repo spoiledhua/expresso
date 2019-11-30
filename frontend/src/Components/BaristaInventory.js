@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Icon, Image, Container, Header, Grid, Dimmer, Loader, Item, List, Responsive, Card, Button, Divider, Checkbox } from 'semantic-ui-react';
-
+import AddItem from './AddItem';
+import EditItem from './EditItem';
 import { getAllItems, authenticate } from '../Axios/axios_getter';
 
 class BaristaInventory extends React.Component {
@@ -8,11 +9,13 @@ class BaristaInventory extends React.Component {
     super(props)
     this.drinkRef = React.createRef()
     this.foodRef = React.createRef()
+    this.addonsRef = React.createRef()
     this.contextRef = React.createRef()
   }
 
   state = {
-    active: false,
+    addActive: false,
+    editActive: false,
     selected: null,
     loading: false,
     drinks: [],
@@ -74,11 +77,33 @@ class BaristaInventory extends React.Component {
     this.setState({ loading: false });
   }
 
-  handleClose = async () => {
+  handleAddClick = async (item) => {
     this.setState({ loading: true });
-    await this.setState({ active: false });
+    await this.setState({ addActive: true });
+    this.setState({ loading: false });
+
+  }
+
+  handleAddClose = async () => {
+    this.setState({ loading: true });
+    await this.setState({ addActive: false });
     this.setState({ loading: false });
   }
+
+  handleEditClick = async (item) => {
+    this.setState({ loading: true });
+    await this.setState({ selected: item });
+    await this.setState({ editActive: true });
+    this.setState({ loading: false });
+
+  }
+
+  handleEditClose = async () => {
+    this.setState({ loading: true });
+    await this.setState({ editActive: false });
+    this.setState({ loading: false });
+  }
+
 
   handleDrinksMenuClick = (e) => {
     // speed scroll to Drinks
@@ -90,18 +115,13 @@ class BaristaInventory extends React.Component {
     window.scrollTo(0, this.foodRef.current.offsetTop)
   }
 
-  handleItemClick = async (item) => {
-    this.setState({ loading: true });
-    await this.setState({ selected: item });
-    await this.setState({ active: true });
-    this.setState({ loading: false });
-
+  handleAddOnsMenuClick = () => {
+    // speed scroll to Add Ons
+    window.scrollTo(0, this.addonsRef.current.offsetTop)
   }
 
-  handleItemSubmit = async (item) => {
-    this.setState({ loading: true });
-    this.props.handleItemSubmit(item);
-    this.handleClose()
+  handleEditClick = () => {
+
   }
 
   handleFeedback = (e) => {
@@ -112,8 +132,31 @@ class BaristaInventory extends React.Component {
 
     return (
       <React.Fragment>
+          <Dimmer active={this.state.loading} inverted page>
+            <Loader inverted>Loading</Loader>
+          </Dimmer>
+          <Dimmer active={this.state.addActive} onClickOutside={this.handleAddClose} page>
+            <Container style={{ width: '720px' }}>
+              <AddItem handleAddClose={this.handleAddClose}/>
+            </Container>
+          </Dimmer>
+          <Dimmer active={this.state.editActive} onClickOutside={this.handleEditClose} page>
+            <Container style={{ width: '720px' }}>
+              <EditItem handleEditClose={this.handleEditClose}/>
+            </Container>
+          </Dimmer>
           <Menu vertical secondary fixed='left' color='grey' size='massive'>
             <div style={{ height: '30vh' }} />
+            <Menu.Item onClick={this.handleAddClick}>
+              <div style={{ height: '2vh' }} />
+              <Container textAlign='center'>
+                <Header as='h2'>
+                  <Icon name='plus' />
+                  ADD ITEM
+                </Header>
+              </Container>
+              <div style={{ height: '2vh' }} />
+            </Menu.Item>
             <Menu.Item onClick={this.handleDrinksMenuClick}>
               <div style={{ height: '2vh' }} />
               <Container textAlign='center'>
@@ -124,12 +167,24 @@ class BaristaInventory extends React.Component {
               </Container>
               <div style={{ height: '2vh' }} />
             </Menu.Item>
+            
             <Menu.Item onClick={this.handleFoodMenuClick}>
               <div style={{ height: '2vh' }} />
               <Container textAlign='center'>
                 <Header as='h2'>
                   <Icon name='utensils' />
                   FOOD
+                </Header>
+              </Container>
+              <div style={{ height: '2vh' }} />
+            </Menu.Item>
+
+            <Menu.Item onClick={this.handleAddOnsMenuClick}>
+              <div style={{ height: '2vh' }} />
+              <Container textAlign='center'>
+                <Header as='h2'>
+                  <Icon name='plus square outline' />
+                  ADD-ONS
                 </Header>
               </Container>
               <div style={{ height: '2vh' }} />
@@ -163,7 +218,15 @@ class BaristaInventory extends React.Component {
                             {this.state.drinks.map(drink => {
                                 return (
                                     <Grid.Row>
-                                        <h2>{drink.name}</h2> <Checkbox toggle checked label='In Stock' />
+                                        <Grid.Column width='2'>
+                                            <h2>{drink.name}</h2>
+                                        </Grid.Column>
+                                        <Grid.Column width='4'>
+                                            <Checkbox toggle label='In Stock' />
+                                        </Grid.Column>
+                                        <Grid.Column width='4'>
+                                            <Button circular onClick={this.handleEditClick(drink)}>Edit Details</Button>
+                                        </Grid.Column>
                                         <Divider></Divider>
                                     </Grid.Row>
                                 )
@@ -182,7 +245,40 @@ class BaristaInventory extends React.Component {
                             {this.state.food.map(food => {
                                 return (
                                     <Grid.Row>
-                                        <h2>{food.name}</h2> <Checkbox toggle checked label='In Stock' />
+                                        <Grid.Column width='2'>
+                                            <h2>{food.name}</h2>
+                                        </Grid.Column>
+                                        <Grid.Column width='4'>
+                                            <Checkbox toggle label='In Stock' />
+                                        </Grid.Column>
+                                        <Grid.Column width='4'>
+                                            <Button circular>Edit Details</Button>
+                                        </Grid.Column>
+                                        <Divider></Divider>
+                                    </Grid.Row>
+                                )
+                            })}
+                          </Grid.Column>
+                        </Grid.Row>
+                        <div ref={this.addonsRef}></div>
+                        <Grid.Row>
+                          <Header style={{ 'fontSize': '2em' }}>ADD-ONS</Header>
+                        </Grid.Row>
+                        <Grid.Row>
+                          <Grid.Column width='1' />
+                          <Grid.Column width='15'>
+                            {this.state.add.map(addon => {
+                                return (
+                                    <Grid.Row>
+                                        <Grid.Column width='2'>
+                                            <h2>{addon.name}</h2>
+                                        </Grid.Column>
+                                        <Grid.Column width='4'>
+                                            <Checkbox toggle label='In Stock' />
+                                        </Grid.Column>
+                                        <Grid.Column width='4'>
+                                            <Button circular>Edit Details</Button>
+                                        </Grid.Column>
                                         <Divider></Divider>
                                     </Grid.Row>
                                 )
