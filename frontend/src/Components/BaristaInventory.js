@@ -81,7 +81,6 @@ class BaristaInventory extends React.Component {
     this.setState({ loading: true });
     await this.setState({ addActive: true });
     this.setState({ loading: false });
-
   }
 
   handleAddClose = async () => {
@@ -91,11 +90,11 @@ class BaristaInventory extends React.Component {
   }
 
   handleEditClick = async (item) => {
+    console.log(item)
     this.setState({ loading: true });
     await this.setState({ selected: item });
     await this.setState({ editActive: true });
     this.setState({ loading: false });
-
   }
 
   handleEditClose = async () => {
@@ -118,10 +117,6 @@ class BaristaInventory extends React.Component {
   handleAddOnsMenuClick = () => {
     // speed scroll to Add Ons
     window.scrollTo(0, this.addonsRef.current.offsetTop)
-  }
-
-  handleEditClick = () => {
-
   }
 
   handleFeedback = (e) => {
@@ -225,7 +220,7 @@ class BaristaInventory extends React.Component {
                                             <Checkbox toggle label='In Stock' />
                                         </Grid.Column>
                                         <Grid.Column width='4'>
-                                            <Button circular onClick={this.handleEditClick(drink)}>Edit Details</Button>
+                                            <Button circular onClick={() => this.handleEditClick(drink)}>Edit Details</Button>
                                         </Grid.Column>
                                         <Divider></Divider>
                                     </Grid.Row>
