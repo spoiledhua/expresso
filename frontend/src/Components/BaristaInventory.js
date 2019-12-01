@@ -136,7 +136,7 @@ class BaristaInventory extends React.Component {
           </Dimmer>
           <Dimmer active={this.state.editActive} onClickOutside={this.handleEditClose} page>
             <Container style={{ width: '720px' }}>
-              <EditItem handleEditClose={this.handleEditClose}/>
+              <EditItem handleEditClose={this.handleEditClose} item={this.state.selected}/>
             </Container>
           </Dimmer>
           <Menu vertical secondary fixed='left' color='grey' size='massive'>

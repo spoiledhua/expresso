@@ -2,9 +2,11 @@ import React from 'react'
 import { Header, Icon, Image, Menu, Segment, Sidebar, Button, Grid, Responsive, Dropdown, Popup, Card, Form, Label } from 'semantic-ui-react'
 
 class EditItem extends React.Component {
+    
     // lolz this needs a ton of work
     
     render() {
+        const item = this.props.item
 
         return (
             <React.Fragment>
@@ -21,19 +23,37 @@ class EditItem extends React.Component {
                             <Grid.Row>
                                 <Grid.Column width='2'/>
                                 <Grid.Column width='12'>
+                                
                                 <Form style={{textAlign:'left'}}>
                                     {/* should prepopulate with current prices*/}
                                     <Form.Field>
-                                        <label>Item Name</label>
-                                        <input placeholder='hi' />
+                                        <label>Name</label>
+                                        <input placeholder={item.name} />
                                     </Form.Field>
-                                    <Form.Field>
-                                        <label>Price</label>
-                                        <input placeholder='hi'/>
-                                    </Form.Field>
-                                    <label>Category</label>
-                                    <Form.Select placeholder='Category' options={[{key:1, text: 'Drink'}, {key:2, text: 'Food'}, {key:3,text: 'Add-On'}]}>
-                                    </Form.Select>
+                                    {(item.category == 'Drink' | item.category == 'Food' ) ?
+                                        <Form.Field>
+                                            <label>Description</label>
+                                            <input placeholder={item.description} />
+                                        </Form.Field>
+                                    : null}
+                                    {(item.category == 'Drink') ?
+                                        <Form.Field>
+                                            <label>Small Price</label>
+                                            <input/>
+                                        </Form.Field>
+                                    : null}
+                                    {(item.category == 'Drink') ?
+                                        <Form.Field>
+                                            <label>Large Price</label>
+                                            <input/>
+                                        </Form.Field>
+                                    : null}
+                                    {(item.category == 'Food' | !item.category) ?
+                                        <Form.Field>
+                                            <label>Price</label>
+                                            <input/>
+                                        </Form.Field>
+                                    : null}
                                 </Form>
                                 </Grid.Column>
                             </Grid.Row>
@@ -42,7 +62,6 @@ class EditItem extends React.Component {
                     <Card.Content>
                         <Button circular basic color='green'>Add Item</Button>
                         <Button circular basic color='red'>Cancel</Button>
-                        
                     </Card.Content>
                 </Card>
             </React.Fragment>
