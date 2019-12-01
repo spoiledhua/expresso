@@ -49,7 +49,7 @@ class AddItem extends React.Component {
                             <Grid.Row>
                                 <Grid.Column width='14'/>
                                 <Grid.Column width='2'>
-                                    <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleAddClose}/>
+                                    <Button circular icon='close' size='medium' floated='right' basic color='black' onClick={this.props.handleAddClose}/>
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>

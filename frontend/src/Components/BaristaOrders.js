@@ -12,7 +12,7 @@ const Progress = ({handleProgressClose}) => {
           <Grid.Row>
             <Grid.Column width='14'/>
             <Grid.Column width='2'>
-              <Button circular icon='close' size='medium' floated='right' onClick={handleProgressClose}/>
+              <Button circular icon='close' size='medium' floated='right' onClick={handleProgressClose} basic color='black'/>
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -31,7 +31,7 @@ const Complete = ({handleCompleteClose}) => {
           <Grid.Row>
             <Grid.Column width='14'/>
             <Grid.Column width='2'>
-              <Button circular icon='close' size='medium' floated='right' onClick={handleCompleteClose}/>
+              <Button circular icon='close' size='medium' floated='right' onClick={handleCompleteClose} basic color='black'/>
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -50,7 +50,7 @@ const Paid = ({handlePaidClose}) => {
           <Grid.Row>
             <Grid.Column width='14'/>
             <Grid.Column width='2'>
-              <Button circular icon='close' size='medium' floated='right' onClick={handlePaidClose}/>
+              <Button circular icon='close' size='medium' floated='right' onClick={handlePaidClose} basic color='black'/>
             </Grid.Column>
           </Grid.Row>
         </Grid>

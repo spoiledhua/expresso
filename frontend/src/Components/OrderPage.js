@@ -110,7 +110,7 @@ class OrderPage extends React.Component {
               <Header as='h3' color='grey'>{"$" + Number(item.sp[1]).toFixed(2)}</Header>
             </Grid.Column>
             <Grid.Column width='6'>
-              <Button circular icon='close' size='mini' onClick={() => this.handleRemoveItem(item.id)}/>
+              <Button circular icon='close' size='mini' onClick={() => this.handleRemoveItem(item.id)} basic color='black'/>
             </Grid.Column>
           </Grid.Row>
           {item.addons.map(addon => {
@@ -257,11 +257,12 @@ class OrderPage extends React.Component {
               </Grid>
             </Card.Content>
 
-            <div>
-              <Button floated='right' onClick={this.handlePlaceOrder}>
+            <Card.Content textAlign='center'>
+              <Button circular onClick={this.handlePlaceOrder} basic color='black'>
                 PLACE ORDER
               </Button>
-            </div>
+            </Card.Content>
+
           </Card>
         </Container>
       </React.Fragment>

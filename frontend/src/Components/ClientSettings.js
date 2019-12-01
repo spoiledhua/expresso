@@ -18,7 +18,7 @@ class ClientSettings extends React.Component {
                                 <Form.Field>
                                     <Checkbox label='Subscribe to email updates on order status' />
                                 </Form.Field>
-                                <Button type='submit'>Save</Button>
+                                <Button circular basic color='black'>Save</Button>
                             </Form>
                         </Grid.Column>
                     </Grid>

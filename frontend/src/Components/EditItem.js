@@ -15,8 +15,7 @@ class EditItem extends React.Component {
                             <Grid.Row>
                                 <Grid.Column width='14'/>
                                 <Grid.Column width='2'>
-                    
-                                    <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleEditClose}/>
+                                    <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleEditClose} basic color='black'/>
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>

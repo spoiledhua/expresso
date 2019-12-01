@@ -52,10 +52,11 @@ class CustomerHistory extends React.Component {
             <Grid.Column width='8' verticalAlign='middle'>
               {history.item.map(subitem => {
                 return (
-                  <React.Fragment>
-                    <h2 style={{margin: '0'}}>{subitem}</h2>
-                    <Divider />
-                  </React.Fragment>
+                  <Grid divided='vertically'>
+                    <Grid.Row>
+                      <h2 style={{margin: '0'}}>{subitem}</h2>
+                    </Grid.Row>
+                  </Grid>
                 )
               })}
             </Grid.Column>
