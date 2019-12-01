@@ -1,13 +1,74 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Button, Divider, Dimmer, Loader} from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Button, Divider, Dimmer, Loader, Card} from 'semantic-ui-react';
 
 import { getBaristaOrders, postInProgress, postComplete, postPaid } from '../Axios/axios_getter';
+
+// idk how to make these render for a couple of seconds so they have an 'x' out button :/
+const Progress = ({handleProgressClose}) => {
+  return (
+    <Card centered>
+      <Card.Content>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width='14'/>
+            <Grid.Column width='2'>
+              <Button circular icon='close' size='medium' floated='right' onClick={handleProgressClose}/>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        <h2 style={{color:'black'}}>Order in progress ✅</h2>
+        <br/><br/><br/>
+      </Card.Content>
+    </Card>
+  )
+}
+
+const Complete = ({handleCompleteClose}) => {
+  return (
+    <Card centered>
+      <Card.Content>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width='14'/>
+            <Grid.Column width='2'>
+              <Button circular icon='close' size='medium' floated='right' onClick={handleCompleteClose}/>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        <h2 style={{color:'black'}}>Order complete ✅</h2>
+        <br/><br/><br/>
+      </Card.Content>
+    </Card>
+  )
+}
+
+const Paid = ({handlePaidClose}) => {
+  return (
+    <Card centered>
+      <Card.Content>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width='14'/>
+            <Grid.Column width='2'>
+              <Button circular icon='close' size='medium' floated='right' onClick={handlePaidClose}/>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        <h2 style={{color:'black'}}>Order paid ✅</h2>
+        <br/><br/><br/>
+      </Card.Content>
+    </Card>
+  )
+}
 
 class BaristaOrders extends React.Component {
 
   state = {
     allOrders: [],
-    loading: false
+    loading: false,
+    progressActive: false,
+    completeActive: false,
+    paidActive : false
   }
 
   componentDidMount = () => {
@@ -32,18 +93,39 @@ class BaristaOrders extends React.Component {
   handleInProgress = (id) => {
     this.setState({ loading: true });
     postInProgress(id);
+    this.setState({progressActive: true})
     this.setState({ loading: false });
   }
 
   handleComplete = (id) => {
     this.setState({ loading: true });
     postComplete(id);
+    this.setState({completeActive: true})
     this.setState({ loading: false });
   }
 
   handlePaid = (id) => {
     this.setState({ loading: true });
     postPaid(id);
+    this.setState({paidActive: true})
+    this.setState({ loading: false });
+  }
+
+  handleProgressClose = async () => {
+    this.setState({ loading: true });
+    await this.setState({ progressActive: false });
+    this.setState({ loading: false });
+  }
+
+  handleCompleteClose = async () => {
+    this.setState({ loading: true });
+    await this.setState({ completeActive: false });
+    this.setState({ loading: false });
+  }
+
+  handlePaidClose = async () => {
+    this.setState({ loading: true });
+    await this.setState({ paidActive: false });
     this.setState({ loading: false });
   }
 
@@ -58,10 +140,24 @@ class BaristaOrders extends React.Component {
 
   
     this.state.allOrders.map(order => {
-      console.log(order)
       if (order.payment) {
       return (
         <React.Fragment>
+          <Dimmer active={this.state.progressActive} onClickOutside={this.handleProgressClose} page>
+            <Container>
+              <Progress handleProgressClose={this.handleProgressClose}/>
+            </Container>
+          </Dimmer>
+          <Dimmer active={this.state.completeActive} onClickOutside={this.handleCompleteClose} page>
+            <Container>
+              <Complete handleCompleteClose={this.handleCompleteClose}/>
+            </Container>
+          </Dimmer>
+          <Dimmer active={this.state.paidActive} onClickOutside={this.handlePaidClose} page>
+            <Container>
+              <Paid handlePaidClose={this.handlePaidClose}/>
+            </Container>
+          </Dimmer>
           <Grid.Row>
             <Grid.Column verticalAlign='middle' width='2' style={{textAlign:'center'}}>
               <h1>{order.orderid}</h1>
@@ -85,7 +181,6 @@ class BaristaOrders extends React.Component {
             <Grid.Column width='2' verticalAlign='middle'>
               <Button circular onClick={() => this.handleComplete(order.orderid)} style={{background: '#B7E4A9'}}>COMPLETE</Button>
             </Grid.Column>
-           
             <Grid.Column width='2'verticalAlign='middle' textAlign='center'> 
               Student-Charge
               <h3 style={{margin:'0'}}>{'$' + order.cost.toFixed(2)}</h3>

@@ -4,7 +4,6 @@ import { getBaristaOrders } from '../Axios/axios_getter';
 
 class AddItem extends React.Component {
     state = {
-        showOSPrice: false,
         showSmallPrice: false,
         showLargePrice: false,
         drinkSelected: true,
@@ -12,18 +11,13 @@ class AddItem extends React.Component {
         addonSelected: false
     }
 
-    handleOSChange = () => {
-        const showOSPrice = !(this.state.showOSPrice);
-        this.setState({showOSPrice}); 
-    }
-
     handleSmallChange = () => {
-        const showSmallPrice = !(this.state.showSmallPrice);
+        const showSmallPrice = !this.state.showSmallPrice;
         this.setState({showSmallPrice}); 
     }
 
     handleLargeChange = () => {
-        const showLargePrice = !(this.state.showLargePrice);
+        const showLargePrice = !this.state.showLargePrice;
         this.setState({showLargePrice}); 
     }
 
@@ -32,22 +26,20 @@ class AddItem extends React.Component {
         this.setState({foodSelected: false})
         this.setState({addonSelected: false})
     }
+
     selectFood = () => {
         this.setState({drinkSelected: false})
         this.setState({foodSelected: true})
         this.setState({addonSelected: false})
     }
+
     selectAddon = () => {
         this.setState({drinkSelected: false})
         this.setState({foodSelected: false})
         this.setState({addonSelected: true})
-        
     }
 
     render() {
-        console.log(this.state.drinkSelected)
-        console.log(this.state.foodSelected)
-        console.log(this.state.addonSelected)
 
         return (
             <React.Fragment>
@@ -57,7 +49,6 @@ class AddItem extends React.Component {
                             <Grid.Row>
                                 <Grid.Column width='14'/>
                                 <Grid.Column width='2'>
-                    
                                     <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleAddClose}/>
                                 </Grid.Column>
                             </Grid.Row>
