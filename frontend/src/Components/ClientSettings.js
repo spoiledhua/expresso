@@ -8,8 +8,10 @@ class ClientSettings extends React.Component {
             <React.Fragment>
                 <Responsive minWidth={Responsive.onlyTablet.minWidth}>
                     <Grid>
+
                         <Grid.Column width='2' />
                         <Grid.Column width='6'>
+                            <Header as='h2'>Settings</Header>
                             <Form>
                                 <Form.Field>
                                     <label>Name On Order</label>
