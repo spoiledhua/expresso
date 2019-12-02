@@ -99,7 +99,7 @@ class BaristaOrders extends React.Component {
     this.setState({progressActive: true})
     this._ProgressTimeoutID = setTimeout(() => {
       this.setState({progressActive: false})
-    }, 2000);
+    }, 1000);
     this.setState({ loading: false });
   }
 
@@ -109,7 +109,7 @@ class BaristaOrders extends React.Component {
     this.setState({completeActive: true})
     this._CompleteTimeoutID = setTimeout(() => {
       this.setState({completeActive: false})
-    }, 2000);
+    }, 1000);
     this.setState({ loading: false });
   }
 
@@ -118,7 +118,7 @@ class BaristaOrders extends React.Component {
     postPaid(id);
     this._PaidTimeoutID = setTimeout(() => {
       this.setState({paidActive: false})
-    }, 2000);
+    }, 1000);
     this.setState({paidActive: true})
     this.setState({ loading: false });
   }
