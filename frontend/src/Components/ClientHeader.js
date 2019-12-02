@@ -172,7 +172,6 @@ class ClientHeader extends React.Component {
                         </Menu.Item>
                         <Menu.Item>
                             <Header as='h3'>
-                                <Icon name='user' />
                                 <Dropdown text={this.state.user}>
                                     <Dropdown.Menu inverted direction='left' style={{ background: '#F98F69' }}>
                                         <Dropdown.Item>
