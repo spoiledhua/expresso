@@ -62,6 +62,9 @@ const Paid = ({handlePaidClose}) => {
 }
 
 class BaristaOrders extends React.Component {
+  _ProgressTimeoutID = null;
+  _CompleteTimeoutID = null;
+  _PaidTimeoutID = null;
 
   state = {
     allOrders: [],
@@ -94,6 +97,9 @@ class BaristaOrders extends React.Component {
     this.setState({ loading: true });
     postInProgress(id);
     this.setState({progressActive: true})
+    this._ProgressTimeoutID = setTimeout(() => {
+      this.setState({progressActive: false})
+    }, 2000);
     this.setState({ loading: false });
   }
 
@@ -101,32 +107,38 @@ class BaristaOrders extends React.Component {
     this.setState({ loading: true });
     postComplete(id);
     this.setState({completeActive: true})
+    this._CompleteTimeoutID = setTimeout(() => {
+      this.setState({completeActive: false})
+    }, 2000);
     this.setState({ loading: false });
   }
 
   handlePaid = (id) => {
     this.setState({ loading: true });
     postPaid(id);
+    this._PaidTimeoutID = setTimeout(() => {
+      this.setState({paidActive: false})
+    }, 2000);
     this.setState({paidActive: true})
     this.setState({ loading: false });
   }
 
-  handleProgressClose = async () => {
-    this.setState({ loading: true });
-    await this.setState({ progressActive: false });
-    this.setState({ loading: false });
+  handleProgressClose = () => {
+    this.setState({ progressActive: false });
   }
 
-  handleCompleteClose = async () => {
-    this.setState({ loading: true });
-    await this.setState({ completeActive: false });
-    this.setState({ loading: false });
+  handleCompleteClose = () => {
+    this.setState({ completeActive: false });
   }
 
-  handlePaidClose = async () => {
-    this.setState({ loading: true });
-    await this.setState({ paidActive: false });
-    this.setState({ loading: false });
+  handlePaidClose = () => {
+    this.setState({ paidActive: false });
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._ProgressTimeoutID);
+    clearTimeout(this._CompleteTimeoutID);
+    clearTimeout(this._PaidTimeoutID);
   }
 
   render() {
@@ -137,7 +149,6 @@ class BaristaOrders extends React.Component {
     <Header as='h3'>
       No pending orders
     </Header> :
-
   
     this.state.allOrders.map(order => {
       if (order.payment) {
@@ -218,20 +229,17 @@ class BaristaOrders extends React.Component {
             <Grid.Column width='2' verticalAlign='middle'>
               <Button circular onClick={() => this.handleComplete(order.orderid)} style={{background: '#B7E4A9'}}>COMPLETE</Button>
             </Grid.Column>
-           
             <Grid.Column width='2'verticalAlign='middle' textAlign='center'> 
               Pay In-Store
               <h3 style={{margin:'0'}}>{'$' + order.cost.toFixed(2)}</h3>
             </Grid.Column>
             <Grid.Column width='2' verticalAlign='middle' textAlign='center'>
-              
               <Button circular onClick={() => this.handlePaid(order.orderid)} color='red'>PAID</Button>
             </Grid.Column>
           </Grid.Row>
         </React.Fragment>
         )
       }
-    
     });
 
     return (
