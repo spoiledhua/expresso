@@ -1,11 +1,11 @@
-from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
+from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint, session
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 from flask_sqlalchemy import SQLAlchemy
 import pytz, base64
 import datetime as d
+from ldap import LDAP
 from models import db, Menu, History, Images, Details, MenuSchema, HistorySchema, DetailsSchema
-
 #-------------------------------------------------------------------------------
 customer = Blueprint('customer', 'customer')
 CORS(customer)
@@ -32,12 +32,10 @@ incoming = {
         }]
     }
 
-# initialize CAS
-#cas = CAS()
 #-------------------------------------------------------------------------------
 # GET Request that returns all of the items on the menu
 @customer.route('/customer/menu', methods = ['GET'])
-#@jwt_required
+@jwt_required
 def populate_menu():
     items = []
     if request.method == 'GET':
@@ -57,7 +55,7 @@ def populate_menu():
 #-------------------------------------------------------------------------------
 #GET Request that returns all of the information about specified item
 @customer.route('/customer/menu/<item>', methods=['GET'])
-#@jwt_required
+@jwt_required
 def menu_get(item):
     items = []
     if request.method == 'GET':
@@ -72,37 +70,33 @@ def menu_get(item):
         return jsonify(error=True), 405
 
 #-------------------------------------------------------------------------------
-# GET request that returns the latest order placed
-@customer.route('/customer/orderid', methods=['GET'])
-@jwt_required
-def order_id():
-    if request.method == 'GET':
-        query = db.session.query(History).order_by(History.orderid.desc()).first()
-        return jsonify(history_schema.dump(query)), 200
-    else:
-        return jsonify(error=True), 405
-
-#-------------------------------------------------------------------------------
 # POST Request that returns JSON of the order details that was placed
-@customer.route('/customer/placeorder', methods = ['POST'])
+@customer.route('/customer/<netid>/placeorder', methods = ['POST'])
 #@jwt_required
-def place_order():
+def place_order(netid):
     ordered = []
     if request.method == 'POST':
+        """if 'username' not in session:
+            return jsonify(msg = "Please login"), 401
+        elif session['username'] != netid:
+            return jsonify(msg = "Wrong netid"), 401"""
+
         try:
+            print('go')
             #incoming = request.get_json()
-            print(incoming)
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
             return jsonify(error=True), 400
-
-        currenttime = d.datetime.now()
-        timezone = pytz.timezone("America/New_York")
-        d_aware = timezone.localize(currenttime)
+        if 'time' not in incoming:
+            eastern = pytz.timezone('US/Eastern')
+            currenttime = eastern.localize(d.datetime.now())
+        else:
+            currenttime = incoming['time']
+        print(currenttime)
         order = History(
-            netid = incoming['netid'],
-            time = d_aware,
+            netid = netid,
+            time = currenttime,
             cost = incoming['cost'],
             payment = incoming['payment'],
             status = incoming['status'],
@@ -131,7 +125,6 @@ def place_order():
                 item_detail = i['item']['name']
                 if len(addon_list) > 0:
                     item_detail += ' w/ ' + addon_list
-            print(item_detail)
             object = Details(
                 id = query.orderid,
                 item = item_detail
@@ -148,31 +141,17 @@ def place_order():
 
 #-------------------------------------------------------------------------------
 # GET Request that returns last order
-@customer.route('/customer/orderinfo', methods = ['GET'])
-#@jwt_required
-def get_information():
-    history = []
-    if request.method == 'GET':
-        try:
-            user = 'vhua'
-            order = db.session.query(History).filter_by(netid=user).\
-            order_by(History.orderid.desc()).limit(1).all()
-            for item in order:
-                item = history_schema.dump(item)
-                history.append(item)
-            return jsonify(history), 200
-        except Exception as e:
-            return jsonify(error=True), 400
-    else:
-        return jsonify(error=True), 405
-
-#-------------------------------------------------------------------------------
-# GET Request that returns last order
 @customer.route('/customer/<netid>/orderhistory', methods = ['GET'])
-#@jwt_required
+@jwt_required
 def get_history(netid):
+    netid = netid + '\n'
     past_orders = []
     if request.method == 'GET':
+        if 'username' not in session:
+            return jsonify(msg = "Please login"), 401
+        elif session['username'] != netid:
+            return jsonify(msg = "Wrong netid"), 401
+
         query = db.session.query(History).filter_by(netid=netid).order_by(History.orderid.desc()).all()
         for orders in query:
             items = db.session.query(Details).filter(Details.id==orders.orderid).all()
@@ -192,3 +171,41 @@ def get_history(netid):
         return jsonify(past_orders), 200
     else:
         return jsonify(error=True), 405
+#-------------------------------------------------------------------------------
+# GET Request that returns status of the individual
+@customer.route('/customer/<netid>/checkstatus', methods = ['GET'])
+@jwt_required
+def check_year(netid):
+    last_valid_date_seniors = ("2019", "04", "07")
+    last_valid_year = int(last_valid_date_seniors[0])
+    last_valid_month = int(last_valid_date_seniors[1])
+    last_valid_day = int(last_valid_date_seniors[2])
+
+    today = d.date.today()
+    year = int(today.strftime("%Y"))
+    month = int(today.strftime("%m"))
+    day = int(today.strftime("%d"))
+
+    senior = 2020
+
+    netid = netid + '\n'
+    past_orders = []
+    if request.method == 'GET':
+        if 'username' not in session:
+            return jsonify(msg = "Please login"), 401
+        elif session['username'] != netid:
+            return jsonify(msg = "Wrong netid"), 401
+        conn = LDAP()
+        conn.connect_LDAP()
+        status = conn.get_pustatus(netid)
+        if status == None or status != 'undergraduate':
+            return jsonify(error = "Cannot Student Charge"), 405
+        classyear = conn.get_puclassyear(netid)
+        conn.disconnect_LDAP()
+        if classyear == senior:
+            if month > last_valid_month and year == last_valid_year:
+                return jsonify(error = "Cannot Student Charge"), 405
+            if month == last_valid_month and year == last_valid_year and day > last_valid_day:
+                return jsonify(error = "Cannot Student Charge"), 405
+        else:
+            return jsonify(status = status), 200

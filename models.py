@@ -9,7 +9,7 @@ class History(db.Model):
     __tablename__ = 'order_history'
     netid = db.Column('netid', db.String)
     orderid = db.Column('order_id', db.Integer, primary_key=True)
-    time = db.Column('timestamp', db.TIMESTAMP)
+    time = db.Column('timestamp', db.TIMESTAMP(timezone=True))
     cost = db.Column('total_cost', db.Float)
     payment = db.Column('type_of_payment', db.Boolean)
     status = db.Column('payment_status', db.Boolean)

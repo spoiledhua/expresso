@@ -1,10 +1,10 @@
-from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
+from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint, session
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import jwt_required
 from flask_sqlalchemy import SQLAlchemy
 from models import db, Menu, History, Details, MenuSchema, HistorySchema, DetailsSchema
-
+from jwtprotected import add_claims_to_access_token, admin_required
 #-------------------------------------------------------------------------------
 # Sets up the admin routes
 admin = Blueprint('admin', 'admin')
@@ -17,33 +17,32 @@ details_schema = DetailsSchema()
 #-------------------------------------------------------------------------------
 @admin.route('/admin/authenticate', methods=['POST'])
 def admin_authenticate():
-    if request.method != 'POST':
-        return jsonify(error=True), 405
+    if request.method == 'POST':
+        """incoming = request.get_json()
+        username = incoming['username']
+        password = incoming['password']"""
+        username = 'admin'
+        password = 'admin'
+        password = generate_password_hash(password)
+        __password = 'admin'
 
-    if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
+        if 'user' in session:
+            add_claims_to_access_token(session['user'])
+            return jsonify(user = session['user'], url = None)
 
-    #username = request.json.get('username', None)
-    #password = request.json.get('password', None)
-    username = 'coffeeclub_admin'
-    password = 'SingleOrigin123'
-    __password = 'SingleOrigin123'
-    if not username:
-        return jsonify(username=None), 400
-    if not password:
-        return jsonify(username=None), 400
-    password = generate_password_hash(password)
-    if username == 'coffeeclub_admin' or check_password_hash(password, __password):
-        # Identity can be any data that is json serializable
-        return jsonify(username=username), 200
+        else:
+            if username == 'admin' and check_password_hash(password, __password):
+                session['user'] = username
+                add_claims_to_access_token(session['user'])
+                return jsonify(user= session['user'], url='http://coffeeclub.princeton.edu'), 200
     else:
-        return jsonify(username=None), 401
+        return jsonify(error=True), 405
 
 #-------------------------------------------------------------------------------
 # POST request that will either upload an item and return the item
 # needs to do check that the user is called admin
 @admin.route('/admin/addinventory', methods=['POST'])
-@jwt_required
+@admin_required
 def add_inventory():
     incoming = request.get_json()
     if incoming is None:
@@ -67,7 +66,7 @@ def add_inventory():
 #-------------------------------------------------------------------------------
 # DELETE request that takes item and deletes it from Menu, returns deleted item
 @admin.route('/admin/deleteinventory', methods=['DELETE'])
-@jwt_required
+@admin_required
 def delete_inventory():
     if request.method == 'DELETE':
         query = db.session.query(Menu).filter_by(item=incoming['item'])
