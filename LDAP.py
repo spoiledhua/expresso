@@ -51,7 +51,7 @@ class LDAP:
 
         if success:
             result = self._connection.entries[0]['universityid'][0]
-            result = result.strip()
+            result = result.rstrip()
         else:
             print("Search failed", file=stderr)
 
@@ -65,7 +65,7 @@ class LDAP:
 
         if success:
             result = self._connection.entries[0]['displayname'][0]
-            result = result.strip()
+            result = result.rstrip()
         else:
             print("Search failed", file=stderr)
 
@@ -79,7 +79,7 @@ class LDAP:
 
         if success:
             result = self._connection.entries[0]['givenname'][0]
-            result = result.strip()
+            result = result.rstrip()
         else:
             print("Search failed", file=stderr)
 
@@ -93,7 +93,7 @@ class LDAP:
 
         if success:
             result = self._connection.entries[0]['sn'][0]
-            result = result.strip()
+            result = result.rstrip()
         else:
             print("Search failed", file=stderr)
 
@@ -107,7 +107,7 @@ class LDAP:
 
         if success:
             result = self._connection.entries[0]['mail'][0]
-            result = result.strip()
+            result = result.rstrip()
         else:
             print("Search failed", file=stderr)
 
@@ -121,7 +121,7 @@ class LDAP:
 
         if success:
             result = self._connection.entries[0]['pustatus'][0]
-            result = result.strip()
+            result = result.rstrip()
         else:
             print("Search failed", file=stderr)
 
