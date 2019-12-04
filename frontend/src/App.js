@@ -7,7 +7,6 @@ import { Switch, Route, Redirect, BrowserRouter } from 'react-router-dom';
 import MenuPage from './Components/MenuPage';
 import ItemPopUp from './Components/ItemPopUp';
 import OrderPage from './Components/OrderPage';
-import ClientHeader2 from './Components/ClientHeader2';
 import Test from './Components/Test';
 import LandingPage from './Components/LandingPage'
 import AboutTeam from './Components/AboutTeam'
@@ -16,6 +15,8 @@ import ClientHeader from './Components/ClientHeader';
 import BaristaHeader from './Components/BaristaHeader';
 import BaristaLogin from './Components/BaristaLogin';
 import ClientHistory from './Components/ClientHistory';
+
+import AddItem from './Components/AddItem'
 
 class App extends React.Component {
 

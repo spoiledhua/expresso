@@ -11,7 +11,7 @@ class ItemPopUp extends React.Component {
     finalOrder: { item: this.props.item, sp: this.props.item.sp[0], addons: [] },
     totalPrice: Number(this.props.item.sp[0][1])
   }
-
+ 
   getPrice = async () => {
     let price = Number(this.state.finalOrder.sp[1]);
     for (let i = 0; i < this.state.finalOrder.addons.length; i++) {
@@ -71,7 +71,7 @@ class ItemPopUp extends React.Component {
             <Grid stackable>
               <Grid.Row textAlign='right'>
                 <Grid.Column>
-                  <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleClose}/>
+                  <Button circular icon='close' size='medium' floated='right' onClick={this.props.handleClose} basic color='black'/>
                 </Grid.Column>
               </Grid.Row>
               <Grid.Row>
@@ -81,7 +81,6 @@ class ItemPopUp extends React.Component {
                   <Item.Group>
                     <Item>
                       <Item.Image src={cappuccino} />
-
                       <Item.Content verticalAlign='middle'>
                         <Item.Header as='a'>{this.props.item.name}</Item.Header>
                         <Item.Meta>{this.props.item.description}</Item.Meta>
@@ -152,7 +151,7 @@ class ItemPopUp extends React.Component {
                   <Header as='h3' color='grey'>{"$" + this.state.totalPrice.toFixed(2)}</Header>
                 </Grid.Column>
                 <Grid.Column width='4' textAlign='center' verticalAlign='middle'>
-                  <Button onClick={() => this.props.handleItemSubmit(this.state.finalOrder)}>
+                  <Button onClick={() => this.props.handleItemSubmit(this.state.finalOrder)} basic color='black' circular>
                     ADD ITEM
                   </Button>
                 </Grid.Column>
