@@ -3,6 +3,10 @@ import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Butto
 
 import { getBaristaOrders, postInProgress, postComplete, postPaid } from '../Axios/axios_getter';
 
+import * as dingURL from '../Assets/ding.mp3';
+
+const ding = new Audio(dingURL);
+
 // idk how to make these render for a couple of seconds so they have an 'x' out button :/
 const Progress = ({handleProgressClose}) => {
   return (
@@ -76,16 +80,33 @@ class BaristaOrders extends React.Component {
 
   componentDidMount = () => {
     this.setState({ loading: true });
-    this.getPendingOrders();
+    this.getPendingOrders(true);
     this.setState({ loading: false });
     let intervalFunction = setInterval(this.getPendingOrders, 10000);
   }
 
-  getPendingOrders = async () => {
+  getPendingOrders = async (isFirstLoad) => {
     await getBaristaOrders()
       .then(allOrders => {
+        // Check if there are any new orders
+        let hasNewOrders = false;
+        if (!isFirstLoad) {
+          const oldOrders = new Set(this.state.allOrders.map(order => order.orderid));
+          for (let i = 0; i < allOrders.length; i++) {
+            if (!oldOrders.has(allOrders[i].orderid)) {
+              hasNewOrders = true;
+              console.log('found new order', allOrders[i]);
+              break;
+            }
+          }
+        }
+
+        // If there's a new order, play a ding
+        if (hasNewOrders) {
+          ding.play();
+        }
+
         this.setState({ allOrders: allOrders });
-        // console.log(this.state.allOrders);
       })
       .catch(error => {
         console.log(error);
