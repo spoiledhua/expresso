@@ -5,15 +5,8 @@ import os
 from sys import stderr
 
 
-# MAKE SURE TO GO BACK AND ADD IN MORE ERROR HANDLING CODE on the execute statements
-# check and test payment file
-# cas
-# write up a new function to create a table that stores an image id INT, image name VARCHAR, and image BLOB
-# push ALL code to git hub
-
 def convertToBinaryData(filename):
     # Convert digital data to binary format
-    print(filename)
     with open(filename, 'rb') as file:
         binaryData = file.read()
     return binaryData
@@ -126,11 +119,16 @@ def build_order_history_table(mydb):
         mycursor = mydb.cursor()
 
         try:
-            # for type_of_payment 1 indicates online payment and 0 indicates in-store payment...
-            # for payment_status 1 indicates paid and 0 indicates not paid
-            # for order_status 0 indicates order not completed, 1 indicates order in-progress, 2 indicates order complete
+            # type_of_payment: 1 indicates online payment and 0 indicates in-store payment...
+            # payment_status: 1 indicates paid and 0 indicates not paid
+            # order_status: 0 indicates order not completed, 1 indicates order in-progress, 2 indicates order complete
             mycursor.execute("CREATE TABLE order_history (netid VARCHAR(255), order_id INT, timestamp TIMESTAMP, " +
                              "total_cost DECIMAL(10,2), type_of_payment BOOLEAN, payment_status BOOLEAN, order_status INT)")
+
+            mycursor.execute("ALTER TABLE `order_history` ADD PRIMARY KEY(`order_id`)")
+
+            mycursor.execute("ALTER TABLE `order_history` CHANGE `order_id` `order_id` INT(11) NOT NULL AUTO_INCREMENT");
+
         except Exception as e:
             print("build_order_history_table creating table failed: %s", str(e), file=stderr)
 
