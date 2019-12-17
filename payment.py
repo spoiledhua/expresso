@@ -15,8 +15,8 @@ senior = 2020
 last_valid_date_seniors = ("2020", "04", "07")
 
 
-def charge(pay_file):
-
+# Returns false if not valid student, returns true if valid student
+def validate(netid):
     year = int(today.strftime("%Y"))
     month = int(today.strftime("%m"))
     day = int(today.strftime("%d"))
@@ -25,16 +25,35 @@ def charge(pay_file):
     last_valid_month = int(last_valid_date_seniors[1])
     last_valid_day = int(last_valid_date_seniors[2])
 
-    mydb = connect()
-    mycursor = mydb.cursor()
     conn = LDAP()
     conn.connect_LDAP()
-    date = today.strftime("%Y-%m-%d")
-    first = date + " 00:00:00"
-    last = date + " 23:59:59"
+
+    puclassyear = conn.get_puclassyear(netid)
+    pustatus = conn.get_pustatus(netid)
+
+    conn.disconnect_LDAP()
+
+    if pustatus != 'undergraduate':
+        return False
+    if puclassyear not in valid_class_year:
+        return False
+    if puclassyear == valid_class_year[3]:
+        if month > last_valid_month and year >= last_valid_year:
+            return False
+        if month == last_valid_month and year >= last_valid_year and day > last_valid_day:
+            return False
+
+    return True
+
+
+def charge(pay_file):
+    mydb = connect()
+    mycursor = mydb.cursor()
+    todaydate = today.strftime("%Y-%m-%d")
+    first = todaydate + " 00:00:00"
+    last = todaydate + " 23:59:59"
     sql = "SELECT * FROM order_history WHERE timestamp BETWEEN %s and %s"
     val = (first, last)
-    print(val)
     try:
         mycursor.execute(sql, val)
     except Exception as e:
@@ -44,23 +63,13 @@ def charge(pay_file):
 
     while row is not None:
         netid = row[0]
+        netid = netid.rstrip()
         paid = row[5]
-        puclassyear = conn.get_puclassyear(netid)
-        pustatus = conn.get_pustatus(netid)
 
-        if pustatus != 'undergraduate':
+        result = validate(netid)
+        if not result:
             row = mycursor.fetchone()
             continue
-        if puclassyear not in valid_class_year:
-            row = mycursor.fetchone()
-            continue
-        if puclassyear == valid_class_year[3]:
-            if month > last_valid_month and year == last_valid_year:
-                row = mycursor.fetchone()
-                continue
-            if month == last_valid_month and year == last_valid_year and day > last_valid_day:
-                row = mycursor.fetchone()
-                continue
 
         if not paid:
             cost = str(row[3])
@@ -71,7 +80,6 @@ def charge(pay_file):
 
     mycursor.close()
     disconnect(mydb)
-    conn.disconnect_LDAP()
 
 
 def open_file():
