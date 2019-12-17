@@ -1,27 +1,28 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Checkbox } from 'semantic-ui-react';
+import { Menu, Icon, Image, Container, Header, Responsive, Dropdown, Checkbox, Dimmer, Loader, Card, Button } from 'semantic-ui-react';
 import * as logo from '../Assets/logo.png';
 
-import BaristaOrders from './BaristaOrders';
-import BaristaHistory from './BaristaHistory';
-import BaristaInventory from './BaristaInventory';
 
-
-import { baristaGetUser } from '../Axios/axios_getter';
+import { baristaGetUser, baristaLogout } from '../Axios/axios_getter';
 
 
 class BaristaHeader extends React.Component {
 
   state = {
     user: null,
-    selectedPage: 'BaristaOrders',
+    baristaLogoutConfirm: false,
+    loading: false
   }
 
   componentDidMount = async () => {
+    this.setState({ loading: true });
     baristaGetUser()
       .then(user => {
-        if (user.user == null) {
-          this.props.history.push('/baristalogin');
+        if (user.user === null) {
+          this.props.history.push({
+            pathname: '/baristalogin',
+            state: { requested: this.props.history.location.pathname }
+          });
         }
         else {
           this.setState({ user: user.username });
@@ -30,94 +31,161 @@ class BaristaHeader extends React.Component {
       .catch(error => {
         console.log(error);
       });
+    this.setState({ loading: false });
   }
 
-  handleOrdersClick = (e) => {
+  handleOrdersClick = () => {
     // redirect to current orders page
-    this.setState({ selectedPage: 'BaristaOrders' })
+    this.setState({ loading: true });
+    this.props.history.push({
+      pathname: '/baristaorders',
+      state: { requested: '/baristaorders' }
+    });
+    this.setState({ loading: false });
   }
 
-  handleHistoryClick = (e) => {
+  handleHistoryClick = () => {
     // redirect to current orders page
-    this.setState({ selectedPage: 'BaristaHistory' })
+    this.setState({ loading: true });
+    this.props.history.push({
+      pathname: '/baristahistory',
+      state: { requested: '/baristahistory' }
+    });
+    this.setState({ loading: false });
   }
 
-  handleLogoClick = (e) => {
+  handleLogoClick = () => {
+    this.setState({ loading: true });
+    this.props.history.push('/landing');
+    this.setState({ loading: false });
+  }
+
+  handleInventoryClick = async () => {
+    this.setState({ loading: true });
+    this.props.history.push({
+      pathname: '/baristainventory',
+      state: { requested: '/baristainventory' }
+    });
+    this.setState({ loading: false });
+  }
+
+  handleBaristaLogout = () => {
+    this.setState({ loading: true });
+    this.setState({ baristaLogoutConfirm: true });
+    this.setState({ loading: false });
+  }
+
+  handleBaristaLogoutCancel = () => {
+    this.setState({ baristaLogoutConfirm: false });
+  }
+
+  handleBaristaLogoutConfirm = async () => {
+    this.setState({ loading: true });
+    await setTimeout(() => { baristaLogout() }, 1000);
+    this.setState({ loading: false });
     this.props.history.push('/landing');
   }
 
-  handleInventoryClick = (e) => {
-    // redirect to inventory page
-    this.setState({ selectedPage: 'BaristaInventory' })
-
-  }
-
   render() {
-    var appPages = {
-      'BaristaOrders': <BaristaOrders />,
-      'BaristaHistory': <BaristaHistory />,
-      'BaristaInventory' : <BaristaInventory />
-    };
 
     return (
       <React.Fragment>
         <Responsive minWidth={Responsive.onlyTablet.minWidth}>
+          <Dimmer active={this.state.loading} page inverted>
+            <Loader inverted>Loading</Loader>
+          </Dimmer>
+          <Dimmer active={this.state.baristaLogoutConfirm} onClickOutside={this.handleBaristaLogoutCancel} page>
+            <Container style={{ width: '720px' }}>
+              <Card fluid>
+                <Card.Content>
+                  <Header as='h3' color='grey'>Are you sure you want to logout?</Header>
+                </Card.Content>
+                <Button.Group>
+                  <Button onClick={this.handleBaristaLogoutCancel}>Cancel</Button>
+                  <Button positive onClick={this.handleBaristaLogoutConfirm}>Logout</Button>
+                </Button.Group>
+              </Card>
+            </Container>
+          </Dimmer>
           {/* Top Menu */}
-          <Menu inverted fixed="top" fluid secondary style={{ height: '10vh', background: '#F98F69' }}>
-            <Menu.Item width='2' style={{ cursor: 'pointer' }} onClick={this.handleOrdersClick}>
+          <Menu inverted widths='7' fixed="top" fluid secondary style={{ height: '7vh', background: '#F98F69' }}>
+            <Menu.Item onClick={this.handleOrdersClick}>
               <Header as='h3'>
-                ORDERS
+                <Icon name='th list' />
+                Orders
               </Header>
             </Menu.Item>
-            <Menu.Item width='2' style={{ cursor: 'pointer' }} onClick={this.handleHistoryClick}>
+            <Menu.Item onClick={this.handleHistoryClick}>
               <Header as='h3'>
-                HISTORY
+                <Icon name='history' />
+                History
               </Header>
             </Menu.Item>
-            <Menu.Item width='2' style={{ cursor: 'pointer' }} onClick={this.handleInventoryClick}>
+            <Menu.Item onClick={this.handleInventoryClick}>
               <Header as='h3'>
-                INVENTORY
+                <Icon name='archive' />
+                Inventory
               </Header>
             </Menu.Item>
-            <Menu.Item width='2' position='right'>
+            <Menu.Item>
+              <Image src={logo} onClick={this.handleLogoClick} size='mini' style={{ cursor: 'pointer' }} />
+            </Menu.Item>
+            <Menu.Item />
+            <Menu.Item onClick={this.handleBaristaLogout}>
+              <Header as='h3'>
+                <Icon name='sign-out' />
+                Logout
+              </Header>
+            </Menu.Item>
+            <Menu.Item>
               <Header as='h3'>
                 <Checkbox toggle label='Accepting Orders' />
               </Header>
-            </Menu.Item>
-            <Menu.Item position='right' width='2'>
-              <Image src={logo} onClick={this.handleLogoClick} size='mini' style={{ cursor: 'pointer' }} />
             </Menu.Item>
           </Menu>
 
         </Responsive>
         <Responsive {...Responsive.onlyMobile}>
-          <Menu inverted fixed="top" fluid secondary style={{ height: '10vh', background: '#F98F69' }}>
+          <Menu inverted fixed="top" fluid secondary style={{ height: '7vh', background: '#F98F69' }}>
             <Menu.Item position='left'>
               <Dropdown icon='sidebar' style={{ color: 'black' }}>
                 <Dropdown.Menu style={{ background: '#F98F69' }}>
-                  <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleOrdersClick}>
+                  <Dropdown.Item onClick={this.handleOrdersClick}>
                     <Header as='h3'>
-                      ORDERS
+                      <Icon name='unordered list' />
+                      Orders
                     </Header>
                   </Dropdown.Item>
-                  <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleHistoryClick}>
+                  <Dropdown.Item onClick={this.handleHistoryClick}>
                     <Header as='h3'>
-                      HISTORY
+                      <Icon name='history' />
+                      History
+                    </Header>
+                  </Dropdown.Item>
+                  <Dropdown.Item onClick={this.handleInventoryClick}>
+                    <Header as='h3'>
+                      <Icon name='archive' />
+                      Inventory
+                    </Header>
+                  </Dropdown.Item>
+                  <Dropdown.Item onClick={this.handleBaristaLogout}>
+                    <Header as='h3'>
+                      <Icon name='sign-out' />
+                      Logout
                     </Header>
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </Menu.Item>
-            <Menu.Item>
-            <Checkbox toggle label='Accepting Orders' />
-            </Menu.Item>
             <Menu.Item position='right'>
               <Image src={logo} size='mini' style={{ cursor: 'pointer' }} />
+            </Menu.Item>
+            <Menu.Item>
+              <Checkbox toggle label='Accepting Orders' />
             </Menu.Item>
           </Menu>
         </Responsive>
         <div style={{ height: '15vh' }} />
-        {appPages[this.state.selectedPage]}
       </React.Fragment>
     );
   };

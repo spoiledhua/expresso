@@ -1,7 +1,5 @@
 import React from 'react';
-import { Card, Icon, Image, Container, Header, Grid, Button, Radio, Form, Divider, Dimmer, Loader, Segment, Dropdown } from 'semantic-ui-react';
-
-import { getLastOrder } from '../Axios/axios_getter';
+import { Card, Container, Header, Grid, Button, Radio, Form, Divider, Dimmer, Loader } from 'semantic-ui-react';
 
 class OrderPage extends React.Component {
 
@@ -27,7 +25,6 @@ class OrderPage extends React.Component {
       loading: false
     }
   }
-  
 
   getPrice = () => {
     let { shoppingCart } = this.props;
@@ -61,17 +58,21 @@ class OrderPage extends React.Component {
   }
 
   handleConfirm = async () => {
-    let { shoppingCart } = this.props;
     this.setState({ loading: true });
-    if (this.props.shoppingCart.length == 0)
+    if (this.props.shoppingCart.length === 0) {
       this.setState({ emptyPopUp: true });
+      this.handleCloseConfirm();
+      this.setState({ loading: false });
+    }
     else {
       await this.props.postOrder(this.state.payment);
+      await this.handleCloseConfirm();
+      await this.props.emptyCart();
+      await this.setState({ totalPrice: 0 });
+      await this.setState({ loading: false });
+      // this.props.history.push('/menu');
+      this.props.redirect();
     }
-    await this.handleCloseConfirm();
-    await this.props.emptyCart();
-    await this.setState({ totalPrice: 0 })
-    await this.setState({ loading: false });
   }
 
   handleCloseEmpty = () => {
@@ -88,13 +89,8 @@ class OrderPage extends React.Component {
   }
 
   render() {
-    let timeOptions = [
-      {key: 1, text: '7:00 AM'},
-      {key: 2, text: '7:15 AM'},
-      {key: 3, text: '7:45 AM'},
-      {key: 4, text: '8:00 AM'}
-    ]
-    let currentOrder = (this.props.shoppingCart == 0) ?
+
+    let currentOrder = (this.props.shoppingCart === 0) ?
     <Header as='h3'>
       Your order will show up here!
     </Header> :
@@ -110,7 +106,7 @@ class OrderPage extends React.Component {
               <Header as='h3' color='grey'>{"$" + Number(item.sp[1]).toFixed(2)}</Header>
             </Grid.Column>
             <Grid.Column width='6'>
-              <Button circular icon='close' size='mini' onClick={() => this.handleRemoveItem(item.id)} basic color='black'/>
+              <Button circular icon='close' size='mini' onClick={() => this.handleRemoveItem(item.id)}/>
             </Grid.Column>
           </Grid.Row>
           {item.addons.map(addon => {
@@ -242,27 +238,11 @@ class OrderPage extends React.Component {
                 </Grid.Row>
               </Grid>
             </Card.Content>
-            <Card.Content>
-              <Grid>
-                <Grid.Row>
-                  <Grid.Column>
-                    <Header as='h2' color='black'>3. PICKUP TIME</Header>
-                  </Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column>
-                  <Dropdown placeholder='Now' selection options={timeOptions} />
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Card.Content>
-
-            <Card.Content textAlign='center'>
-              <Button circular onClick={this.handlePlaceOrder} basic color='black'>
+            <div>
+              <Button floated='right' onClick={this.handlePlaceOrder}>
                 PLACE ORDER
               </Button>
-            </Card.Content>
-
+            </div>
           </Card>
         </Container>
       </React.Fragment>

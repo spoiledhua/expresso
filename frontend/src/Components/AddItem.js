@@ -1,6 +1,5 @@
 import React from 'react'
-import { Header, Icon, Image, Menu, Segment, Sidebar, Button, Grid, Responsive, Dropdown, Popup, Card, Form, Checkbox, Radio} from 'semantic-ui-react'
-import { getBaristaOrders } from '../Axios/axios_getter';
+import { Button, Grid, Card, Form, Checkbox, Radio} from 'semantic-ui-react'
 
 class AddItem extends React.Component {
     state = {
@@ -13,12 +12,12 @@ class AddItem extends React.Component {
 
     handleSmallChange = () => {
         const showSmallPrice = !this.state.showSmallPrice;
-        this.setState({showSmallPrice}); 
+        this.setState({showSmallPrice});
     }
 
     handleLargeChange = () => {
         const showLargePrice = !this.state.showLargePrice;
-        this.setState({showLargePrice}); 
+        this.setState({showLargePrice});
     }
 
     selectDrink = () => {

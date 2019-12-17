@@ -1,5 +1,4 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
 import { Header, Icon, Image, Menu, Segment, Sidebar, Button, Grid, Responsive, Dropdown} from 'semantic-ui-react';
 import { authenticate, getUser } from '../Axios/axios_getter';
 import * as logo from '../Assets/logo.png';
@@ -40,7 +39,10 @@ class LandingPage extends React.Component {
         else {
           this.props.history.push('/menu');
         }
-      });
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   baristaRoute = () => {
@@ -71,7 +73,6 @@ class LandingPage extends React.Component {
               icon='labeled'
               vertical
               visible={this.state.visible}
-              width='narrow'
               style={{background: '#F98F69'}}
             >
               <Menu.Item as='a' style={{background: '#F98F69', textAlign: 'center'}}>
@@ -114,7 +115,7 @@ class LandingPage extends React.Component {
                   <Grid.Column stretched style={{ padding:'0'}}>
                     <Grid.Row style={{height: '5%'}}></Grid.Row>
                     <Grid.Row style={{height: '15%'}}>
-                      <Image centered src={logo} size='tiny'/>
+                      <Image centered={true} src={logo} size='tiny'/>
                     </Grid.Row>
                     <Grid.Row style={{height: '5%'}}></Grid.Row>
                     <Grid.Row style={{height: '40%'}}>
@@ -130,7 +131,7 @@ class LandingPage extends React.Component {
                       </Button>
                     </Grid.Row>
                   </Grid.Column>
-                  <Grid.Column stretched style={{padding:'0'}} centered>
+                  <Grid.Column stretched style={{padding:'0'}} centered={true}>
                     <Image src={animation} style={{objectFit: 'cover'}}/>
                   </Grid.Column>
                 </Grid.Row>
@@ -170,12 +171,12 @@ class LandingPage extends React.Component {
               <Grid.Column>
                 <Grid.Row style={{height:'10%'}}></Grid.Row>
                 <Grid.Row style={{height:'10%'}}>
-                  <Image centered src={logo} size='tiny'/>
+                  <Image centered={true} src={logo} size='tiny'/>
                 </Grid.Row>
                 <Grid.Row style={{height:'15%'}}></Grid.Row>
                 <Grid.Row style={{height:'25%'}}>
                   <h1 style={{textAlign:'center', fontSize: '35px', fontFamily:'Didot'}}>
-                    Fair Trade.<br/>
+                    Responsibly Sourced.<br/>
                     Student Owned.<br/>
                     Coffee Club.
                   </h1>
@@ -184,6 +185,11 @@ class LandingPage extends React.Component {
                 <Grid.Row style={{height:'15%'}}>
                   <Button circular basic color='black' size='huge' style={{textAlign: "center"}} onClick={this.route}>
                     <strong>ORDER NOW</strong>
+                  </Button>
+                </Grid.Row>
+                <Grid.Row style={{height:'15%'}}>
+                  <Button circular basic color='black' size='huge' style={{textAlign: "center"}} onClick={this.baristaRoute}>
+                    <strong>BARISTA LOGIN</strong>
                   </Button>
                 </Grid.Row>
               </Grid.Column>
