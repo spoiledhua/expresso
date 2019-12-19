@@ -443,7 +443,9 @@ def barista_logout():
 def get_orders():
     current_orders = []
     if request.method == 'GET':
-        query = db.session.query(History).filter(History.order_status!=2).order_by(History.time.asc()).all()
+        query = db.session.query(History). \
+        filter(((History.order_status!=2) & (History.payment==1)) | ((History.payment==0) & (History.status==0))) \
+        .order_by(History.time.asc()).all()
         for orders in query:
             items = db.session.query(Details).filter(Details.id==orders.orderid).all()
             item_names = []
@@ -482,7 +484,7 @@ def complete_order(id):
         query = db.session.query(History).get(id)
         if query is None:
             return jsonify(error=True), 408
-        if (query.order_status == 1 or query.order_status == 0) and query.status == 1:
+        if (query.order_status == 1 or query.order_status == 0):
             query.order_status = 2
             try:
                 db.session.commit()
@@ -505,7 +507,7 @@ def paid_order(id):
         query = db.session.query(History).get(id)
         if query is None:
             return jsonify(error=True), 408
-        if (query.order_status == 1 or query.order_status == 0) and query.payment == 0:
+        if query.payment == 0:
             query.status = 1
             try:
                 db.session.commit()
