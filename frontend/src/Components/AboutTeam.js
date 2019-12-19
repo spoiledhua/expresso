@@ -135,14 +135,11 @@ class AboutTeam extends React.Component {
 					>
 							<Grid verticalAlign='middle' style={{ margin:'0'}}>
                 <Grid.Row verticalAlign='middle' style={{height: '7vh', background: '#BEB19B', padding:'0'}}>
-									<Grid.Column width={1} style={{textAlign: "center"}}>
-										<Button onClick={this.setVisible} circular icon='sidebar' size='huge' style={{color:'white',background: '#BEB19B'}}>
-										</Button>
-									</Grid.Column>
-									<Grid.Column width={6}></Grid.Column>
-									<Grid.Column width={2}>
-									</Grid.Column>
-									<Grid.Column width={5}></Grid.Column>
+									<Menu inverted fixed="top" fluid widths='6' secondary style={{ height: '7vh', background: '#BEB19B' }}>
+	                	<Menu.Item position='left' style={{width:'10%'}}>
+	                  	<Icon name='sidebar' size ='large' onClick={this.setVisible} style={{color:'white', background: 'none'}} />
+	                	</Menu.Item>
+	              	</Menu>
 								</Grid.Row>
 								<Grid.Row />
 								<Grid.Row />
