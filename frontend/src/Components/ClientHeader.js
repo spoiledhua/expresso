@@ -6,6 +6,7 @@ import OrderPage from './OrderPage';
 import FAQPage from './FAQ';
 import ContactUs from './ContactUs';
 import ClientHistory from './ClientHistory';
+import MobileMenu from './MobileMenu';
 
 import * as logo from '../Assets/logo.png';
 import { postMakeOrder } from '../Axios/axios_getter';
@@ -18,6 +19,7 @@ class ClientHeader extends React.Component {
     shoppingCart: [],
     id: 0,
     loading: false,
+    visible:false,
     user: null,
     userLogoutConfirm: false,
     availabilityConfirm: false
@@ -84,6 +86,19 @@ class ClientHeader extends React.Component {
     await this.setState({ loading: true });
     await setTimeout(() => { this.setState({ selectedPage: 'ContactUs' }) }, 1000);
     await this.setState({ loading: false });
+  }
+
+  handleMobileMenu = async () => {
+    // redirect to mobile menu
+    const isVisible = this.state.visible;
+    if (isVisible) {
+      this.setState({selectedPage:'MenuPage'});
+      this.setState({visible:false});
+    }
+    else {
+      this.setState({ selectedPage: 'MobileMenu' });
+      this.setState({visible:true});
+    }
   }
 
   handleLogoClick = () => {
@@ -182,6 +197,7 @@ class ClientHeader extends React.Component {
     this.setState({ selectedPage: 'MenuPage' });
   }
 
+
   render() {
 
     var appPages = {
@@ -189,7 +205,8 @@ class ClientHeader extends React.Component {
       'OrderPage': <OrderPage shoppingCart={this.state.shoppingCart} handleRemoveItem={this.handleRemoveItem} emptyCart={this.emptyCart} postOrder={this.postOrder} redirect={this.redirect}/>,
       'User': <ClientHistory netid={this.state.user}/>,
       'FAQPage': <FAQPage/>,
-      'ContactUs': <ContactUs/>
+      'ContactUs': <ContactUs/>,
+      'MobileMenu': <MobileMenu user={ this.state.user}/>
     };
 
     return (
@@ -302,8 +319,10 @@ class ClientHeader extends React.Component {
         </Responsive>
         <Responsive {...Responsive.onlyMobile}>
           <Menu inverted fixed="top" fluid widths='7' secondary style={{ height: '7vh', background: '#BEB19B' }}>
-            <Menu.Item/>
-            <Menu.Item/>
+            <Menu.Item />
+            <Menu.Item style={{width:'10%'}}>
+              <Icon name='sidebar' style={{color:'white'}} onClick={this.handleMobileMenu}/>
+            </Menu.Item>
             <Menu.Item/>
             <Menu.Item style={{width:'35%'}}>
               <Header as='h3' style={{fontFamily:'Didot', color: 'white', fontStyle:'italic'}}>
@@ -311,32 +330,11 @@ class ClientHeader extends React.Component {
               </Header>
             </Menu.Item>
             <Menu.Item/>
-            <Menu.Item position='right'>
-              {/* Dropdown menu */}
-              <Dropdown fluid icon='sidebar' style={{color:'white'}}>
-                <Dropdown.Menu direction='left' style={{ background: 'white'}}>
-                  <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
-                    <Header>
-                      Menu
-                    </Header>
-                  </Dropdown.Item>
-                  <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleOrderItemClick}>
-                    <Header as='h3'>
-                      My Cart
-                    </Header>
-                  </Dropdown.Item>
-                  <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleUserItemClick}>
-                    <Header as='h3'>
-                      History
-                    </Header>
-                  </Dropdown.Item>
-                  <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleUserLogout}>
-                    <Header as='h3'>
-                      Logout
-                    </Header>
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
+            <Menu.Item position='right' onClick={this.handleOrderItemClick}>
+              <Icon name='cart' size = 'large' style={{paddingLeft:'10%', paddingRight:'3%', color: 'white'}}/>
+              <Label basic circular size='tiny' horizontal style={{borderColor:'white', background:'#EDAC86',color:'white'}}>
+                1
+              </Label>
             </Menu.Item>
             <Menu.Item/>
           </Menu>
