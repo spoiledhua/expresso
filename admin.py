@@ -15,26 +15,18 @@ history_schema = HistorySchema()
 details_schema = DetailsSchema()
 
 #-------------------------------------------------------------------------------
-@admin.route('/admin/authenticate', methods=['POST'])
-def admin_authenticate():
-    if request.method == 'POST':
-        """incoming = request.get_json()
-        username = incoming['username']
-        password = incoming['password']"""
-        username = 'admin'
-        password = 'admin'
-        password = generate_password_hash(password)
-        __password = 'admin'
-
+# ADMIN
+#-------------------------------------------------------------------------------
+@admin.route('/admin/checkstatus', methods=['GET'])
+def admin_checkstatus():
+    if request.method == 'GET':
         if 'user' in session:
-            add_claims_to_access_token(session['user'])
-            return jsonify(user = session['user'], url = None)
-
+            if session['user'] != 'cc_admin':
+                return jsonify(error='Access Denied'), 402
+            else:
+                return jsonify(status='admin'), 200
         else:
-            if username == 'admin' and check_password_hash(password, __password):
-                session['user'] = username
-                add_claims_to_access_token(session['user'])
-                return jsonify(user= session['user'], url='http://coffeeclub.princeton.edu'), 200
+            return jsonify(error='Access Denied'), 402
     else:
         return jsonify(error=True), 405
 
@@ -42,40 +34,70 @@ def admin_authenticate():
 # POST request that will either upload an item and return the item
 # needs to do check that the user is called admin
 @admin.route('/admin/addinventory', methods=['POST'])
-@admin_required
 def add_inventory():
     incoming = request.get_json()
     if incoming is None:
         return jsonify(error=True), 403
     if request.method == 'POST':
-        try:
+        """if 'user' not in session:
+            return jsonify(msg = 'Cannot access endpoint'), 401
+        elif session['user'] != 'cc_admin':
+            return jsonify(msg = 'Cannot access endpoint'), 401"""
+        query = db.session.query(Menu).filter_by(item=incoming['item']).all()
+        if len(query) > 0:
+            return jsonify(msg='Item exists'), 200
+        for i in range(0, len(incoming['price'])):
+            if 'size' not in incoming:
+                size = 'One Size'
+            else:
+                size = incoming['size'][i]
             new_item = Menu (
                 item = incoming['item'],
-                price = incoming['price'],
-                availability = incoming['availability'],
+                price = incoming['price'][i],
+                description = incoming['description'],
+                size = size,
+                availability = True,
                 category = incoming['category']
                 )
-            db.session.add(new_item)
-            db.session.commit()
-        except Exception as e:
-            return jsonify(error=True), 408
-        return jsonify(menu_schema.dump(new_item))
+            try:
+                db.session.add(new_item)
+                db.session.commit()
+            except Exception as e:
+                return jsonify(error=True), 408
+        return jsonify(item=menu_schema.dump(new_item), msg=None), 201
     else:
         return jsonify(error=True), 405
 
 #-------------------------------------------------------------------------------
 # DELETE request that takes item and deletes it from Menu, returns deleted item
-@admin.route('/admin/deleteinventory', methods=['DELETE'])
-@admin_required
-def delete_inventory():
+@admin.route('/admin/<item_name>/deleteinventory', methods=['DELETE'])
+def delete_inventory(item_name):
     if request.method == 'DELETE':
-        query = db.session.query(Menu).filter_by(item=incoming['item'])
+        """if 'user' not in session:
+            return jsonify(msg = 'Cannot access endpoint'), 401
+        elif session['user'] != 'cc_admin':
+            return jsonify(msg = 'Cannot access endpoint'), 401"""
+        deleted = []
+        query = db.session.query(Menu).filter_by(item=item_name).all()
+        if len(query) == 0:
+            return jsonify(items=deleted), 201
+        for menu_item in query:
+            deleted.append(menu_schema.dump(menu_item))
+            try:
+                db.session.delete(menu_item)
+                db.session.commit()
+            except Exception as e:
+                return jsonify(error="Error here"), 403
+
+        query = db.session.query(Images).filter_by(name=query[0].item).all()
+        if len(query) == 0:
+            return jsonify(items=deleted), 201
+
         try:
-            deleted = query.one()
-            query.delete()
+            db.session.delete(query)
             db.session.commit()
         except Exception as e:
-            return jsonify(error=True), 403
-        return jsonify(menu_schema.dump(deleted))
+            return jsonify(error='True'), 403
+        return jsonify(items=deleted), 201
     else:
         return jsonify(error=True), 405

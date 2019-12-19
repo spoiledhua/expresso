@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required
 from flask_sqlalchemy import SQLAlchemy
 import pytz, base64
 import datetime as d
-from ldap import LDAP
+from LDAP import LDAP
 from models import db, Menu, History, Images, Details, MenuSchema, HistorySchema, DetailsSchema
 #-------------------------------------------------------------------------------
 customer = Blueprint('customer', 'customer')
@@ -33,21 +33,28 @@ incoming = {
     }
 
 #-------------------------------------------------------------------------------
+# CUSTOMER
+#-------------------------------------------------------------------------------
 # GET Request that returns all of the items on the menu
 @customer.route('/customer/menu', methods = ['GET'])
-@jwt_required
 def populate_menu():
     items = []
     if request.method == 'GET':
+        """if 'username' not in session:
+            return jsonify(msg='Cannot access endpoint'), 401"""
+
         query = db.session.query(Menu).all()
         if query is None:
             return jsonify(error=True), 403
         for item in query:
             menu_item = menu_schema.dump(item)
-            #print(db.session.query(Images).all())
-            #picture = db.session.query(Images).filter(Images.name==item.item).all()[0].picture
-            #menu_item['image'] = base64.b64encode(picture).decode('utf-8')
-            items.append(menu_item)
+            picture = db.session.query(Images).filter(Images.name==item.item).all()
+            if len(picture) != 0:
+                picture = picture[0].picture
+                menu_item['image'] = base64.b64encode(picture).decode('utf-8')
+                items.append(menu_item)
+            else:
+                items.append(menu_item)
         return jsonify(items), 200
     else:
         return jsonify(error=True), 405
@@ -55,45 +62,64 @@ def populate_menu():
 #-------------------------------------------------------------------------------
 #GET Request that returns all of the information about specified item
 @customer.route('/customer/menu/<item>', methods=['GET'])
-@jwt_required
 def menu_get(item):
     items = []
     if request.method == 'GET':
+        """if 'username' not in session:
+            return jsonify(msg='Cannot access endpoint'), 401"""
         item_name = item
         query = db.session.query(Menu).filter(Menu.item==item_name).all()
         if query is None:
             return jsonify(error=True), 403
         for item in query:
-            items.append(menu_schema.dump(item))
-        return jsonify(items), 200
+            if item.availability is False:
+                return jsonify(availability=False), 402
+        return jsonify(availability=True, items=items), 200
     else:
         return jsonify(error=True), 405
+#-------------------------------------------------------------------------------
+@customer.route('/customer/checkavailability', methods = ['GET'])
+def check_availability():
+    if request.method == 'GET':
+        """if 'username' not in session:
+            return jsonify(msg = "Cannot access endpoint"), 401"""
+        for i in incoming['items']:
+            for add in i['addons']:
+                print(add['name'])
+                query = db.session.query(Menu).filter_by(item=add['name']).first()
+                if query is not None and query.availability is False:
+                    return jsonify(item=query.item), 400
+            item_name = i['item']['name']
+            query = db.session.query(Menu).filter_by(item=item_name).first()
+            if query is not None and query.availability is False:
+                return jsonify(item=query.item), 400
+    return jsonify(item=None), 200
 
 #-------------------------------------------------------------------------------
 # POST Request that returns JSON of the order details that was placed
 @customer.route('/customer/<netid>/placeorder', methods = ['POST'])
-#@jwt_required
 def place_order(netid):
-    ordered = []
     if request.method == 'POST':
-        """if 'username' not in session:
-            return jsonify(msg = "Please login"), 401
-        elif session['username'] != netid:
-            return jsonify(msg = "Wrong netid"), 401"""
-
         try:
-            print('go')
-            #incoming = request.get_json()
+            incoming = request.get_json()
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
             return jsonify(error=True), 400
         if 'time' not in incoming:
             eastern = pytz.timezone('US/Eastern')
-            currenttime = eastern.localize(d.datetime.now())
+            currenttime = eastern.localize(datetime.datetime.now())
         else:
             currenttime = incoming['time']
-        print(currenttime)
+        for i in incoming['items']:
+            query = db.session.query(Menu).filter_by(item=i['item']['name']).first()
+            if query.availability is False:
+                return jsonify(availability=False), 200
+            for add in i['addons']:
+                addon = add['name']
+                query = db.session.query(Menu).filter_by(item=addon).first()
+                if query.availability is False:
+                    return jsonify(availability=False), 200
         order = History(
             netid = netid,
             time = currenttime,
@@ -108,17 +134,19 @@ def place_order(netid):
         except Exception as e:
             return jsonify(error=True), 408
         query = db.session.query(History).order_by(History.orderid.desc()).first()
+        id = query.orderid
         for i in incoming['items']:
             addon_list = ''
             count = 0
             for add in i['addons']:
+                addon = add['name']
                 if count is 0:
-                    addon_list += add['name']
+                    addon_list += addon
                 else:
-                    addon_list += ', ' + add['name']
+                    addon_list += ', ' + addon
                 count += 1
-            if i['sp'][0] == 'Small' or i['sp'][0] == 'Large':
-                item_detail = i['sp'][0] + ' ' + i['item']['name']
+            if i['sp'] == 'Small' or i['sp'] == 'Large':
+                item_detail = i['sp'] + ' ' + i['item']['name']
                 if len(addon_list) > 0:
                     item_detail += ' w/ ' + addon_list
             else:
@@ -126,31 +154,28 @@ def place_order(netid):
                 if len(addon_list) > 0:
                     item_detail += ' w/ ' + addon_list
             object = Details(
-                id = query.orderid,
+                id = id,
                 item = item_detail
             )
             try:
                 db.session.add(object)
                 db.session.commit()
-                ordered.append(object)
             except Exception as e:
-                return jsonify(error='True'), 408
-        return jsonify(history_schema.dump(order)), 201
+                return jsonify(error=True), 408
+        return jsonify(availability=True), 201
     else:
         return jsonify(error=True), 405
 
 #-------------------------------------------------------------------------------
 # GET Request that returns last order
 @customer.route('/customer/<netid>/orderhistory', methods = ['GET'])
-@jwt_required
 def get_history(netid):
-    netid = netid + '\n'
     past_orders = []
     if request.method == 'GET':
-        if 'username' not in session:
+        """if 'username' not in session:
             return jsonify(msg = "Please login"), 401
         elif session['username'] != netid:
-            return jsonify(msg = "Wrong netid"), 401
+            return jsonify(msg = "Wrong netid"), 401"""
 
         query = db.session.query(History).filter_by(netid=netid).order_by(History.orderid.desc()).all()
         for orders in query:
@@ -174,8 +199,11 @@ def get_history(netid):
 #-------------------------------------------------------------------------------
 # GET Request that returns status of the individual
 @customer.route('/customer/<netid>/checkstatus', methods = ['GET'])
-@jwt_required
 def check_year(netid):
+    """if 'username' not in session:
+        return jsonify(msg = "Please login"), 401
+    elif session['username'] != netid:
+        return jsonify(msg = "Wrong netid"), 401"""
     last_valid_date_seniors = ("2019", "04", "07")
     last_valid_year = int(last_valid_date_seniors[0])
     last_valid_month = int(last_valid_date_seniors[1])
