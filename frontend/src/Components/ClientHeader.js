@@ -1,5 +1,5 @@
 import React from 'react';
-import {Segment, Label, Menu, Icon, Image, Container, Header, Dimmer, Divider, Loader, Responsive, Dropdown, Card, Button } from 'semantic-ui-react';
+import {Segment, Label, Sidebar, Menu, Icon, Image, Container, Header, Dimmer, Divider, Loader, Responsive, Dropdown, Card, Button } from 'semantic-ui-react';
 
 import MenuPage from './MenuPage';
 import OrderPage from './OrderPage';
@@ -37,6 +37,7 @@ class ClientHeader extends React.Component {
         }
       });
   }
+
 
   getPrice = () => {
     let { shoppingCart } = this.state;
@@ -259,7 +260,7 @@ class ClientHeader extends React.Component {
             <Menu.Item position='right'>
               <Header as='h4' style={{ textTransform: 'lowercase', fontFamily:'Avenir', color: 'white'}}>
                 <Dropdown text floating style={{paddingRight:'1em'}}>
-                  <Dropdown.Menu style={{ top:'170%',background: 'white', width:'50em' }}>
+                  <Dropdown.Menu style={{ top:'170%', background: 'white', width:'50em' }}>
                     <Dropdown.Item style={{height:'6vh'}}>
                       <Header as='h4' style={{fontFamily:'Avenir', fontStyle:'italic', marginTop:'1vh'}}>
                       Your Account
@@ -300,14 +301,20 @@ class ClientHeader extends React.Component {
           </Menu>
         </Responsive>
         <Responsive {...Responsive.onlyMobile}>
-          <Menu inverted fixed="top" fluid widths='7' secondary style={{ height: '7vh', background: '#EDAC86' }}>
-            <Menu.Item position='left'>
-              <Image src={logo} size='mini' style={{ cursor: 'pointer' }} onClick={this.handleLogoClick}/>
+          <Menu inverted fixed="top" fluid widths='7' secondary style={{ height: '7vh', background: '#BEB19B' }}>
+            <Menu.Item/>
+            <Menu.Item/>
+            <Menu.Item/>
+            <Menu.Item style={{width:'35%'}}>
+              <Header as='h3' style={{fontFamily:'Didot', color: 'white', fontStyle:'italic'}}>
+                · the coffee club ·
+              </Header>
             </Menu.Item>
+            <Menu.Item/>
             <Menu.Item position='right'>
               {/* Dropdown menu */}
-              <Dropdown icon='sidebar' style={{color:'white'}}>
-                <Dropdown.Menu direction='left' style={{ background: 'white' }}>
+              <Dropdown fluid icon='sidebar' style={{color:'white'}}>
+                <Dropdown.Menu direction='left' style={{ background: 'white'}}>
                   <Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.handleMenuItemClick}>
                     <Header>
                       Menu
@@ -331,6 +338,7 @@ class ClientHeader extends React.Component {
                 </Dropdown.Menu>
               </Dropdown>
             </Menu.Item>
+            <Menu.Item/>
           </Menu>
         </Responsive>
         <div style={{ height: '15vh' }} />
