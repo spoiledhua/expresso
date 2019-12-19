@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from models import db, ma, Menu, History, Images, Barista, Details, MenuSchema, HistorySchema, DetailsSchema
-import os, pytz, base64, datetime, hashlib
+import os, pytz, base64, datetime, hashlib, re
 import urllib.parse
 from LDAP import LDAP
 from CASClient import CASClient
@@ -346,6 +346,29 @@ def get_display(netid):
             if displayname is '':
                 displayname = netid
         return jsonify(name=displayname), 200
+    else:
+        return jsonify(error=True), 405
+
+#-------------------------------------------------------------------------------
+@app.route('/customer/contact', methods=['GET'])
+#@jwt_required
+def contact():
+    if request.method == 'GET':
+        if incoming is None:
+            return jsonify(error=True), 408
+        for elements in incoming:
+            if (incoming[elements] is None) or (len(incoming[elements]) == 0):
+                return jsonify(error=True), 408
+        first = incoming['firstname']
+        last = incoming['lastname']
+        email = incoming['email']
+        # regex email checker comes from Geek for Geeks
+        regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+        search = re.search(regex,email)
+        if (search is None):
+            return jsonify(error='Invalid email'), 408
+        message = incoming['message']
+        return jsonify(sent=True), 200
     else:
         return jsonify(error=True), 405
 
