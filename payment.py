@@ -27,7 +27,7 @@ def validate(netid):
 
     conn = LDAP()
     conn.connect_LDAP()
-    print(netid)
+
     puclassyear = conn.get_puclassyear(netid)
     pustatus = conn.get_pustatus(netid)
 
@@ -35,13 +35,13 @@ def validate(netid):
 
     if pustatus != 'undergraduate':
         return False
-    """if puclassyear not in valid_class_year:
+    if puclassyear not in valid_class_year:
         return False
     if puclassyear == valid_class_year[3]:
         if month > last_valid_month and year >= last_valid_year:
             return False
         if month == last_valid_month and year >= last_valid_year and day > last_valid_day:
-            return False"""
+            return False
 
     return True
 
@@ -84,7 +84,7 @@ def charge(pay_file):
 
 def open_file():
     name = today.strftime("%Y-%m-%d")
-    pay_file = open("/Users/dorazhao/Desktop/expresso/CCPayment%s.mp" % name, "w+")
+    pay_file = open("/Users/HariRaval/Desktop/expresso/CCPayment%s.mp" % name, "w+")
     return pay_file
 
 

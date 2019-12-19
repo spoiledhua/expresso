@@ -122,14 +122,12 @@ def build_order_history_table(mydb):
             # type_of_payment: 1 indicates online payment and 0 indicates in-store payment...
             # payment_status: 1 indicates paid and 0 indicates not paid
             # order_status: 0 indicates order not completed, 1 indicates order in-progress, 2 indicates order complete
-            mycursor.execute("CREATE TABLE order_history (netid VARCHAR(255), order_id INT, timestamp DATETIME, " +
+            mycursor.execute("CREATE TABLE order_history (netid VARCHAR(255), order_id INT, timestamp TIMESTAMP, " +
                              "total_cost DECIMAL(10,2), type_of_payment BOOLEAN, payment_status BOOLEAN, order_status INT)")
 
             mycursor.execute("ALTER TABLE `order_history` ADD PRIMARY KEY(`order_id`)")
 
-
-            mycursor.execute(
-                "ALTER TABLE `order_history` CHANGE `order_id` `order_id` INT(11) NOT NULL AUTO_INCREMENT")
+            mycursor.execute("ALTER TABLE `order_history` CHANGE `order_id` `order_id` INT(11) NOT NULL AUTO_INCREMENT");
 
         except Exception as e:
             print("build_order_history_table creating table failed: %s", str(e), file=stderr)
@@ -150,44 +148,12 @@ def build_order_details_table(mydb):
         mycursor.close()
 
 
-def build_barista_user_passwords_table(mydb):
-    check_table = check_table_exists(mydb, "valid_barista_users")
-
-    if not check_table:
-        mycursor = mydb.cursor()
-
-        try:
-            mycursor.execute("CREATE TABLE valid_barista_users (username VARCHAR(255), password VARCHAR(255))")
-
-        except Exception as e:
-            print("valid_barista_users creating table failed: %s", str(e), file=stderr)
-
-        barista_users = pd.read_excel("barista_users.xlsx")
-
-        for index, row in barista_users.iterrows():
-            username = row['username']
-            password = row['password']
-            # protect against SQL injections
-            sql = "INSERT INTO valid_barista_users (username, password) VALUES (%s, %s)"
-            val = (username, password)
-
-            try:
-                mycursor.execute(sql, val)
-            except Exception as e:
-                print("build_menu_table inserting item failed: %s", str(e), file=stderr)
-
-            mydb.commit()
-
-        mycursor.close()
-
-
 def main():
     mydb = connect()
     build_menu_table(mydb)
     build_order_history_table(mydb)
     build_order_details_table(mydb)
     build_images_table(mydb)
-    build_barista_user_passwords_table(mydb)
     disconnect(mydb)
 
 

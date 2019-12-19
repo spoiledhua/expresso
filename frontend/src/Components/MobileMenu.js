@@ -253,7 +253,7 @@ class MobileMenu extends React.Component {
                 <Grid.Row>
                   <Grid.Column />
                   <Grid.Column>
-                      <span style={{paddingLeft:'10%', color:'black'}}> { this.state.user} </span>
+                      <span style={{paddingLeft:'10%', color:'black'}}> {this.state.user} </span>
                   </Grid.Column>
                   <Grid.Column style={{width:'60%'}}/>
                   <Grid.Column>

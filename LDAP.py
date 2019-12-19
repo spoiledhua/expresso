@@ -134,7 +134,6 @@ class LDAP:
         result = 0
 
         if success:
-            print(self._connection.entries[0])
             result = self._connection.entries[0]['puclassyear'][0]
         else:
             print("Search failed", file=stderr)
@@ -149,7 +148,7 @@ def main():
     print(searchResults)
     #searchResults = conn.get_id("jk30")
     #print(searchResults)
-    searchResults = conn.get_displayname("r")
+    searchResults = conn.get_displayname("jk30")
     print(searchResults)
     searchResults = conn.get_givenname("jk30")
     print(searchResults)
