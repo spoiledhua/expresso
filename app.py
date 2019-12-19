@@ -1,7 +1,7 @@
-#------------------------------------------------------------------------------
-from flask import Flask, request, render_template, jsonify, redirect
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from flask import Flask, request, render_template, jsonify, redirect, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, \
+get_jwt_identity, verify_jwt_in_request, get_jwt_claims
 from werkzeug.security import generate_password_hash
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
@@ -9,6 +9,7 @@ from customer import customer
 from barista import barista
 from admin import admin
 from models import db, ma
+from jwtprotected import jwt, add_claims_to_access_token
 import os
 from CASClient import CASClient
 #------------------------------------------------------------------------------
@@ -30,24 +31,18 @@ app.secret_key = b'\x06\x99\x99hR\x9a\x16\xae\x0f\xe6_\xf3\x0en\xe0\xda'
 app.config.from_mapping(config)
 db.init_app(app)
 ma.init_app(app)
-jwt = JWTManager(app)
-import models, admin, barista, customer
+jwt.init_app(app)
+import models, admin, barista, customer, jwtprotected
 #-------------------------------------------------------------------------------
 @app.route('/gettoken', methods=['GET'])
 def get_token():
-    if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
+    username = None
+    if 'user' in session:
+        username = session['user']
+    elif 'username' in session:
+        username = session['username']
 
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
-    __password = 'test'
-    if not username:
-        return jsonify({"msg": "Missing username parameter"}), 400
-    if not password:
-        return jsonify({"msg": "Missing password parameter"}), 400
-    password = generate_password_hash(password)
-    app_pass = generate_password_hash(__password)
-    if username == 'coffeeclubtester' or password == app_pass:
+    if username is not None:
         # Identity can be any data that is json serializable
         access_token = create_access_token(identity=username)
         return jsonify(access_token=access_token), 200
@@ -56,7 +51,6 @@ def get_token():
 #-------------------------------------------------------------------------------
 @app.route('/', defaults={'path':''}, methods=['GET'])
 @app.route('/<path:path>')
-#@login_required
 def index(path):
     return jsonify(msg='You put in an invalid endpoint. Try again.'), 403
 
@@ -65,7 +59,6 @@ def index(path):
 def logout():
     if request.method == 'GET':
         return jsonify(url=CASClient().logout()), 201
-        #return jsonify(logout = True), 200
     else:
         return jsonify(error=True), 403
 #------------------------------------------------------------------------------
@@ -88,10 +81,9 @@ def authenticate():
         ret = CASClient().authenticate()
         if ret[0] is None and ret[1] is not None:
             return jsonify(user = ret[0], url = ret[1]), 200
-        elif ret[0] is not None and ret[1] is not None:
-            return jsonify(user = ret[0], url = 'http://localhost:3000'), 200
         else:
-            return redirect('http://localhost:3000/menu')
+            add_claims_to_access_token(ret[0])
+            return redirect('http://www.google.com')
     else:
         return jsonify(error=True), 403
 #------------------------------------------------------------------------------

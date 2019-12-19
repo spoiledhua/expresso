@@ -58,7 +58,6 @@ class CASClient:
     # Do not return unless the user is successfully authenticated.
 
     def authenticate(self):
-        print(session)
         if 'username' in session:
             return (session.get('username'), None)
         # If the user's username is in the session, then the user was

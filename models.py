@@ -9,7 +9,7 @@ class History(db.Model):
     __tablename__ = 'order_history'
     netid = db.Column('netid', db.String)
     orderid = db.Column('order_id', db.Integer, primary_key=True)
-    time = db.Column('timestamp', db.TIMESTAMP)
+    time = db.Column('timestamp', db.DATETIME)
     cost = db.Column('total_cost', db.Float)
     payment = db.Column('type_of_payment', db.Boolean)
     status = db.Column('payment_status', db.Boolean)
@@ -18,7 +18,8 @@ class History(db.Model):
 class Details(db.Model):
     __tablename__ = 'order_details'
     id = db.Column('order_id', db.Integer, primary_key=True)
-    item = db.Column('item', db.String, primary_key=True)
+    item = db.Column('item', db.String)
+    item_id = db.Column('item_id', db.Integer, primary_key=True)
 
 class Menu(db.Model):
     __tablename__ = 'menu'
@@ -33,6 +34,11 @@ class Images(db.Model):
     __tablename__= 'images'
     name = db.Column('name', db.String, primary_key=True)
     picture = db.Column('picture', db.BLOB)
+
+class Barista(db.Model):
+    __tablename__= 'valid_barista_users'
+    username = db.Column('username', db.String, primary_key=True)
+    password = db.Column('password', db.String)
 
 #---------------------------------------------------------------------------
 # sets Flask Marshmallow Schemas

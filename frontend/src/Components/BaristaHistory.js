@@ -1,6 +1,7 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Button, Divider, Dimmer, Loader } from 'semantic-ui-react';
+import { Header, Grid, Divider, Dimmer, Loader } from 'semantic-ui-react';
 
+import BaristaHeader from './BaristaHeader';
 import { getDayHistory, getAllHistory } from '../Axios/axios_getter';
 
 class BaristaHistory extends React.Component {
@@ -14,11 +15,10 @@ class BaristaHistory extends React.Component {
 
   componentDidMount = () => {
     this.setState({ loading: true });
-    this.getDayHistory();
+    setTimeout(this.getDayHistory, 1000);
     this.getAllHistory();
-    this.setState({ loading: false });
-    let intervalFunctionDay = setInterval(this.getDayHistory, 10000);
-    let intervalFunctionAll = setInterval(this.getAllHistory, 10000);
+    setInterval(this.getDayHistory, 10000);
+    setInterval(this.getAllHistory, 10000);
   }
 
   getDayHistory = async () => {
@@ -30,6 +30,7 @@ class BaristaHistory extends React.Component {
         console.log(error);
         this.setState({ dayHistory: [] });
       });
+    this.setState({ loading: false });
   }
 
   getAllHistory = async () => {
@@ -49,9 +50,9 @@ class BaristaHistory extends React.Component {
 
       let historyType = (showAll) ? allHistory : dayHistory;
 
-      let history = (historyType.length == 0) ?
+      let history = (historyType.length === 0) ?
       <Header as='h3'>
-        No past orders
+        :)
       </Header> :
 
       <React.Fragment>
@@ -65,11 +66,10 @@ class BaristaHistory extends React.Component {
               <Grid.Column width='8' verticalAlign='middle'>
                 {history.item.map(subitem => {
                   return (
-                    <Grid divided>
-                      <Grid.Row>
-                        <h2 style={{margin: '0'}}>{subitem}</h2>
-                      </Grid.Row>
-                    </Grid>
+                    <React.Fragment>
+                      <h2 style={{margin: '0'}}>{subitem}</h2>
+                      <Divider />
+                    </React.Fragment>
                   )
                 })}
               </Grid.Column>
@@ -90,6 +90,7 @@ class BaristaHistory extends React.Component {
 
         return (
             <React.Fragment>
+              <BaristaHeader history={this.props.history} />
               <Dimmer active={this.state.loading} inverted page>
                 <Loader inverted>Loading</Loader>
               </Dimmer>

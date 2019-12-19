@@ -1,7 +1,5 @@
 import React from 'react';
-import { Card, Icon, Image, Container, Header, Grid, Button, Radio, Form, Divider, Dimmer, Loader, Segment, Dropdown } from 'semantic-ui-react';
-
-import { getLastOrder } from '../Axios/axios_getter';
+import { Card, Container, Header, Grid, Button, Radio, Form, Divider, Dimmer, Loader } from 'semantic-ui-react';
 
 class OrderPage extends React.Component {
 
@@ -27,7 +25,6 @@ class OrderPage extends React.Component {
       loading: false
     }
   }
-  
 
   getPrice = () => {
     let { shoppingCart } = this.props;
@@ -61,17 +58,21 @@ class OrderPage extends React.Component {
   }
 
   handleConfirm = async () => {
-    let { shoppingCart } = this.props;
     this.setState({ loading: true });
-    if (this.props.shoppingCart.length == 0)
+    if (this.props.shoppingCart.length === 0) {
       this.setState({ emptyPopUp: true });
+      this.handleCloseConfirm();
+      this.setState({ loading: false });
+    }
     else {
       await this.props.postOrder(this.state.payment);
+      await this.handleCloseConfirm();
+      await this.props.emptyCart();
+      await this.setState({ totalPrice: 0 });
+      await this.setState({ loading: false });
+      // this.props.history.push('/menu');
+      this.props.redirect();
     }
-    await this.handleCloseConfirm();
-    await this.props.emptyCart();
-    await this.setState({ totalPrice: 0 })
-    await this.setState({ loading: false });
   }
 
   handleCloseEmpty = () => {
@@ -88,13 +89,8 @@ class OrderPage extends React.Component {
   }
 
   render() {
-    let timeOptions = [
-      {key: 1, text: '7:00 AM'},
-      {key: 2, text: '7:15 AM'},
-      {key: 3, text: '7:45 AM'},
-      {key: 4, text: '8:00 AM'}
-    ]
-    let currentOrder = (this.props.shoppingCart == 0) ?
+
+    let currentOrder = (this.props.shoppingCart === 0) ?
     <Header as='h3'>
       Your order will show up here!
     </Header> :
@@ -110,7 +106,7 @@ class OrderPage extends React.Component {
               <Header as='h3' color='grey'>{"$" + Number(item.sp[1]).toFixed(2)}</Header>
             </Grid.Column>
             <Grid.Column width='6'>
-              <Button circular icon='close' size='mini' onClick={() => this.handleRemoveItem(item.id)} basic color='black'/>
+              <Button circular icon='close' size='mini' onClick={() => this.handleRemoveItem(item.id)}/>
             </Grid.Column>
           </Grid.Row>
           {item.addons.map(addon => {
@@ -140,9 +136,11 @@ class OrderPage extends React.Component {
           <Container style={{ width: '720px' }}>
             <Card fluid>
               <Card.Content>
-                <Header as='h3' color='grey'>Add something to your cart to fuel your grind.</Header>
+                <Header as='h3' color='grey' style={{fontFamily:'Avenir'}}>
+                  Add something to your cart to fuel your grind.
+                </Header>
               </Card.Content>
-              <Button onClick={this.handleCloseEmpty}>
+              <Button style={{fontFamily:'Avenir'}} onClick={this.handleCloseEmpty}>
                 Close Window
               </Button>
             </Card>
@@ -153,17 +151,16 @@ class OrderPage extends React.Component {
           <Container style={{ width: '720px' }}>
             <Card fluid>
               <Card.Content>
-                <Header as='h3' color='grey'>Are you sure you're all finished?</Header>
-                <Header as='h4' color='black'>
-                  Hi from the Expresso team! We would like to notify you that clicking “All Set” below WILL charge
-                  your student account if you selected student charge. If you selected to “pay in store” and do not
-                  pay before the end of the day, your student account will be charged, whether you picked up your
-                  food/beverage or not. Thank you for ordering with Expresso! We hope to see you again!
+                <Header as='h3' color='grey' style={{fontFamily:'Avenir'}}>Are you sure you're all finished?</Header>
+                <Header as='h4' color='black' style={{fontFamily:'Avenir'}}>
+                  Clicking “All Set” WILL charge your student account if you selected student charge.
+                  If you selected to “pay in store” and do not pay before the end of the day,
+                  your student account will be charged, whether you picked up your food/beverage or not.
                 </Header>
               </Card.Content>
               <Button.Group>
                 <Button onClick={this.handleCloseConfirm}>Cancel</Button>
-                <Button positive onClick={this.handleConfirm}>All Set!</Button>
+                <Button positive style={{backgroundColor:'#85A290'}}onClick={this.handleConfirm}>All Set!</Button>
               </Button.Group>
             </Card>
           </Container>
@@ -189,12 +186,12 @@ class OrderPage extends React.Component {
 
         {/* Main component */}
         <Container style={{ width: '720px' }}>
-          <Card fluid>
+          <Card fluid style={{padding:'5%'}}>
             <Card.Content>
               <Grid stackable>
                 <Grid.Row>
                   <Grid.Column>
-                    <Header as='h2' color='black'>1. ORDER</Header>
+                    <Header as='h2' style={{fontFamily:'Didot', fontStyle:'italic', color:'black'}}>01. Order</Header>
                   </Grid.Column>
                 </Grid.Row>
                 {currentOrder}
@@ -202,7 +199,7 @@ class OrderPage extends React.Component {
               <Grid>
                 <Grid.Row>
                   <Grid.Column width='3'>
-                    <Header as='h3' color='black'>Total</Header>
+                    <Header as='h3' style={{fontFamily:'Avenir', color:'black'}}>Total</Header>
                   </Grid.Column>
                   <Grid.Column width='3' />
                   <Grid.Column>
@@ -215,7 +212,13 @@ class OrderPage extends React.Component {
               <Grid>
                 <Grid.Row>
                   <Grid.Column>
-                    <Header as='h2' color='black'>2. PAYMENT</Header>
+                    <Header as='h2'
+                      style={{fontFamily:'Didot',
+                        fontStyle:'italic',
+                        color:'black',
+                        paddingTop:'1em'}}>
+                      02. Payment
+                    </Header>
                   </Grid.Column>
                 </Grid.Row>
                 <Grid.Row>
@@ -242,27 +245,11 @@ class OrderPage extends React.Component {
                 </Grid.Row>
               </Grid>
             </Card.Content>
-            <Card.Content>
-              <Grid>
-                <Grid.Row>
-                  <Grid.Column>
-                    <Header as='h2' color='black'>3. PICKUP TIME</Header>
-                  </Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column>
-                  <Dropdown placeholder='Now' selection options={timeOptions} />
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-            </Card.Content>
-
-            <Card.Content textAlign='center'>
-              <Button circular onClick={this.handlePlaceOrder} basic color='black'>
+            <div>
+              <Button circular floated='right' style={{backgroundColor:'#EDAC86'}} onClick={this.handlePlaceOrder}>
                 PLACE ORDER
               </Button>
-            </Card.Content>
-
+            </div>
           </Card>
         </Container>
       </React.Fragment>

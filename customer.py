@@ -1,11 +1,11 @@
-from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint
+from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, Blueprint, session
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 from flask_sqlalchemy import SQLAlchemy
 import pytz, base64
 import datetime as d
+from LDAP import LDAP
 from models import db, Menu, History, Images, Details, MenuSchema, HistorySchema, DetailsSchema
-
 #-------------------------------------------------------------------------------
 customer = Blueprint('customer', 'customer')
 CORS(customer)
@@ -32,24 +32,29 @@ incoming = {
         }]
     }
 
-# initialize CAS
-#cas = CAS()
+#-------------------------------------------------------------------------------
+# CUSTOMER
 #-------------------------------------------------------------------------------
 # GET Request that returns all of the items on the menu
 @customer.route('/customer/menu', methods = ['GET'])
-#@jwt_required
 def populate_menu():
     items = []
     if request.method == 'GET':
+        """if 'username' not in session:
+            return jsonify(msg='Cannot access endpoint'), 401"""
+
         query = db.session.query(Menu).all()
         if query is None:
             return jsonify(error=True), 403
         for item in query:
             menu_item = menu_schema.dump(item)
-            #print(db.session.query(Images).all())
-            #picture = db.session.query(Images).filter(Images.name==item.item).all()[0].picture
-            #menu_item['image'] = base64.b64encode(picture).decode('utf-8')
-            items.append(menu_item)
+            picture = db.session.query(Images).filter(Images.name==item.item).all()
+            if len(picture) != 0:
+                picture = picture[0].picture
+                menu_item['image'] = base64.b64encode(picture).decode('utf-8')
+                items.append(menu_item)
+            else:
+                items.append(menu_item)
         return jsonify(items), 200
     else:
         return jsonify(error=True), 405
@@ -57,52 +62,67 @@ def populate_menu():
 #-------------------------------------------------------------------------------
 #GET Request that returns all of the information about specified item
 @customer.route('/customer/menu/<item>', methods=['GET'])
-#@jwt_required
 def menu_get(item):
     items = []
     if request.method == 'GET':
+        """if 'username' not in session:
+            return jsonify(msg='Cannot access endpoint'), 401"""
         item_name = item
         query = db.session.query(Menu).filter(Menu.item==item_name).all()
         if query is None:
             return jsonify(error=True), 403
         for item in query:
-            items.append(menu_schema.dump(item))
-        return jsonify(items), 200
+            if item.availability is False:
+                return jsonify(availability=False), 402
+        return jsonify(availability=True, items=items), 200
     else:
         return jsonify(error=True), 405
-
 #-------------------------------------------------------------------------------
-# GET request that returns the latest order placed
-@customer.route('/customer/orderid', methods=['GET'])
-@jwt_required
-def order_id():
+@customer.route('/customer/checkavailability', methods = ['GET'])
+def check_availability():
     if request.method == 'GET':
-        query = db.session.query(History).order_by(History.orderid.desc()).first()
-        return jsonify(history_schema.dump(query)), 200
-    else:
-        return jsonify(error=True), 405
+        """if 'username' not in session:
+            return jsonify(msg = "Cannot access endpoint"), 401"""
+        for i in incoming['items']:
+            for add in i['addons']:
+                print(add['name'])
+                query = db.session.query(Menu).filter_by(item=add['name']).first()
+                if query is not None and query.availability is False:
+                    return jsonify(item=query.item), 400
+            item_name = i['item']['name']
+            query = db.session.query(Menu).filter_by(item=item_name).first()
+            if query is not None and query.availability is False:
+                return jsonify(item=query.item), 400
+    return jsonify(item=None), 200
 
 #-------------------------------------------------------------------------------
 # POST Request that returns JSON of the order details that was placed
-@customer.route('/customer/placeorder', methods = ['POST'])
-#@jwt_required
-def place_order():
-    ordered = []
+@customer.route('/customer/<netid>/placeorder', methods = ['POST'])
+def place_order(netid):
     if request.method == 'POST':
         try:
             incoming = request.get_json()
-            print(incoming)
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
             return jsonify(error=True), 400
-
-        currenttime = d.datetime.now()
-        timezone = pytz.timezone("America/New_York")
-        d_aware = timezone.localize(currenttime)
+        if 'time' not in incoming:
+            eastern = pytz.timezone('US/Eastern')
+            currenttime = eastern.localize(datetime.datetime.now())
+        else:
+            currenttime = incoming['time']
+        for i in incoming['items']:
+            query = db.session.query(Menu).filter_by(item=i['item']['name']).first()
+            if query.availability is False:
+                return jsonify(availability=False), 200
+            for add in i['addons']:
+                addon = add['name']
+                query = db.session.query(Menu).filter_by(item=addon).first()
+                if query.availability is False:
+                    return jsonify(availability=False), 200
         order = History(
-            netid = incoming['netid'],
-            time = d_aware,
+            netid = netid,
+            time = currenttime,
             cost = incoming['cost'],
             payment = incoming['payment'],
             status = incoming['status'],
@@ -114,65 +134,49 @@ def place_order():
         except Exception as e:
             return jsonify(error=True), 408
         query = db.session.query(History).order_by(History.orderid.desc()).first()
+        id = query.orderid
         for i in incoming['items']:
             addon_list = ''
             count = 0
             for add in i['addons']:
+                addon = add['name']
                 if count is 0:
-                    addon_list += add['name']
+                    addon_list += addon
                 else:
-                    addon_list += ', ' + add['name']
+                    addon_list += ', ' + addon
                 count += 1
-            if i['sp'][0] == 'Small' or i['sp'][0] == 'Large':
-                item_detail = i['sp'][0] + ' ' + i['item']['name']
+            if i['sp'] == 'Small' or i['sp'] == 'Large':
+                item_detail = i['sp'] + ' ' + i['item']['name']
                 if len(addon_list) > 0:
                     item_detail += ' w/ ' + addon_list
             else:
                 item_detail = i['item']['name']
                 if len(addon_list) > 0:
                     item_detail += ' w/ ' + addon_list
-            print(item_detail)
             object = Details(
-                id = query.orderid,
+                id = id,
                 item = item_detail
             )
             try:
                 db.session.add(object)
                 db.session.commit()
-                ordered.append(object)
             except Exception as e:
-                return jsonify(error='True'), 408
-        return jsonify(history_schema.dump(order)), 201
-    else:
-        return jsonify(error=True), 405
-
-#-------------------------------------------------------------------------------
-# GET Request that returns last order
-@customer.route('/customer/orderinfo', methods = ['GET'])
-#@jwt_required
-def get_information():
-    history = []
-    if request.method == 'GET':
-        try:
-            user = 'vhua'
-            order = db.session.query(History).filter_by(netid=user).\
-            order_by(History.orderid.desc()).limit(1).all()
-            for item in order:
-                item = history_schema.dump(item)
-                history.append(item)
-            return jsonify(history), 200
-        except Exception as e:
-            return jsonify(error=True), 400
+                return jsonify(error=True), 408
+        return jsonify(availability=True), 201
     else:
         return jsonify(error=True), 405
 
 #-------------------------------------------------------------------------------
 # GET Request that returns last order
 @customer.route('/customer/<netid>/orderhistory', methods = ['GET'])
-#@jwt_required
 def get_history(netid):
     past_orders = []
     if request.method == 'GET':
+        """if 'username' not in session:
+            return jsonify(msg = "Please login"), 401
+        elif session['username'] != netid:
+            return jsonify(msg = "Wrong netid"), 401"""
+
         query = db.session.query(History).filter_by(netid=netid).order_by(History.orderid.desc()).all()
         for orders in query:
             items = db.session.query(Details).filter(Details.id==orders.orderid).all()
@@ -192,3 +196,44 @@ def get_history(netid):
         return jsonify(past_orders), 200
     else:
         return jsonify(error=True), 405
+#-------------------------------------------------------------------------------
+# GET Request that returns status of the individual
+@customer.route('/customer/<netid>/checkstatus', methods = ['GET'])
+def check_year(netid):
+    """if 'username' not in session:
+        return jsonify(msg = "Please login"), 401
+    elif session['username'] != netid:
+        return jsonify(msg = "Wrong netid"), 401"""
+    last_valid_date_seniors = ("2019", "04", "07")
+    last_valid_year = int(last_valid_date_seniors[0])
+    last_valid_month = int(last_valid_date_seniors[1])
+    last_valid_day = int(last_valid_date_seniors[2])
+
+    today = d.date.today()
+    year = int(today.strftime("%Y"))
+    month = int(today.strftime("%m"))
+    day = int(today.strftime("%d"))
+
+    senior = 2020
+
+    netid = netid + '\n'
+    past_orders = []
+    if request.method == 'GET':
+        if 'username' not in session:
+            return jsonify(msg = "Please login"), 401
+        elif session['username'] != netid:
+            return jsonify(msg = "Wrong netid"), 401
+        conn = LDAP()
+        conn.connect_LDAP()
+        status = conn.get_pustatus(netid)
+        if status == None or status != 'undergraduate':
+            return jsonify(error = "Cannot Student Charge"), 405
+        classyear = conn.get_puclassyear(netid)
+        conn.disconnect_LDAP()
+        if classyear == senior:
+            if month > last_valid_month and year == last_valid_year:
+                return jsonify(error = "Cannot Student Charge"), 405
+            if month == last_valid_month and year == last_valid_year and day > last_valid_day:
+                return jsonify(error = "Cannot Student Charge"), 405
+        else:
+            return jsonify(status = status), 200

@@ -1,13 +1,13 @@
 import React from 'react';
-import { Card, Icon, Image, Container, Header, Grid, Button, Radio, Segment, Message, Checkbox, Form, Item, Statistic } from 'semantic-ui-react';
+import { Header, Grid, Button, Segment, Form, Dimmer, Loader } from 'semantic-ui-react';
 import { baristaLogin } from '../Axios/axios_getter';
-import * as logo from '../Assets/logo.png';
 
 class BaristaLogin extends React.Component {
 
   state = {
     username: '',
     password: '',
+    invalid: null,
     loading: false
   }
 
@@ -19,53 +19,50 @@ class BaristaLogin extends React.Component {
     this.setState({ password: e.target.value });
   }
 
-  handleLogin = () => {
-    this.setState({ loading: true });
+  handleLogin = async () => {
+    await this.setState({ loading: true });
     const user = { username: this.state.username, password: this.state.password };
-    baristaLogin(user)
+    await baristaLogin(user)
       .then(data => {
-        this.props.history.push('barista');
+        console.log(data)
+        this.setState({ invalid: null });
+        let url = (typeof this.props.history.location.state === "undefined") ? '/baristaorders' : this.props.history.location.state.requested
+        this.props.history.push(url);
       })
       .catch(error => {
-        console.log('invalid login');
+        console.log(error)
+        this.setState({ invalid: 'Invalid login' });
       });
-    this.setState({ loading: false });
+    await this.setState({ loading: false });
   }
 
   render() {
 
-    const { selectedItem } = this.state
-
-    var appMenus = {'Menu':
-    <Header as='h2'>
-      <Icon name='settings' />
-      <Header.Content>
-        Account Settings
-        <Header.Subheader>Manage your preferences</Header.Subheader>
-      </Header.Content>
-    </Header>,
-    'Order': <div>My Order</div>,
-    'User': <div>User</div>};
-
     return (
       <React.Fragment>
+        <Dimmer active={this.state.loading} page inverted>
+          <Loader inverted>Loading</Loader>
+        </Dimmer>
         {/* Main Content */}
-            <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
-              <Grid.Column style={{ maxWidth: 450 }}>
-                <Header as='h2' color='#F98F69' textAlign='center'>
-                  Barista Login
-                </Header>
-                <Form size='large'>
-                  <Segment stacked>
-                    <Form.Input fluid icon='user' iconPosition='left' placeholder='Username' value={this.state.username} onChange={this.handleUsername}/>
-                    <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' value={this.state.password} onChange={this.handlePassword} type='password' />
-                    <Button onClick = {this.handleLogin} color='black' style={{background: '#F98F69'}} fluid size='medium'>
-                      Login
-                    </Button>
-                  </Segment>
-                </Form>
-              </Grid.Column>
-            </Grid>
+        <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
+          <Grid.Column style={{ maxWidth: 450 }}>
+            <Header as='h2' style={{color:'black', textAlign:'center', fontFamily:'Didot', fontStyle:'italic'}}>
+              Barista Login
+            </Header>
+            <Form size='large'>
+              <Segment stacked>
+                <Form.Input fluid icon='user' iconPosition='left' placeholder='Username' value={this.state.username} onChange={this.handleUsername}/>
+                <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' value={this.state.password} onChange={this.handlePassword} type='password' />
+                <Button onClick = {this.handleLogin} color='black' style={{background: '#EDAC86', fontFamily:'Avenir'}} fluid size='medium'>
+                  Login
+                </Button>
+              </Segment>
+            </Form>
+            <Header as='h4' color='black' textAlign='center' fontFamily='Avenir'>
+              {this.state.invalid}
+            </Header>
+          </Grid.Column>
+        </Grid>
       </React.Fragment>
 
     );

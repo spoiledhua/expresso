@@ -1,6 +1,6 @@
 import React from 'react';
-import { Menu, Icon, Image, Container, Header, Grid, Responsive, Dropdown, Button, Dimmer, Loader, Divider } from 'semantic-ui-react';
-
+import { Header, Grid, Dimmer, Loader, Divider } from 'semantic-ui-react';
+import * as history from '../Assets/Orders.png';
 import { getHistory } from '../Axios/axios_getter'
 
 class CustomerHistory extends React.Component {
@@ -13,7 +13,7 @@ class CustomerHistory extends React.Component {
   componentDidMount = () => {
     this.setState({ loading: true });
     this.getHistory();
-    let intervalFunction = setInterval(this.getHistory, 10000);
+    setInterval(this.getHistory, 10000);
     this.setState({ loading: false });
   }
 
@@ -28,15 +28,13 @@ class CustomerHistory extends React.Component {
       });
   }
 
- 
-
   render() {
 
     const { history } = this.state;
 
-    let showHistory = (history.length == 0) ?
+    let showHistory = (history.length === 0) ?
     <Header as='h3'>
-      No past orders
+      :)
     </Header> :
 
     <React.Fragment>
@@ -52,11 +50,10 @@ class CustomerHistory extends React.Component {
             <Grid.Column width='8' verticalAlign='middle'>
               {history.item.map(subitem => {
                 return (
-                  <Grid>
-                    <Grid.Row>
-                      <h2 style={{margin: '0'}}>{subitem}</h2>
-                    </Grid.Row>
-                  </Grid>
+                  <React.Fragment>
+                    <h2 style={{margin: '0'}}>{subitem}</h2>
+                    <Divider />
+                  </React.Fragment>
                 )
               })}
             </Grid.Column>
@@ -79,15 +76,14 @@ class CustomerHistory extends React.Component {
             <Grid stackable divided='vertically'>
               <Grid.Row>
                 <Grid.Column width='2' />
-                <Grid.Column width='12' >
-                  <h2>Account History</h2>
-                </Grid.Column>
-                <Grid.Column width='2'>
+                <Grid.Column width='14' >
+                  <h1 style={{fontFamily:'Didot', fontStyle:'italic'}}>Past Orders</h1>
                 </Grid.Column>
               </Grid.Row>
               {showHistory}
             </Grid>
           </React.Fragment>
+
         );
     }
 }
