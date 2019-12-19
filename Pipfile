@@ -17,6 +17,7 @@ pymysql = "*"
 pytz = "*"
 flask-login = "*"
 certifi = "*"
+ldap3 = "*"
 
 [requires]
 python_version = "3.7"
