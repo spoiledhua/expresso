@@ -224,32 +224,78 @@ class AboutTeam extends React.Component {
           </Sidebar.Pushable>
         </Responsive>
         <Responsive {...Responsive.onlyMobile}>
+					<Sidebar.Pushable as={Segment}>
+						<Sidebar
+							as={Menu}
+							animation='push'
+							fluid
+							vertical
+							inverted
+							borderless
+							visible={this.state.visible}
+							style={{background: '#EDAC86'}}
+						>
+							<Menu.Item>
+								<Icon name='x' size='large' style={{cursor:'pointer', color:'white'}} onClick={this.handlePusher}/>
+							</Menu.Item>
+							<Menu.Item style={{height:'12vh'}}/>
+							<Menu.Item>
+								<Image centered={true} src={logo} size='mini'/>
+							</Menu.Item>
+							<Menu.Item>
+								<hr></hr>
+							</Menu.Item>
+							<Menu.Item as='a' style={{background: '#EDAC86', textAlign: 'center'}}>
+								<Header as='h2' style={{paddingLeft:'5%',color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>01.&nbsp;&nbsp;&nbsp;&nbsp;Home</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item as='a' onClick={this.teamRoute} style={{background: '#EDAC86'}}>
+							<Header as='h2' style={{paddingLeft:'5%', color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+								<span>02.&nbsp;&nbsp;&nbsp;&nbsp;Team</span>
+							</Header>
+							</Menu.Item>
+							<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
+								<Header as='h2' style={{paddingLeft:'5%',color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>03.&nbsp;&nbsp;&nbsp;&nbsp;About</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
+								<Header as='h2' style={{paddingLeft:'5%', color:'white',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>04.&nbsp;&nbsp;&nbsp;&nbsp;Location</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item>
+								<Header as='h2' onClick={this.baristaRoute} style={{paddingLeft:'5%', color:'white',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>05.&nbsp;&nbsp;&nbsp;&nbsp;Barista Login</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item>
+								<hr></hr>
+							</Menu.Item>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item>
+								<Header as='h5' style={{textAlign:'center', fontFamily:'Didot', fontStyle:'italic', color:'white'}}>
+									© 2020 Expresso
+								</Header>
+							</Menu.Item>
+						</Sidebar>
+					<Sidebar.Pusher
+						dimmed={this.state.visible}
+						onClick={this.handlePusher}
+					>
 					<Grid style={{ 'marginBottom': '10vh' }} columns='equal'>
-						<Grid.Row style={{height: '80px', background: '#F98F69', padding:'0'}}>
-							<Button size='huge' style={{background: '#F98F69'}}>
-								<Dropdown icon='sidebar' style={{color:'black'}}>
-									<Dropdown.Menu style={{ background: '#F98F69' }}>
-										<Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.landingRoute}>
-											<Header as='h3'>
-												<Icon name='home'/>
-												Home
-											</Header>
-										</Dropdown.Item>
-										<Dropdown.Item style={{ cursor: 'pointer' }} >
-											<Header as='h3'>
-												<Icon name='users'/>
-												Meet the Team
-											</Header>
-										</Dropdown.Item>
-										<Dropdown.Item style={{ cursor: 'pointer' }} onClick={this.aboutRoute}>
-											<Header as='h3'>
-												<Icon name='coffee'/>
-												About Coffee Club
-											</Header>
-										</Dropdown.Item>
-									</Dropdown.Menu>
-								</Dropdown>
-							</Button>
+						<Grid.Row>
+				    	<Menu inverted fixed="top" fluid widths='6' secondary style={{ height: '7vh', background: '#BEB19B' }}>
+			        	<Menu.Item position='left' style={{width:'10%'}}>
+			          	<Icon name='sidebar' size ='large' onClick={this.setVisible} style={{color:'white', background: 'none'}} />
+			          </Menu.Item>
+			         </Menu>
 						</Grid.Row>
 						<Grid.Row />
 						<Grid.Row />
@@ -326,6 +372,8 @@ class AboutTeam extends React.Component {
 							</Grid.Column>
 						</Grid.Row>
 					</Grid>
+					</Sidebar.Pusher>
+	        </Sidebar.Pushable>
         </Responsive>
       </React.Fragment>
     );

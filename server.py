@@ -7,11 +7,11 @@ import os, pytz, base64, datetime, hashlib, re
 import urllib.parse
 from LDAP import LDAP
 from CASClient import CASClient
-from testemail import send
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
 )
+from testemail import confirmation, completed
 #------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -184,9 +184,12 @@ def check_availability():
 @app.route('/customer/<netid>/placeorder', methods = ['POST'])
 #@jwt_required
 def place_order(netid):
+    receipt = {}
+    receipt['items']=[]
     if request.method == 'POST':
         try:
-            incoming = request.get_json()
+            print('hi')
+            #incoming = request.get_json()
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
@@ -196,6 +199,8 @@ def place_order(netid):
             currenttime = eastern.localize(datetime.datetime.now())
         else:
             currenttime = incoming['time']
+
+        # check whether the items ordered are in stock
         for i in incoming['items']:
             query = db.session.query(Menu).filter_by(item=i['item']['name']).first()
             if query is None:
@@ -209,6 +214,7 @@ def place_order(netid):
                     return jsonify(error=True), 408
                 if query.availability is False:
                     return jsonify(availability=False, item=query.item), 200
+        # add item to the History table
         order = History(
             netid = netid,
             time = currenttime,
@@ -222,10 +228,18 @@ def place_order(netid):
             db.session.commit()
         except Exception as e:
             return jsonify(error=True), 408
+
+        # add the order details to the dictionary receipt for email
+        receipt['netid']= netid
+        receipt['cost'] = incoming['cost']
+        receipt['time'] = currenttime
+        receipt['type_payment']= incoming['payment']
         query = db.session.query(History).order_by(History.orderid.desc()).first()
         if query is None:
             return jsonify(error=True), 408
         id = query.orderid
+        item_id = 0
+        # add items to order details table
         for i in incoming['items']:
             addon_list = ''
             count = 0
@@ -247,13 +261,17 @@ def place_order(netid):
             object = Details(
                 id = id,
                 item = item_detail,
-                item_id = i['item_id']
+                item_id = item_id
             )
             try:
                 db.session.add(object)
                 db.session.commit()
+                # append items to the receipt
+                receipt['items'].append(item_detail)
+                item_id += 1
             except Exception as e:
                 return jsonify(error=True), 408
+        confirmation(receipt)
         return jsonify(availability=True, item=None), 201
     else:
         return jsonify(error=True), 405
@@ -292,7 +310,7 @@ def get_history(netid):
 #-------------------------------------------------------------------------------
 # GET Request that returns status of the individual
 @app.route('/customer/<netid>/checkstatus', methods = ['GET'])
-@jwt_required
+#@jwt_required
 def check_year(netid):
     """if 'username' not in session:
         return jsonify(msg = "Please login"), 401
@@ -334,7 +352,7 @@ def check_year(netid):
 
 #-------------------------------------------------------------------------------
 @app.route('/customer/<netid>/displayname', methods=['GET'])
-@jwt_required
+#@jwt_required
 def get_display(netid):
     if request.method == 'GET':
         conn = LDAP()
@@ -493,6 +511,7 @@ def complete_order(id):
         else:
             return jsonify(error=True), 408
         query = db.session.query(History).get(id)
+        completed(query.netid)
         return jsonify(status=query.order_status), 201
     else:
         return jsonify(error=True), 405
@@ -522,11 +541,11 @@ def paid_order(id):
 
 #-------------------------------------------------------------------------------
 # Changes status of item from not started to in progress. Returns item.
-@app.route('/barista/<orderid>/inprogress', methods=['POST'])
+@app.route('/barista/<id>/inprogress', methods=['POST'])
 #@jwt_required
-def in_progress(orderid):
+def in_progress(id):
     if request.method == 'POST':
-        query = db.session.query(History).get(orderid)
+        query = db.session.query(History).get(id)
         if query is None:
             return jsonify(error=True), 408
         if query.order_status is 0:
@@ -537,7 +556,7 @@ def in_progress(orderid):
                 return jsonify(error=True), 408
         else:
             return jsonify(error=True), 408
-        query = db.session.query(History).get(orderid)
+        query = db.session.query(History).get(id)
         return jsonify(status=query.order_status), 201
     else:
         return jsonify(error=True), 405
@@ -602,7 +621,7 @@ def change_stock(item_name):
 #-------------------------------------------------------------------------------
 # Gets the inventory and returns the inventory.
 @app.route('/barista/loadinventory', methods = ['GET'])
-@jwt_required
+#@jwt_required
 def load_inventory():
     items = []
     if request.method == 'GET':
