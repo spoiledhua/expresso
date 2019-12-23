@@ -58,6 +58,10 @@ class LandingPage extends React.Component {
     this.props.history.push('/landing');
   }
 
+  locationRoute = () => {
+    this.props.history.push('/location');
+  }
+
   aboutRoute = () => {
     window.location.href = 'https://pucoffeeclub.com/';
   }
@@ -103,7 +107,7 @@ class LandingPage extends React.Component {
                   <span>03.&nbsp;&nbsp;&nbsp;&nbsp;About</span>
                 </Header>
               </Menu.Item>
-              <Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
+              <Menu.Item as='a' onClick={this.locationRoute} style={{background: '#EDAC86'}}>
                 <Header as='h2' style={{paddingLeft:'5%', color:'white',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
                   <span>04.&nbsp;&nbsp;&nbsp;&nbsp;Location</span>
                 </Header>
@@ -215,7 +219,7 @@ class LandingPage extends React.Component {
               <span>03.&nbsp;&nbsp;&nbsp;&nbsp;About</span>
             </Header>
           </Menu.Item>
-          <Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
+          <Menu.Item as='a' onClick={this.locationRoute} style={{background: '#EDAC86'}}>
             <Header as='h2' style={{paddingLeft:'5%', color:'white',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
               <span>04.&nbsp;&nbsp;&nbsp;&nbsp;Location</span>
             </Header>

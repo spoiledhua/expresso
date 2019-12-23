@@ -5,6 +5,7 @@ import { Switch, Route, Redirect, BrowserRouter } from 'react-router-dom';
 
 import LandingPage from './Components/LandingPage'
 import AboutTeam from './Components/AboutTeam'
+import LocationPage from './Components/LocationPage'
 
 import ClientHeader from './Components/ClientHeader';
 import ClientHistory from './Components/ClientHistory';
@@ -30,6 +31,7 @@ class App extends React.Component {
             <Route path="/baristahistory" component={BaristaHistory} />
             <Route path="/baristainventory" component={BaristaInventory} />
             <Route path="/team" component={AboutTeam} />
+            <Route path="/location" component={LocationPage} />
           </Switch>
         </BrowserRouter>
       </React.Fragment>
