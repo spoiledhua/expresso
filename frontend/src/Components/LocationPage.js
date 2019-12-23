@@ -33,8 +33,8 @@ const Map = () => {
         <Marker
           lat={40.347626}
           lng={-74.654417}
-          name="My Marker"
-          color="#c96148"
+          name="Campus Club"
+          color="blue"
         />
       </GoogleMapReact>
     </div>
@@ -272,44 +272,43 @@ class LocationPage extends React.Component {
                     </Menu.Item>
                   </Menu>
                 </Grid.Row>
-                <Grid.Row style={{height:'90%'}}>
+                <Grid.Row style={{ height: '90%' }}>
                   <Grid.Column>
-                <Grid.Row style={{ height: '10%' }} />
-                <Grid.Row style={{ height: '10%' }}>
-                  <Header as='h1' style={{ textAlign: 'center', fontSize: '400%', fontFamily: 'Didot', marginTop: '0vh', fontStyle: 'italic' }}>
-                    Find Us!
+                    <Grid.Row style={{ height: '10%' }} />
+                    <Grid.Row style={{ height: '10%' }}>
+                      <Header as='h1' style={{ textAlign: 'center', fontSize: '400%', fontFamily: 'Didot', marginTop: '0vh', fontStyle: 'italic' }}>
+                        Find Us!
                       </Header>
+                    </Grid.Row>
+                    <Grid.Row style={{ height: '5%' }} />
+                    <Grid.Row style={{ height: '10%' }}>
+                      <Header as='h2' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Didot', fontStyle: 'italic' }}>
+                        Conveniently located at
+                      </Header>
+                    </Grid.Row>
+                    <Grid.Row style={{ height: '15%' }}>
+                      <Header as='h1' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova', color: '#edac86' }}>
+                        Campus Club Taproom
+                      </Header>
+                      <Header as='p' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova' }}>
+                        5 Prospect Ave, Princeton, NJ
+                      </Header>
+                    </Grid.Row>
+                    <Grid.Row style={{ height: '5%' }} />
+                    <Divider />
+                    <Grid.Row style={{ height: '5%' }} />
+                    <Grid.Row style={{ height: '25%' }}>
+                      <Header as='h1' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova', color: '#edac86' }}>
+                        Hours
+                      </Header>
+                      <Header as='p' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova' }}>
+                        Monday - Friday: 8AM-6PM<br />
+                        Saturday: 10AM-2AM<br />
+                        Sunday: 10AM-6PM
+                      </Header>
+                    </Grid.Row>
+                  </Grid.Column>
                 </Grid.Row>
-                <Grid.Row style={{ height: '5%' }} />
-                <Grid.Row style={{ height: '10%' }}>
-                  <Header as='h2' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Didot', fontStyle: 'italic' }}>
-                    Conveniently located at
-                      </Header>
-                </Grid.Row>
-                <Grid.Row style={{ height: '15%' }}>
-                  <Header as='h1' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova', color: '#edac86' }}>
-                    Campus Club Taproom
-                      </Header>
-                  <Header as='p' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova' }}>
-                    5 Prospect Ave, Princeton, NJ
-                      </Header>
-                </Grid.Row>
-                <Grid.Row style={{ height: '5%' }} />
-                <Divider />
-                <Grid.Row style={{ height: '5%' }} />
-                <Grid.Row style={{ height: '25%' }}>
-                  <Header as='h1' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova', color: '#edac86' }}>
-                    Hours
-                      </Header>
-                  <Header as='p' style={{ textAlign: 'center', marginTop: '0vh', fontFamily: 'Proxima Nova' }}>
-                    Monday - Friday: 8AM-6PM<br />
-                    Saturday: 10AM-2AM<br />
-                    Sunday: 10AM-6PM
-                      </Header>
-                </Grid.Row>
-                </Grid.Column>
-                </Grid.Row>
-
               </Grid>
             </Sidebar.Pusher>
           </Sidebar.Pushable>
