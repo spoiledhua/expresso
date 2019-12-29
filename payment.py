@@ -1,3 +1,8 @@
+# -----------------------------------------------------------------------
+# payment.py
+# Author: Expresso backend developers
+# -----------------------------------------------------------------------
+
 from datetime import date
 from database import connect, disconnect
 from LDAP import LDAP
@@ -15,7 +20,7 @@ senior = 2020
 last_valid_date_seniors = ("2020", "04", "07")
 
 
-# Returns false if not valid student, returns true if valid student
+# validate whether individual can purchase coffee online: return false if not valid student or true if valid student
 def validate(netid):
     year = int(today.strftime("%Y"))
     month = int(today.strftime("%m"))
@@ -46,6 +51,7 @@ def validate(netid):
     return True
 
 
+# write to the .mp file all orders that are unpaid or are student charge
 def charge(pay_file):
     mydb = connect()
     mycursor = mydb.cursor()
@@ -65,13 +71,14 @@ def charge(pay_file):
         netid = row[0]
         netid = netid.rstrip()
         paid = row[5]
+        payment_type = row[4]
 
         result = validate(netid)
         if not result:
             row = mycursor.fetchone()
             continue
 
-        if not paid:
+        if payment_type or (paid == 0):
             cost = str(row[3])
             cost = cost.replace('.', '')
             pay_file.write('C,%s,110,--%s,Coffee Club\n' % (netid, cost))
@@ -82,16 +89,19 @@ def charge(pay_file):
     disconnect(mydb)
 
 
+# open an .mp file to write into
 def open_file():
     name = today.strftime("%Y-%m-%d")
-    pay_file = open("/Users/HariRaval/Desktop/expresso/CCPayment%s.mp" % name, "w+")
+    pay_file = open("/Users/HariRaval/Desktop/expresso/CCcharge%s.mp" % name, "w+")
     return pay_file
 
 
+# close the .mp file that is being written to
 def close_file(pay_file):
     pay_file.close()
 
 
+# open a file and call the main driver function to write to this file
 def main():
     pay_file = open_file()
     charge(pay_file)
