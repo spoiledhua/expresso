@@ -97,7 +97,8 @@ def build_menu_table(mydb):
 
         try:
             mycursor.execute("CREATE TABLE menu (size VARCHAR(255), item VARCHAR(255), price DECIMAL(10,2), " +
-                             "category VARCHAR(255), availability BOOLEAN, description VARCHAR(255))")
+                             "category VARCHAR(255), availability BOOLEAN, description VARCHAR(255),"
+                             " definition VARCHAR(255))")
         except Exception as e:
             print("build_menu_table creating table failed: %s", str(e), file=stderr)
 
@@ -109,9 +110,11 @@ def build_menu_table(mydb):
             price = row['price']
             category = row['category']
             description = row['description']
+            definition = row['definition']
             # protect against SQL injections
-            sql = "INSERT INTO menu (size, item, price, category, availability, description) VALUES (%s, %s, %s, %s, %s, %s)"
-            val = (size, item, price, category, 1, description)
+            sql = "INSERT INTO menu (size, item, price, category, availability, description, definition) " \
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            val = (size, item, price, category, 1, description, definition)
 
             try:
                 mycursor.execute(sql, val)

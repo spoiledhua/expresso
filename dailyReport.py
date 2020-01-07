@@ -6,6 +6,7 @@
 
 from database import connect, disconnect
 from datetime import date
+from sendmail import dailySale
 from sys import stderr
 import csv
 
@@ -17,13 +18,19 @@ def retrieve_order_details():
     mydb = connect()
     mycursor = mydb.cursor()
 
+    todaydate = today.strftime("%Y-%m-%d")
+    first = todaydate + " 00:00:00"
+    last = todaydate + " 23:59:59"
+
     # select the relevant information from the order_details and order_history tables by concatenating on the items
     # ordered
     sql = "SELECT order_details.order_id, order_history.timestamp, order_history.netid, order_history.total_cost, " \
           "order_history.type_of_payment, GROUP_CONCAT(order_details.item) FROM order_history, order_details WHERE " \
-          "order_history.order_id = order_details.order_id GROUP BY order_details.order_id"
+          "order_history.order_id = order_details.order_id AND timestamp BETWEEN %s and %s " \
+          "GROUP BY order_details.order_id"
+    val = (first, last)
     try:
-        mycursor.execute(sql)
+        mycursor.execute(sql, val)
     except Exception as e:
         print("Retrieve Order Details Failure: %s", str(e), file=stderr)
 
@@ -61,7 +68,7 @@ def write_to_csv():
 
     data = retrieve_order_details()
 
-    with open("/Users/HariRaval/Desktop/'Coffee_Club_Sales_%s.csv'" % today, "w") as csv_file:
+    with open("/Users/HariRaval/Desktop/Coffee_Club_Sales_%s.csv" % today, "w") as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
 
         writer.writerow(headers)
@@ -73,13 +80,15 @@ def write_to_csv():
 
         writer.writerow('\n')
 
-        overall_statistics = ["DAILY SALE:", '', '', str(total_cost)]
+        overall_statistics = ["DAILY SALE:", '', '', '$' + str(total_cost)]
         writer.writerow(overall_statistics)
 
 
 # call the main driver function to write data to the csv
 def main():
     write_to_csv()
+    filename = "Coffee_Club_Sales_" + str(today) + ".csv"
+    dailySale(filename, str(today))
 
 
 if __name__ == "__main__":

@@ -155,14 +155,15 @@ class LDAP:
 
         return result
 
+
 # test the LDAP object
 def main():
     conn = LDAP()
     conn.connect_LDAP()
     searchResults = conn.get_all("jk30")
     print(searchResults)
-    #searchResults = conn.get_id("jk30")
-    #print(searchResults)
+    # searchResults = conn.get_id("jk30")
+    # print(searchResults)
     searchResults = conn.get_displayname("jk30")
     print(searchResults)
     searchResults = conn.get_givenname("jk30")
