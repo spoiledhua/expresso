@@ -1,3 +1,8 @@
+# -----------------------------------------------------------------------
+# database.py
+# Author: Expresso backend developers
+# -----------------------------------------------------------------------
+
 import mysql.connector
 from mysql.connector import errorcode
 import pandas as pd
@@ -5,13 +10,14 @@ import os
 from sys import stderr
 
 
+# encode the image: convert digital data to binary format
 def convertToBinaryData(filename):
-    # Convert digital data to binary format
     with open(filename, 'rb') as file:
         binaryData = file.read()
     return binaryData
 
 
+# establish a connection with the database using the mysql connector
 def connect():
     try:
         mydb = mysql.connector.connect(host="198.199.71.236", user="ccmobile_coffee",
@@ -27,10 +33,12 @@ def connect():
     return mydb
 
 
+# disconnect from the database
 def disconnect(mydb):
     mydb.close()
 
 
+# verify if a table named table_name exists in the database, mydb
 def check_table_exists(mydb, table_name):
     mycursor = mydb.cursor()
 
@@ -46,6 +54,7 @@ def check_table_exists(mydb, table_name):
     return True if result is not None else False
 
 
+# build the table that will hold the images and their names
 def build_images_table(mydb):
     check_table = check_table_exists(mydb, "images")
 
@@ -53,7 +62,7 @@ def build_images_table(mydb):
         mycursor = mydb.cursor()
 
         try:
-            mycursor.execute("CREATE TABLE images (name VARCHAR(255), picture MEDIUMBLOB)")
+            mycursor.execute("CREATE TABLE images (name VARCHAR(255), picture BLOB)")
         except Exception as e:
             print("build_images_table creating table failed: %s", str(e), file=stderr)
 
@@ -61,7 +70,8 @@ def build_images_table(mydb):
         for filename in os.listdir(directory):
             if filename.endswith(".jpeg"):
                 picture = directory + '/' + filename
-                pic = convertToBinaryData(picture)  # this is new
+                # convert the picture to binary data
+                pic = convertToBinaryData(picture)
                 name = filename[0:filename.find('.')]
                 sql = "INSERT INTO images (name, picture) VALUES (%s, %s)"
 
@@ -77,6 +87,7 @@ def build_images_table(mydb):
         mycursor.close()
 
 
+# build the table that holds the menu details; read from excel spreadsheet provided by Coffee Club
 def build_menu_table(mydb):
     check_table = check_table_exists(mydb, "menu")
 
@@ -112,6 +123,7 @@ def build_menu_table(mydb):
         mycursor.close()
 
 
+# build a table to hold all orders/transactions history
 def build_order_history_table(mydb):
     check_table = check_table_exists(mydb, "order_history")
 
@@ -122,12 +134,13 @@ def build_order_history_table(mydb):
             # type_of_payment: 1 indicates online payment and 0 indicates in-store payment...
             # payment_status: 1 indicates paid and 0 indicates not paid
             # order_status: 0 indicates order not completed, 1 indicates order in-progress, 2 indicates order complete
-            mycursor.execute("CREATE TABLE order_history (netid VARCHAR(255), order_id INT, timestamp TIMESTAMP, " +
+            mycursor.execute("CREATE TABLE order_history (netid VARCHAR(255), order_id INT, timestamp DATETIME, " +
                              "total_cost DECIMAL(10,2), type_of_payment BOOLEAN, payment_status BOOLEAN, order_status INT)")
 
             mycursor.execute("ALTER TABLE `order_history` ADD PRIMARY KEY(`order_id`)")
 
-            mycursor.execute("ALTER TABLE `order_history` CHANGE `order_id` `order_id` INT(11) NOT NULL AUTO_INCREMENT");
+            mycursor.execute(
+                "ALTER TABLE `order_history` CHANGE `order_id` `order_id` INT(11) NOT NULL AUTO_INCREMENT")
 
         except Exception as e:
             print("build_order_history_table creating table failed: %s", str(e), file=stderr)
@@ -135,6 +148,7 @@ def build_order_history_table(mydb):
         mycursor.close()
 
 
+# build a table to hold the details associated with each order
 def build_order_details_table(mydb):
     check_table = check_table_exists(mydb, "order_details")
 
@@ -142,18 +156,52 @@ def build_order_details_table(mydb):
         mycursor = mydb.cursor()
 
         try:
-            mycursor.execute("CREATE TABLE order_details (order_id INT, item VARCHAR(255))")
+            mycursor.execute("CREATE TABLE order_details (order_id INT, item_id INT, item VARCHAR(255))")
         except Exception as e:
             print("build_order_details_table creating table failed: %s", str(e), file=stderr)
         mycursor.close()
 
 
+# build a table to hold the barista usernames and encrypted passwords
+def build_barista_user_passwords_table(mydb):
+    check_table = check_table_exists(mydb, "valid_barista_users")
+
+    if not check_table:
+        mycursor = mydb.cursor()
+
+        try:
+            mycursor.execute("CREATE TABLE valid_barista_users (username VARCHAR(255), password VARCHAR(255))")
+
+        except Exception as e:
+            print("valid_barista_users creating table failed: %s", str(e), file=stderr)
+
+        barista_users = pd.read_excel("barista_users.xlsx")
+
+        for index, row in barista_users.iterrows():
+            username = row['username']
+            password = row['password']
+            # protect against SQL injections
+            sql = "INSERT INTO valid_barista_users (username, password) VALUES (%s, %s)"
+            val = (username, password)
+
+            try:
+                mycursor.execute(sql, val)
+            except Exception as e:
+                print("build_menu_table inserting item failed: %s", str(e), file=stderr)
+
+            mydb.commit()
+
+        mycursor.close()
+
+
+# execute the primary functions above to connect to the database, create all tables, and disconnect from the database
 def main():
     mydb = connect()
     build_menu_table(mydb)
     build_order_history_table(mydb)
     build_order_details_table(mydb)
     build_images_table(mydb)
+    build_barista_user_passwords_table(mydb)
     disconnect(mydb)
 
 
