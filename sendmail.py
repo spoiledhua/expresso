@@ -18,7 +18,7 @@ def confirmation(order):
     receiver_email = str(order['netid']) + "@princeton.edu"
 
     message = MIMEMultipart("alternative")
-    message["Subject"] = "Coffee Club Order Confirmation"
+    message["Subject"] = "Your Coffee Club Order is Brewing..."
     message["From"] = sender_email
     message["To"] = receiver_email
     text = "Your Order is Confirmed!\n"
@@ -111,6 +111,8 @@ def confirmation(order):
             </td>
                     </tr><tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;"><td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
                                             <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">Thanks for using Expresso</h2>
+                                            <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">Your order will be ready in 5-10 minutes.</h2>
+
                                         </td>
                                     </tr><tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;"><td class="content-block aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">
                                             <table class="invoice" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; text-align: left; width: 80%; margin: 40px auto;"><tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;"><td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;" valign="top"><br style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" /><br style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" /></td>
@@ -333,4 +335,13 @@ def dailySale(filename, date):
 
 
 if __name__ == "__main__":
-    dailySale("Coffee_Club_Sales_2020-01-03.csv", "1/11/20")
+    # for testing
+    item = {'items': ['Small Pumpkin Spice w/ Oat Milk', 'Small Coffee'],
+            'netid': 'dorothyz',
+            'cost': 8.50,
+            'type_payment': False}
+
+    dictionary = {'netid': 'jk30', 'firstname': 'Joseph', 'lastname': 'Kim', 'comment': 'Could use better blah blah'}
+    confirmation(item)
+    # completed('jk30')
+    # feedback(dictionary)
