@@ -62,7 +62,7 @@ def build_images_table(mydb):
         mycursor = mydb.cursor()
 
         try:
-            mycursor.execute("CREATE TABLE images (name VARCHAR(255), picture BLOB)")
+            mycursor.execute("CREATE TABLE images (item VARCHAR(255), picture BLOB)")
         except Exception as e:
             print("build_images_table creating table failed: %s", str(e), file=stderr)
 
@@ -72,10 +72,10 @@ def build_images_table(mydb):
                 picture = directory + '/' + filename
                 # convert the picture to binary data
                 pic = convertToBinaryData(picture)
-                name = filename[0:filename.find('.')]
-                sql = "INSERT INTO images (name, picture) VALUES (%s, %s)"
+                item = filename[0:filename.find('.')]
+                sql = "INSERT INTO images (item, picture) VALUES (%s, %s)"
 
-                val = (name, pic)
+                val = (item, pic)
 
                 try:
                     mycursor.execute(sql, val)
@@ -197,6 +197,31 @@ def build_barista_user_passwords_table(mydb):
         mycursor.close()
 
 
+# build a table to hold the open/close status of the store
+def build_store_status_table(mydb):
+    check_table = check_table_exists(mydb, "store_status")
+    if not check_table:
+        mycursor = mydb.cursor()
+
+        try:
+            # 1 indicates open and 0 indicate closed
+            mycursor.execute("CREATE TABLE store_status (store_open BOOLEAN)")
+        except Exception as e:
+            print("build_order_details_table creating table failed: %s", str(e), file=stderr)
+
+        sql = "INSERT INTO store_status (store_open) VALUES  (%s)"
+        val = (1,)
+
+        try:
+            mycursor.execute(sql, val)
+        except Exception as e:
+            print("build_store_status_table inserting item failed: %s", str(e), file=stderr)
+
+        mydb.commit()
+
+        mycursor.close()
+
+
 # execute the primary functions above to connect to the database, create all tables, and disconnect from the database
 def main():
     mydb = connect()
@@ -205,6 +230,7 @@ def main():
     build_order_details_table(mydb)
     build_images_table(mydb)
     build_barista_user_passwords_table(mydb)
+    build_store_status_table(mydb)
     disconnect(mydb)
 
 
