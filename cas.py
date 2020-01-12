@@ -1,6 +1,9 @@
+# -----------------------------------------------------------------------
+# cas.py
+# Author: Expresso server-side developers
+# -----------------------------------------------------------------------
 from os import path, getcwd
 from sys import argv
-
 from flask import Flask, render_template, session, redirect, send_from_directory
 from flask_cas import CAS
 from flask_cas import login
