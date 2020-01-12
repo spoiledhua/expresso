@@ -1,17 +1,21 @@
+# -----------------------------------------------------------------------
+# server.py
+# Author: Expresso server-side developers
+# -----------------------------------------------------------------------
 from flask import Flask, request, render_template, jsonify, url_for, redirect, g, abort, session, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
-from models import db, ma, Menu, History, Images, Barista, Details, MenuSchema, HistorySchema, DetailsSchema
+from models import db, ma, Menu, History, Images, Barista, Status, Details, MenuSchema, HistorySchema, DetailsSchema
 import os, pytz, base64, datetime, hashlib, re
 import urllib.parse
-from LDAP import LDAP
+from ldap import LDAP
 from CASClient import CASClient
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
 )
-from testemail import confirmation, completed
+from sendmail import confirmation, feedback
 #------------------------------------------------------------------------------
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -34,45 +38,6 @@ menu_schema = MenuSchema()
 history_schema = HistorySchema()
 details_schema = DetailsSchema()
 
-incoming = {
-    'netid': 'dorothyz/n',
-    'orderid': 11,
-    'cost': 8.50,
-    'payment': False,
-    'status': False,
-    'items': [
-        {
-            'item_id': 1,
-            'item': {
-                'name': 'Pumpkin Spice'
-            },
-            'addons': [
-                {
-                'name': 'Oat Milk'
-                }],
-            'sp': 'Small'
-        },
-        {
-            'item_id': 2,
-            'item': {
-                'name': 'Pumpkin Spice'
-            },
-            'addons': [
-                {
-                'name': 'Oat Milk'
-                }],
-            'sp': 'Small'
-        }
-        ]
-    }
-"""incoming = {
-    'item': 'Matcha Latte',
-    'category': 'Drink',
-    'description': 'Yum',
-    'size': ['Small', 'Large'],
-    'price': ['4.50', '6.50']
-}"""
-
 #-------------------------------------------------------------------------------
 # GENERAL ROUTES
 #-------------------------------------------------------------------------------
@@ -81,15 +46,17 @@ incoming = {
 def index(path):
     return jsonify(msg='You put in an invalid endpoint. Try again.'), 403
 
-#------------------------------------------------------------------------------
-@app.route('/logout', methods=['GET'])
+#-------------------------------------------------------------------------------
+# CUSTOMER
+#-------------------------------------------------------------------------------
+@app.route('/customer/logout', methods=['GET'])
 def logout():
     if request.method == 'GET':
         return jsonify(url=CASClient().logout()), 201
     else:
         return jsonify(error=True), 403
 #------------------------------------------------------------------------------
-@app.route('/getuser', methods=['GET', 'OPTIONS'])
+@app.route('/customer/getuser', methods=['GET', 'OPTIONS'])
 def getuser():
     if request.method == 'GET':
         ret = CASClient().get_user()
@@ -99,12 +66,21 @@ def getuser():
             user = user[:-1]
         elif ret[1] is not None:
             return jsonify(error=True), 400
-        access_token = create_access_token(identity=user)
-        return jsonify(user=user, token=access_token), 200
+        if user is not None:
+            access_token = create_access_token(identity=user, expires_delta=False)
+        else:
+            access_token = ''
+        eligible = True
+        conn = LDAP()
+        conn.connect_LDAP()
+        status = conn.get_pustatus(user)
+        if status != 'undergraduate':
+            eligible=False
+        return jsonify(user=user, charge_eligible = eligible, token=access_token), 200
     else:
         return jsonify(error=True), 403
 #------------------------------------------------------------------------------
-@app.route('/authenticate', methods=['GET', 'OPTIONS'])
+@app.route('/customer/authenticate', methods=['GET', 'OPTIONS'])
 def authenticate():
     if request.method == 'GET':
         ret = CASClient().authenticate()
@@ -113,16 +89,16 @@ def authenticate():
         elif ret[0] is not None and ret[1] is not None:
             return jsonify(user = ret[0], url = 'http://coffeeclub.princeton.edu'), 200
         else:
-            return redirect('http://localhost:3000/menu')
+            return redirect('http://coffeeclub.princeton.edu/menu')
     else:
         return jsonify(error=True), 403
 #-------------------------------------------------------------------------------
-# CUSTOMER
-#-------------------------------------------------------------------------------
 # GET Request that returns all of the items on the menu
 @app.route('/customer/menu', methods = ['GET'])
+#@jwt_required
 def populate_menu():
     items = []
+    none = 'no_image'
     if request.method == 'GET':
         """if 'username' not in session:
             return jsonify(msg='Cannot access endpoint'), 401"""
@@ -133,12 +109,11 @@ def populate_menu():
         for item in query:
             menu_item = menu_schema.dump(item)
             picture = db.session.query(Images).filter(Images.name==item.item).all()
-            if len(picture) != 0:
-                picture = picture[0].picture
-                menu_item['image'] = base64.b64encode(picture).decode('utf-8')
-                items.append(menu_item)
-            else:
-                items.append(menu_item)
+            if len(picture) == 0:
+                picture = db.session.query(Images).filter(Images.name==none).all()
+            picture = picture[0].picture
+            menu_item['image'] = base64.b64encode(picture).decode('utf-8')
+            items.append(menu_item)
         return jsonify(items), 200
     else:
         return jsonify(error=True), 405
@@ -162,24 +137,6 @@ def menu_get(item):
     else:
         return jsonify(error=True), 405
 #-------------------------------------------------------------------------------
-@app.route('/customer/checkavailability', methods = ['GET'])
-def check_availability():
-    if request.method == 'GET':
-        """if 'username' not in session:
-            return jsonify(msg = "Cannot access endpoint"), 401"""
-        for i in incoming['items']:
-            for add in i['addons']:
-                print(add['name'])
-                query = db.session.query(Menu).filter_by(item=add['name']).first()
-                if query is not None and query.availability is False:
-                    return jsonify(item=query.item), 400
-            item_name = i['item']['name']
-            query = db.session.query(Menu).filter_by(item=item_name).first()
-            if query is not None and query.availability is False:
-                return jsonify(item=query.item), 400
-    return jsonify(item=None), 200
-
-#-------------------------------------------------------------------------------
 # POST Request that returns JSON of the order details that was placed
 @app.route('/customer/<netid>/placeorder', methods = ['POST'])
 #@jwt_required
@@ -187,18 +144,23 @@ def place_order(netid):
     receipt = {}
     receipt['items']=[]
     if request.method == 'POST':
+        eastern = pytz.timezone('US/Eastern')
         try:
-            print('hi')
-            #incoming = request.get_json()
+            incoming = request.get_json()
         except Exception as e:
             return jsonify(error=True), 400
         if incoming is None:
             return jsonify(error=True), 400
-        if 'time' not in incoming:
-            eastern = pytz.timezone('US/Eastern')
+        if incoming['time'] == 'Now':
             currenttime = eastern.localize(datetime.datetime.now())
+        # for delayed ordering
         else:
-            currenttime = incoming['time']
+            # get the year, month, and day for today to make datetime object
+            year = datetime.date.today().year
+            month = datetime.date.today().month
+            day = datetime.date.today().day
+            timestamp = incoming['time'].split(':')
+            currenttime = eastern.localize(datetime.datetime(year, month, day, int(timestamp[0]), int(timestamp[1])))
 
         # check whether the items ordered are in stock
         for i in incoming['items']:
@@ -232,7 +194,7 @@ def place_order(netid):
         # add the order details to the dictionary receipt for email
         receipt['netid']= netid
         receipt['cost'] = incoming['cost']
-        receipt['time'] = currenttime
+        receipt['time'] = currenttime.strftime("%H:%M")
         receipt['type_payment']= incoming['payment']
         query = db.session.query(History).order_by(History.orderid.desc()).first()
         if query is None:
@@ -277,9 +239,19 @@ def place_order(netid):
         return jsonify(error=True), 405
 
 #-------------------------------------------------------------------------------
+# GET Request that returns store status
+@app.route('/customer/storestatus', methods=['GET'])
+#@jwt_required
+def get_storestatus():
+    if request.method == 'GET':
+        query = db.session.query(Status).all()
+        return jsonify(status = query[0].open), 200
+    else:
+        return jsonify(error=True), 403
+#-------------------------------------------------------------------------------
 # GET Request that returns last order
 @app.route('/customer/<netid>/orderhistory', methods = ['GET'])
-#@jwt_required
+@jwt_required
 def get_history(netid):
     past_orders = []
     if request.method == 'GET':
@@ -297,69 +269,25 @@ def get_history(netid):
             barista_row = {}
             barista_row['item'] = item_names
             barista_row['netid'] = orders.netid
-            barista_row['time'] = orders.time
+            barista_row['time'] = str(orders.time) + ' EST'
             barista_row['orderid'] = orders.orderid
             barista_row['status'] = orders.status
             barista_row['cost'] = orders.cost
             barista_row['payment'] = orders.payment
-            #print(barista_row)
             past_orders.append(barista_row)
         return jsonify(past_orders), 200
     else:
         return jsonify(error=True), 405
-#-------------------------------------------------------------------------------
-# GET Request that returns status of the individual
-@app.route('/customer/<netid>/checkstatus', methods = ['GET'])
-#@jwt_required
-def check_year(netid):
-    """if 'username' not in session:
-        return jsonify(msg = "Please login"), 401
-    elif session['username'] != netid:
-        return jsonify(msg = "Wrong netid"), 401"""
-    last_valid_date_seniors = ("2019", "04", "07")
-    last_valid_year = int(last_valid_date_seniors[0])
-    last_valid_month = int(last_valid_date_seniors[1])
-    last_valid_day = int(last_valid_date_seniors[2])
-
-    today = d.date.today()
-    year = int(today.strftime("%Y"))
-    month = int(today.strftime("%m"))
-    day = int(today.strftime("%d"))
-
-    senior = 2020
-
-    netid = netid + '\n'
-    past_orders = []
-    if request.method == 'GET':
-        if 'username' not in session:
-            return jsonify(msg = "Please login"), 401
-        elif session['username'] != netid:
-            return jsonify(msg = "Wrong netid"), 401
-        conn = LDAP()
-        conn.connect_LDAP()
-        status = conn.get_pustatus(netid)
-        if status == None or status != 'undergraduate':
-            return jsonify(error = "Cannot Student Charge"), 405
-        classyear = conn.get_puclassyear(netid)
-        conn.disconnect_LDAP()
-        if classyear == senior:
-            if month > last_valid_month and year == last_valid_year:
-                return jsonify(error = "Cannot Student Charge"), 405
-            if month == last_valid_month and year == last_valid_year and day > last_valid_day:
-                return jsonify(error = "Cannot Student Charge"), 405
-        else:
-            return jsonify(status = status), 200
 
 #-------------------------------------------------------------------------------
 @app.route('/customer/<netid>/displayname', methods=['GET'])
-#@jwt_required
+@jwt_required
 def get_display(netid):
     if request.method == 'GET':
         conn = LDAP()
         conn.connect_LDAP()
         displayname = conn.get_displayname(netid)
         if displayname == '':
-            print('here')
             displayname = conn.get_givenname(netid)
             if displayname is '':
                 displayname = netid
@@ -368,25 +296,32 @@ def get_display(netid):
         return jsonify(error=True), 405
 
 #-------------------------------------------------------------------------------
-@app.route('/customer/contact', methods=['GET'])
+@app.route('/customer/contact', methods=['POST'])
 #@jwt_required
 def contact():
-    if request.method == 'GET':
+    if request.method == 'POST':
+        attach = {}
+        try:
+            incoming = request.get_json()
+        except Exception as e:
+            return jsonify(error=True), 400
         if incoming is None:
-            return jsonify(error=True), 408
-        for elements in incoming:
-            if (incoming[elements] is None) or (len(incoming[elements]) == 0):
-                return jsonify(error=True), 408
+            return jsonify(error=True), 400
         first = incoming['firstname']
+        attach['firstname'] = first
         last = incoming['lastname']
+        attach['lastname'] = last
         email = incoming['email']
+        attach['netid'] = email
         # regex email checker comes from Geek for Geeks
         regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
         search = re.search(regex,email)
         if (search is None):
-            return jsonify(error='Invalid email'), 408
+            return jsonify(error='Invalid email'), 200
         message = incoming['message']
-        return jsonify(sent=True), 200
+        attach['comment'] = message
+        feedback(attach)
+        return jsonify(error=None), 200
     else:
         return jsonify(error=True), 405
 
@@ -406,7 +341,6 @@ def barista_authenticate():
         if len(username) == 0 or len(password) == 0:
             return jsonify(msg='Invalid Login'), 401
         password = password + __salt
-        #print(password)
         encrypted_password = hashlib.sha256(password.encode()).hexdigest()
 
         userinfo = db.session.query(Barista).filter(Barista.username == username).all()
@@ -416,8 +350,7 @@ def barista_authenticate():
             userinfo = userinfo[0]
         if userinfo.password == encrypted_password:
             session['user'] = username
-            access_token = create_access_token(identity=username)
-            print(access_token)
+            access_token = create_access_token(identity=username, expires_delta=False)
             return jsonify(token=access_token), 200
         else:
             return jsonify(msg = "Invalid Login"),  401
@@ -427,7 +360,7 @@ def barista_authenticate():
 #-------------------------------------------------------------------------------
 # GET request that reads in username and password, returns username if correct.
 @app.route('/barista/getuser', methods=['GET'])
-#@jwt_required
+@jwt_required
 def barista_getuser():
     if request.method == 'GET':
         if 'user' in session:
@@ -436,7 +369,29 @@ def barista_getuser():
             return jsonify(user=None), 200
     else:
         return jsonify(error=True), 4
-
+#-------------------------------------------------------------------------------
+@app.route('/barista/storestatus', methods=['POST'])
+def change_storestatus():
+    if request.method == 'POST':
+        query = db.session.query(Status).all()
+        store_status = True
+        if query[0].open is True:
+            query[0].open = False
+            store_status = query[0].open
+            try:
+                db.session.commit()
+            except Exception as e:
+                return jsonify(error=True), 408
+        else:
+            query[0].open = True
+            store_status = query[0].open
+            try:
+                db.session.commit()
+            except Exception as e:
+                return jsonify(error=True), 408
+        return jsonify(status=store_status), 200
+    else:
+        return jsonify(error=True), 403
 #-------------------------------------------------------------------------------
 # POST request that reads in username and password, returns username if correct.
 @app.route('/barista/logout', methods=['GET'])
@@ -444,49 +399,44 @@ def barista_logout():
     if request.method != 'GET':
         return jsonify(error=True), 405
     try:
-        if 'user' in session:
-            session.clear()
-            add_claims_to_access_token(None)
-            return jsonify(user=None), 200
-        else:
-            return jsonify(error=True), 401
+        session.clear()
     except Exception as e:
         return jsonify(error=True), 403
+    return jsonify(user=None), 200
 
 #-------------------------------------------------------------------------------
 # GET HTTP Request that gets incomplete orders from History and returns orders
 # with the oldest request first
 @app.route('/barista/getorders', methods=['GET'])
-#@jwt_required
+@jwt_required
 def get_orders():
     current_orders = []
     if request.method == 'GET':
-        query = db.session.query(History). \
-        filter(((History.order_status!=2) & (History.payment==1)) | ((History.payment==0) & (History.status==0))) \
-        .order_by(History.time.asc()).all()
+        query = db.session.query(History).filter(History.order_status!=2).order_by(History.time.asc()).all()
+        eastern = pytz.timezone('US/Eastern')
         for orders in query:
-            items = db.session.query(Details).filter(Details.id==orders.orderid).all()
-            item_names = []
-            for item in items:
-                item_names.append(item.item)
-            barista_row = {}
-            barista_row['item'] = item_names
-            barista_row['netid'] = orders.netid
-            barista_row['time'] = orders.time
-            barista_row['orderid'] = orders.orderid
-            barista_row['status'] = orders.status
-            barista_row['cost'] = orders.cost
-            barista_row['payment'] = orders.payment
-            barista_row['order_status'] = orders.order_status
-            #print(barista_row)
-            current_orders.append(barista_row)
+            if eastern.localize(orders.time) <= eastern.localize(datetime.datetime.now()):
+                items = db.session.query(Details).filter(Details.id==orders.orderid).all()
+                item_names = []
+                for item in items:
+                    item_names.append(item.item)
+                barista_row = {}
+                barista_row['item'] = item_names
+                barista_row['netid'] = orders.netid
+                barista_row['time'] = str(orders.time) + ' EST'
+                barista_row['orderid'] = orders.orderid
+                barista_row['status'] = orders.status
+                barista_row['cost'] = orders.cost
+                barista_row['payment'] = orders.payment
+                barista_row['order_status'] = orders.order_status
+                current_orders.append(barista_row)
         return jsonify(current_orders), 200
     else:
         return jsonify(error=True), 405
 #-------------------------------------------------------------------------------
 # Gets the status of the item
 @app.route('/barista/<id>/getorderstatus', methods = ['GET'])
-#@jwt_required
+@jwt_required
 def get_orderstatus(id):
     if request.method == 'GET':
         query = db.session.query(History).get(id)
@@ -500,9 +450,7 @@ def get_orderstatus(id):
 def complete_order(id):
     if request.method == 'POST':
         query = db.session.query(History).get(id)
-        if query is None:
-            return jsonify(error=True), 408
-        if (query.order_status == 1 or query.order_status == 0):
+        if (query.order_status == 1 or query.order_status == 0) and query.status == 1:
             query.order_status = 2
             try:
                 db.session.commit()
@@ -511,7 +459,7 @@ def complete_order(id):
         else:
             return jsonify(error=True), 408
         query = db.session.query(History).get(id)
-        completed(query.netid)
+        #completed(query.netid)
         return jsonify(status=query.order_status), 201
     else:
         return jsonify(error=True), 405
@@ -524,9 +472,7 @@ def complete_order(id):
 def paid_order(id):
     if request.method == 'POST':
         query = db.session.query(History).get(id)
-        if query is None:
-            return jsonify(error=True), 408
-        if query.payment == 0:
+        if (query.status == 0) and (query.payment == 0):
             query.status = 1
             try:
                 db.session.commit()
@@ -563,7 +509,7 @@ def in_progress(id):
 #-------------------------------------------------------------------------------
 # Changes stock of item to the opposite of current state and returns item.
 @app.route('/barista/<item_name>/getstock', methods=['GET'])
-#@jwt_required
+@jwt_required
 def get_stock(item_name):
     if request.method == 'GET':
         query = db.session.query(Menu).filter_by(item=item_name).first()
@@ -579,12 +525,6 @@ def get_stock(item_name):
 def change_stock(item_name):
     if request.method == 'POST':
         item_name = urllib.parse.unquote(item_name)
-        """item_name = item_name.split('%20')
-        separator = ' '
-        item_name = separator.join(item_name)"""
-        #print(item_name)
-        #url = urllib.parse.urlparse(urllib.parse.unquote(request.url))
-        #item_name = url.path.split('/')[2]
         query = db.session.query(Menu).filter_by(item=item_name).all()
         availability = None
         name = ''
@@ -621,7 +561,7 @@ def change_stock(item_name):
 #-------------------------------------------------------------------------------
 # Gets the inventory and returns the inventory.
 @app.route('/barista/loadinventory', methods = ['GET'])
-#@jwt_required
+@jwt_required
 def load_inventory():
     items = []
     if request.method == 'GET':
@@ -634,36 +574,8 @@ def load_inventory():
         return jsonify(error=True), 405
 #-------------------------------------------------------------------------------
 # GET HTTP Request that gets orders from History and returns orders
-@app.route('/barista/getallhistory', methods=['GET'])
-#@jwt_required
-def get_allhistory():
-    history = []
-    if request.method == 'GET':
-        query = db.session.query(History).order_by(History.time.desc()).limit(20).all()
-        for orders in query:
-            items = db.session.query(Details).filter(Details.id==orders.orderid).all()
-            item_names = []
-            for item in items:
-                item_names.append(item.item)
-            localtime = pytz.timezone('US/Eastern').localize(orders.time)
-            barista_row = {}
-            barista_row['item'] = item_names
-            barista_row['netid'] = orders.netid
-            barista_row['time'] = localtime
-            barista_row['orderid'] = orders.orderid
-            barista_row['status'] = orders.status
-            barista_row['cost'] = orders.cost
-            barista_row['payment'] = orders.payment
-            #print(barista_row)
-            history.append(barista_row)
-        return jsonify(history), 200
-    else:
-        return jsonify(error=True), 405
-
-#-------------------------------------------------------------------------------
-# GET HTTP Request that gets orders from History and returns orders
 @app.route('/barista/getdayhistory', methods=['GET'])
-#@jwt_required
+@jwt_required
 def get_dayhistory():
     history = []
     yesterday = datetime.date.fromordinal(datetime.date.today().toordinal())
@@ -677,12 +589,11 @@ def get_dayhistory():
             barista_row = {}
             barista_row['item'] = item_names
             barista_row['netid'] = orders.netid
-            barista_row['time'] = orders.time
+            barista_row['time'] = str(orders.time) + " EST"
             barista_row['orderid'] = orders.orderid
             barista_row['status'] = orders.status
             barista_row['cost'] = orders.cost
             barista_row['payment'] = orders.payment
-            #print(barista_row)
             history.append(barista_row)
         return jsonify(history), 200
     else:
@@ -690,7 +601,7 @@ def get_dayhistory():
 #-------------------------------------------------------------------------------
 # GET Request that returns all of the items on the menu
 @app.route('/barista/availability', methods = ['GET'])
-#@jwt_required
+@jwt_required
 def all_availability():
     items = []
     if request.method == 'GET':
@@ -708,15 +619,16 @@ def all_availability():
 # ADMIN
 #-------------------------------------------------------------------------------
 @app.route('/admin/checkstatus', methods=['GET'])
+@jwt_required
 def admin_checkstatus():
     if request.method == 'GET':
         if 'user' in session:
             if session.get('user') != 'cc_admin':
-                return jsonify(error='Access Denied'), 402
+                return jsonify(status='False'), 200
             else:
                 return jsonify(status='True'), 200
         else:
-            return jsonify(error='Access Denied'), 402
+            return jsonify(status='False'), 200
     else:
         return jsonify(error=True), 405
 
@@ -730,28 +642,44 @@ def add_inventory():
     if incoming is None:
         return jsonify(error=True), 403
     if request.method == 'POST':
-        query = db.session.query(Menu).filter_by(item=incoming['item']).all()
+        sp = {}
+        query = db.session.query(Menu).filter_by(item=incoming['name']).all()
         if len(query) > 0:
-            return jsonify(msg='Item exists'), 200
-        for i in range(0, len(incoming['price'])):
-            if 'size' not in incoming:
-                size = 'One Size'
-            else:
-                size = incoming['size'][i]
-            new_item = Menu (
-                item = incoming['item'],
-                price = incoming['price'][i],
-                description = incoming['description'],
-                size = size,
-                availability = True,
-                category = incoming['category']
+            return jsonify(item = None, error='Item already exists'), 200
+        item = incoming['name']
+        description = incoming['description']
+        category = incoming['category']
+        definition = incoming['definition']
+        if incoming['noSize'] is not None:
+            sp['No Size'] = incoming['noSize']
+        if incoming['oneSize'] is not None:
+            sp['One Size'] = incoming['oneSize']
+        if incoming['smallSize'] is not None:
+            sp['Small'] = incoming['smallSize']
+        if incoming['largeSize'] is not None:
+            sp['Large'] = incoming['largeSize']
+        for i in range(0, len(sp)):
+            for size in sp:
+                price = sp[size]
+                try:
+                    float(price)
+                except:
+                    return jsonify(item=None, error="Price is not in correct format"), 200
+                new_item = Menu (
+                    item = item,
+                    price = price,
+                    description = description,
+                    definition = definition,
+                    size = size,
+                    availability = True,
+                    category = category
                 )
-            try:
-                db.session.add(new_item)
-                db.session.commit()
-            except Exception as e:
-                return jsonify(error=True), 408
-        return jsonify(item=menu_schema.dump(new_item), msg=None), 201
+                try:
+                    db.session.add(new_item)
+                    db.session.commit()
+                except Exception as e:
+                    return jsonify(error=True), 408
+        return jsonify(item='Added', error=None), 201
     else:
         return jsonify(error=True), 405
 
@@ -761,25 +689,25 @@ def add_inventory():
 def delete_inventory(item_name):
     if request.method == 'DELETE':
         deleted = []
+        item_name = urllib.parse.unquote(item_name)
         query = db.session.query(Menu).filter_by(item=item_name).all()
         if len(query) == 0:
-            return jsonify(error=True), 408
+            return jsonify(error='No item found'), 408
         for menu_item in query:
             deleted.append(menu_schema.dump(menu_item))
             try:
                 db.session.delete(menu_item)
                 db.session.commit()
             except Exception as e:
-                return jsonify(error="Error here"), 403
-
-        query = db.session.query(Images).filter_by(name=query[0].item).all()
-        if len(query) == 0:
-            return jsonify(error=True), 408
+                return jsonify(error="Could not delete item"), 403
+        query2 = db.session.query(Images).filter_by(name=query[0].item).all()
+        if len(query2) == 0:
+            return jsonify(items=deleted), 201
         try:
-            db.session.delete(query)
+            db.session.delete(query2)
             db.session.commit()
         except Exception as e:
-            return jsonify(error='True'), 403
+            return jsonify(error='Could not delete image of item'), 403
         return jsonify(items=deleted), 201
     else:
         return jsonify(error=True), 405

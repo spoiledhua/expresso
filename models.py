@@ -1,8 +1,14 @@
+# -----------------------------------------------------------------------
+# models.py
+# Author: Expresso server-side developers
+# -----------------------------------------------------------------------
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_jwt_extended import JWTManager
 #---------------------------------------------------------------------------
 db = SQLAlchemy()
 ma = Marshmallow()
+jwt = JWTManager()
 #---------------------------------------------------------------------------
 # sets SQL Alchemy Models
 class History(db.Model):
@@ -29,11 +35,16 @@ class Menu(db.Model):
     availability = db.Column('availability', db.Boolean)
     category = db.Column('category', db.String)
     description = db.Column('description', db.String)
+    definition = db.Column('definition', db.String)
 
 class Images(db.Model):
     __tablename__= 'images'
-    name = db.Column('name', db.String, primary_key=True)
+    name = db.Column('item', db.String, primary_key=True)
     picture = db.Column('picture', db.BLOB)
+
+class Status(db.Model):
+    __tablename__= 'store_status'
+    open = db.Column('store_open', db.Boolean, primary_key=True)
 
 class Barista(db.Model):
     __tablename__= 'valid_barista_users'
