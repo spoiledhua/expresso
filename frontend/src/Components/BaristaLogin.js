@@ -24,9 +24,9 @@ class BaristaLogin extends React.Component {
     const user = { username: this.state.username, password: this.state.password };
     await baristaLogin(user)
       .then(data => {
-        console.log(data)
         this.setState({ invalid: null });
-        let url = (typeof this.props.history.location.state === "undefined") ? '/baristaorders' : this.props.history.location.state.requested
+        localStorage.setItem('token', JSON.stringify(data.token));
+        let url = (typeof this.props.history.location.state === "undefined") ? '/baristaorders' : this.props.history.location.state.requested;
         this.props.history.push(url);
       })
       .catch(error => {
