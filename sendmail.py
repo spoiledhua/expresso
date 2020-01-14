@@ -30,7 +30,7 @@ def confirmation(order):
         text += '$%s Paid' % (str(order['cost']))
     else:
         text += '$%s Required at Pickup' % (str(order['cost']))
-    text += "\nThanks for using Expresso"
+    text += "\nThanks for using Expresso!"
 
     html = '''\
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -110,8 +110,12 @@ def confirmation(order):
     </h1>
             </td>
                     </tr><tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;"><td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
-                                            <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">Thanks for using Expresso</h2>
-                                            <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">Your order will be ready in 5-10 minutes.</h2>
+                                            <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">
+        '''
+    html += "Your order will be ready for pickup roughly 10 minutes after %s" % order['time']
+    html += '''\
+                                        </h2>
+                                            <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">Thanks for using Expresso!</h2>
 
                                         </td>
                                     </tr><tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;"><td class="content-block aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">
@@ -339,9 +343,10 @@ if __name__ == "__main__":
     item = {'items': ['Small Pumpkin Spice w/ Oat Milk', 'Small Coffee'],
             'netid': 'dorothyz',
             'cost': 8.50,
-            'type_payment': False}
+            'type_payment': False,
+            'time': '10:00' }
 
     dictionary = {'netid': 'jk30', 'firstname': 'Joseph', 'lastname': 'Kim', 'comment': 'Could use better blah blah'}
-    confirmation(item)
+    # confirmation(item)
     # completed('jk30')
     # feedback(dictionary)
