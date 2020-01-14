@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Icon, Image, Menu, Segment, Sidebar, Button, Grid, Responsive, Dropdown, Container } from 'semantic-ui-react'
+import { Header, Icon, Image, Menu, Segment, Sidebar, Grid, Responsive, Container } from 'semantic-ui-react'
 import * as victor from '../Assets/victor.jpg';
 import * as karen  from '../Assets/karen.jpg';
 import * as dora from '../Assets/dora.jpg';
@@ -64,7 +64,15 @@ class AboutTeam extends React.Component {
   }
 
 	aboutRoute = () => {
-		window.location.href = 'https://pucoffeeclub.com/';
+		window.open('https://pucoffeeclub.com');
+	}
+
+	locationRoute = () => {
+		this.props.history.push('/location');
+	}
+
+	baristaRoute = () => {
+		this.props.history.push('/baristalogin');
 	}
 
   render() {
@@ -72,74 +80,73 @@ class AboutTeam extends React.Component {
     return (
       <React.Fragment>
         <Responsive minWidth={Responsive.onlyTablet.minWidth}>
-				<Sidebar.Pushable as={Segment}>
-					<Sidebar
-						as={Menu}
-						animation='push'
-						vertical
-						inverted
-						borderless
-						visible={this.state.visible}
-						style={{background: '#EDAC86'}}
-						width='thick'
-					>
-						<Menu.Item>
-							<Icon name='x' size='large' style={{cursor:'pointer', color:'white'}} onClick={this.handlePusher}/>
-						</Menu.Item>
-						<Menu.Item style={{height:'12vh'}}/>
-						<Menu.Item>
-							<Image centered={true} src={logo} size='mini'/>
-						</Menu.Item>
-						<Menu.Item>
-							<hr></hr>
-						</Menu.Item>
-						<Menu.Item as='a' onClick={this.landingRoute} style={{background: '#EDAC86', textAlign: 'center'}}>
-							<Header as='h2' style={{paddingLeft:'5%',color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-								<span>01.&nbsp;&nbsp;&nbsp;&nbsp;Home</span>
-							</Header>
-						</Menu.Item>
-						<Menu.Item as='a' onClick={this.teamRoute} style={{background: '#EDAC86'}}>
-							<Header as='h2' style={{paddingLeft:'5%', color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-								<span>02.&nbsp;&nbsp;&nbsp;&nbsp;Team</span>
-							</Header>
-						</Menu.Item>
-						<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
-							<Header as='h2' style={{paddingLeft:'5%',color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-								<span>03.&nbsp;&nbsp;&nbsp;&nbsp;About</span>
-							</Header>
-						</Menu.Item>
-						<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
-							<Header as='h2' style={{paddingLeft:'5%', color:'white',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-								<span>04.&nbsp;&nbsp;&nbsp;&nbsp;Location</span>
-							</Header>
-						</Menu.Item>
-						<Menu.Item>
-							<hr></hr>
-						</Menu.Item>
-						<Menu.Item/>
-						<Menu.Item/>
-						<Menu.Item/>
-						<Menu.Item/>
-						<Menu.Item/>
-						<Menu.Item/>
-						<Menu.Item/>
-						<Menu.Item>
-							<Header as='h5' style={{textAlign:'center', fontFamily:'Didot', fontStyle:'italic', color:'white'}}>
-								© 2020 Expresso
-							</Header>
-						</Menu.Item>
-					</Sidebar>
-					<Sidebar.Pusher
-						dimmed={this.state.visible}
-						onClick={this.handlePusher}
-					>
-							<Grid verticalAlign='middle' style={{ margin:'0'}}>
-                <Grid.Row verticalAlign='middle' style={{height: '7vh', background: '#BEB19B', padding:'0'}}>
+					<Sidebar.Pushable as={Segment}>
+						<Sidebar
+							as={Menu}
+							animation='push'
+							vertical
+							inverted
+							borderless
+							visible={this.state.visible}
+							style={{background: '#EDAC86'}}
+						>
+							<Menu.Item>
+								<Icon name='x' size='large' style={{cursor:'pointer', color:'black'}} onClick={this.handlePusher}/>
+							</Menu.Item>
+							<Menu.Item style={{height:'12vh'}}/>
+							<Menu.Item>
+								<Image centered={true} src={logo} size='mini'/>
+							</Menu.Item>
+							<Menu.Item>
+								<hr></hr>
+							</Menu.Item>
+							<Menu.Item as='a' onClick={this.landingRoute} style={{background: '#EDAC86', textAlign: 'center'}}>
+								<Header as='h2' style={{paddingLeft:'5%',color:'black', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>01.&nbsp;&nbsp;&nbsp;&nbsp;Home</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item as='a' style={{background: '#EDAC86'}}>
+								<Header as='h2' style={{paddingLeft:'5%', color:'black', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>02.&nbsp;&nbsp;&nbsp;&nbsp;Team</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
+								<Header as='h2' style={{paddingLeft:'5%',color:'black', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>03.&nbsp;&nbsp;&nbsp;&nbsp;About</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item as='a' onClick={this.locationRoute} style={{background: '#EDAC86'}}>
+								<Header as='h2' style={{paddingLeft:'5%', color:'black',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+									<span>04.&nbsp;&nbsp;&nbsp;&nbsp;Location</span>
+								</Header>
+							</Menu.Item>
+							<Menu.Item>
+								<hr></hr>
+							</Menu.Item>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item/>
+							<Menu.Item>
+								<Header as='h5' style={{textAlign:'center', fontFamily:'Didot', fontStyle:'italic', color:'black'}}>
+									© 2020 Expresso
+								</Header>
+							</Menu.Item>
+						</Sidebar>
+						<Sidebar.Pusher
+							dimmed={this.state.visible}
+							onClick={this.handlePusher}
+						>
+							<Grid verticalAlign='middle' style={{ 'marginBottom': '10vh' }}>
+								<Grid.Row verticalAlign='middle' style={{height: '7vh', background: '#BEB19B', padding:'0'}}>
 									<Menu inverted fixed="top" fluid widths='6' secondary style={{ height: '7vh', background: '#BEB19B' }}>
-	                	<Menu.Item position='left' style={{width:'10%'}}>
-	                  	<Icon name='sidebar' size ='large' onClick={this.setVisible} style={{color:'white', background: 'none'}} />
-	                	</Menu.Item>
-	              	</Menu>
+										<Menu.Item position='left' style={{width:'5%'}}>
+											<Icon name='sidebar' size ='large' onClick={this.setVisible} style={{color:'black', background: 'none', cursor: 'pointer'}} />
+										</Menu.Item>
+									</Menu>
 								</Grid.Row>
 								<Grid.Row />
 								<Grid.Row />
@@ -163,8 +170,8 @@ class AboutTeam extends React.Component {
 											<h2 style={{fontFamily:'Avenir'}}>About</h2>
 											<br />
 											<Container style={{ 'width': '720px' }}>
-												<p style={{ 'fontSize': '20px', fontFamily:'Avenir' }}>
-													<em>Expresso</em> is a web application developed and designed for <em>COS 333: Advanced Programming Techniques</em>during the Fall '19 semester for The Coffee Club.
+												<p style={{fontSize:'18px',fontStyle:'Avenir'}}>
+													<em>Expresso</em> is a web application developed and designed for <em>COS 333: Advanced Programming Techniques</em> during the Fall '19 semester for The Coffee Club.
 												</p>
 											</Container>
 										</center>
@@ -177,21 +184,33 @@ class AboutTeam extends React.Component {
 										<center>
 											<h2 style={{fontStyle:'Avenir'}}>Acknowledgments</h2>
 											<br />
-											<u><h3>Dr. Robert Dondero</h3></u>
+											<u><h2>Dr. Robert Dondero</h2></u>
 											<br />
 											<p style={{fontSize:'18px', fontStyle:'Avenir'}}>COS 333 Lead Instructor</p>
 											<br />
-											<u><h3>Jace Lu</h3></u>
+											<u><h2>Jace Lu</h2></u>
 											<br />
 											<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Fall 19-20 COS 333 TA Advisor</p>
 											<br />
-											<u><h3>Greg Blaha</h3></u>
+											<u><h2>Greg Blaha</h2></u>
 											<br />
 											<p style={{fontSize:'18px', fontStyle:'Avenir'}}>ODUS IT Manager</p>
 											<br />
-											<u><h3>Dean Fisher</h3></u>
+											<u><h2>Dean Fisher</h2></u>
 											<br />
-											<p style={{fontSize:'18px',fontStyle:'Avenir'}}>Director of Student Agencies</p>
+											<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Director of Student Agencies</p>
+											<br />
+											<u><h2>Suzanne Bellan</h2></u>
+											<br />
+											<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Princeton Office of Finance and Treasury</p>
+											<br />
+											<u><h2>Emma M. Marshall</h2></u>
+											<br />
+											<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Princeton Tiger Card Services</p>
+											<br />
+											<u><h2>Maria L. Bizzarri</h2></u>
+											<br />
+											<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Princeton's Bursar</p>
 										</center>
 									</Grid.Column>
 								</Grid.Row>
@@ -205,7 +224,7 @@ class AboutTeam extends React.Component {
 											<Container style={{ 'width': '720px' }}>
 												<p style={{fontSize:'18px',fontStyle:'Avenir'}}>
 													<em>Expresso</em> was designed to be a user-friendly and helpful web application to
-													change the way students order their food and beverage from Coffee Club.
+													change the way students order their food and beverage from The Coffee Club.
 													With the goal of making the ordering process as simple and smooth as
 													possible, we hope that <em>Expresso</em> brings even a little bit of convenience to
 													the busy lives of students!
@@ -224,83 +243,78 @@ class AboutTeam extends React.Component {
           </Sidebar.Pushable>
         </Responsive>
         <Responsive {...Responsive.onlyMobile}>
-					<Sidebar.Pushable as={Segment}>
-						<Sidebar
-							as={Menu}
-							animation='push'
-							fluid
-							vertical
-							inverted
-							borderless
-							visible={this.state.visible}
-							style={{background: '#EDAC86'}}
-						>
-							<Menu.Item>
-								<Icon name='x' size='large' style={{cursor:'pointer', color:'white'}} onClick={this.handlePusher}/>
-							</Menu.Item>
-							<Menu.Item style={{height:'12vh'}}/>
-							<Menu.Item>
-								<Image centered={true} src={logo} size='mini'/>
-							</Menu.Item>
-							<Menu.Item>
-								<hr></hr>
-							</Menu.Item>
-							<Menu.Item as='a' style={{background: '#EDAC86', textAlign: 'center'}}>
-								<Header as='h2' style={{paddingLeft:'5%',color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-									<span>01.&nbsp;&nbsp;&nbsp;&nbsp;Home</span>
-								</Header>
-							</Menu.Item>
-							<Menu.Item as='a' onClick={this.teamRoute} style={{background: '#EDAC86'}}>
-							<Header as='h2' style={{paddingLeft:'5%', color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+					<Sidebar
+						as={Menu}
+						animation='push'
+						fluid
+						vertical
+						inverted
+						borderless
+						visible={this.state.visible}
+						style={{background: '#EDAC86'}}
+					>
+						<Menu.Item>
+							<Icon name='x' size='large' style={{cursor:'pointer', color:'black'}} onClick={this.handlePusher}/>
+						</Menu.Item>
+						<Menu.Item style={{height:'12vh'}}/>
+						<Menu.Item>
+							<Image centered={true} src={logo} size='mini'/>
+						</Menu.Item>
+						<Menu.Item>
+							<hr></hr>
+						</Menu.Item>
+						<Menu.Item as='a' onClick={this.landingRoute} style={{background: '#EDAC86', textAlign: 'center'}}>
+							<Header as='h2' style={{paddingLeft:'5%',color:'black', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+								<span>01.&nbsp;&nbsp;&nbsp;&nbsp;Home</span>
+							</Header>
+						</Menu.Item>
+						<Menu.Item as='a' style={{background: '#EDAC86'}}>
+							<Header as='h2' style={{paddingLeft:'5%', color:'black', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
 								<span>02.&nbsp;&nbsp;&nbsp;&nbsp;Team</span>
 							</Header>
-							</Menu.Item>
-							<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
-								<Header as='h2' style={{paddingLeft:'5%',color:'white', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-									<span>03.&nbsp;&nbsp;&nbsp;&nbsp;About</span>
-								</Header>
-							</Menu.Item>
-							<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
-								<Header as='h2' style={{paddingLeft:'5%', color:'white',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-									<span>04.&nbsp;&nbsp;&nbsp;&nbsp;Location</span>
-								</Header>
-							</Menu.Item>
-							<Menu.Item>
-								<Header as='h2' onClick={this.baristaRoute} style={{paddingLeft:'5%', color:'white',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
-									<span>05.&nbsp;&nbsp;&nbsp;&nbsp;Barista Login</span>
-								</Header>
-							</Menu.Item>
-							<Menu.Item>
-								<hr></hr>
-							</Menu.Item>
-							<Menu.Item/>
-							<Menu.Item/>
-							<Menu.Item/>
-							<Menu.Item/>
-							<Menu.Item/>
-							<Menu.Item/>
-							<Menu.Item>
-								<Header as='h5' style={{textAlign:'center', fontFamily:'Didot', fontStyle:'italic', color:'white'}}>
-									© 2020 Expresso
-								</Header>
-							</Menu.Item>
-						</Sidebar>
-					<Sidebar.Pusher
-						dimmed={this.state.visible}
-						onClick={this.handlePusher}
-					>
+						</Menu.Item>
+						<Menu.Item as='a' onClick={this.aboutRoute} style={{background: '#EDAC86'}}>
+							<Header as='h2' style={{paddingLeft:'5%',color:'black', textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+								<span>03.&nbsp;&nbsp;&nbsp;&nbsp;About</span>
+							</Header>
+						</Menu.Item>
+						<Menu.Item as='a' onClick={this.locationRoute} style={{background: '#EDAC86'}}>
+							<Header as='h2' style={{paddingLeft:'5%', color:'black',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+								<span>04.&nbsp;&nbsp;&nbsp;&nbsp;Location</span>
+							</Header>
+						</Menu.Item>
+						<Menu.Item>
+							<Header as='h2' onClick={this.baristaRoute} style={{paddingLeft:'5%', color:'black',textAlign:'left', fontFamily:'Didot', fontStyle:'italic'}}>
+								<span>05.&nbsp;&nbsp;&nbsp;&nbsp;Barista Login</span>
+							</Header>
+						</Menu.Item>
+						<Menu.Item>
+							<hr></hr>
+						</Menu.Item>
+						<Menu.Item/>
+						<Menu.Item/>
+						<Menu.Item/>
+						<Menu.Item/>
+						<Menu.Item/>
+						<Menu.Item/>
+						<Menu.Item>
+							<Header as='h5' style={{textAlign:'center', fontFamily:'Didot', fontStyle:'italic', color:'black'}}>
+								© 2020 Expresso
+							</Header>
+						</Menu.Item>
+					</Sidebar>
 					<Grid style={{ 'marginBottom': '10vh' }} columns='equal'>
 						<Grid.Row>
-				    	<Menu inverted fixed="top" fluid widths='6' secondary style={{ height: '7vh', background: '#BEB19B' }}>
-			        	<Menu.Item position='left' style={{width:'10%'}}>
-			          	<Icon name='sidebar' size ='large' onClick={this.setVisible} style={{color:'white', background: 'none'}} />
-			          </Menu.Item>
-			         </Menu>
+							<Menu inverted fixed="top" fluid widths='6' secondary style={{ height: '7vh', background: '#BEB19B' }}>
+								<Menu.Item position='left' style={{width:'15%'}}>
+									<Icon name='sidebar' size ='large' onClick={this.setVisible} style={{color:'black', background: 'none', cursor: 'pointer'}} />
+								</Menu.Item>
+							</Menu>
 						</Grid.Row>
 						<Grid.Row />
 						<Grid.Row />
 						<Grid.Row centered>
-							<h1>The Team</h1>
+							<span><h1 style={{fontFamily:'Didot', fontStyle:'italic'}}>The Team</h1></span>
 						</Grid.Row>
 						<MobileProfile image={victor} name={'Victor Hua'} major={"COS '21"} role={'Frontend'}/>
 						<MobileProfile image={joseph} name={'Joseph Kim'} major={"COS '21"} role={'Backend'}/>
@@ -312,11 +326,11 @@ class AboutTeam extends React.Component {
 						<Grid.Row centered>
 							<Grid.Column>
 								<center>
-									<h1>About</h1>
+									<h2 style={{fontFamily:'Avenir'}}>About</h2>
 									<br />
 									<Container style={{ 'width': '720px' }}>
-										<p style={{ 'fontSize': '20px' }}>
-											<em>Expresso</em> is a web application developed and designed for <em>COS 333: Advanced Programming Techniques</em>during the Fall '19 semester for The Coffee Club.
+										<p style={{fontSize:'18px',fontStyle:'Avenir'}}>
+											<em>Expresso</em> is a web application developed and designed for <em>COS 333: Advanced Programming Techniques</em> during the Fall '19 semester for The Coffee Club.
 										</p>
 									</Container>
 								</center>
@@ -327,23 +341,35 @@ class AboutTeam extends React.Component {
 						<Grid.Row centered>
 							<Grid.Column>
 								<center>
-									<h1>Acknowledgments</h1>
+									<h2 style={{fontStyle:'Avenir'}}>Acknowledgments</h2>
 									<br />
 									<u><h2>Dr. Robert Dondero</h2></u>
 									<br />
-									<p style={{ 'fontSize': '20px' }}>COS 333 Lead Instructor</p>
+									<p style={{fontSize:'18px', fontStyle:'Avenir'}}>COS 333 Lead Instructor</p>
 									<br />
 									<u><h2>Jace Lu</h2></u>
 									<br />
-									<p style={{ 'fontSize': '20px' }}>Fall 19-20 COS 333 TA Advisor</p>
+									<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Fall 19-20 COS 333 TA Advisor</p>
 									<br />
 									<u><h2>Greg Blaha</h2></u>
 									<br />
-									<p style={{ 'fontSize': '20px' }}>ODUS IT Manager</p>
+									<p style={{fontSize:'18px', fontStyle:'Avenir'}}>ODUS IT Manager</p>
 									<br />
 									<u><h2>Dean Fisher</h2></u>
 									<br />
-									<p style={{ 'fontSize': '20px' }}>Director of Student Agencies</p>
+									<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Director of Student Agencies</p>
+									<br />
+									<u><h2>Suzanne Bellan</h2></u>
+									<br />
+									<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Princeton Office of Finance and Treasury</p>
+									<br />
+									<u><h2>Emma M. Marshall</h2></u>
+									<br />
+									<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Princeton Tiger Card Services</p>
+									<br />
+									<u><h2>Maria L. Bizzarri</h2></u>
+									<br />
+									<p style={{fontSize:'18px', fontStyle:'Avenir'}}>Princeton's Bursar</p>
 								</center>
 							</Grid.Column>
 						</Grid.Row>
@@ -352,10 +378,10 @@ class AboutTeam extends React.Component {
 						<Grid.Row centered>
 							<Grid.Column>
 								<center>
-									<h1>Note from the Developers</h1>
+									<h2 style={{fontStyle:'Avenir'}}>Note from the Developers</h2>
 									<br />
 									<Container style={{ 'width': '720px' }}>
-										<p style={{ 'fontSize': '20px' }}>
+										<p style={{fontSize:'18px',fontStyle:'Avenir'}}>
 											<em>Expresso</em> was designed to be a user-friendly and helpful web application to
 											change the way students order their food and beverage from Coffee Club.
 											With the goal of making the ordering process as simple and smooth as
@@ -372,8 +398,6 @@ class AboutTeam extends React.Component {
 							</Grid.Column>
 						</Grid.Row>
 					</Grid>
-					</Sidebar.Pusher>
-	        </Sidebar.Pushable>
         </Responsive>
       </React.Fragment>
     );

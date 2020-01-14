@@ -1,11 +1,11 @@
 import React from 'react';
-import { Image, Menu, Icon, Container, Header, Grid, Dimmer, Loader, Button, Checkbox } from 'semantic-ui-react';
+import { Menu, Icon, Container, Header, Grid, Dimmer, Modal, Loader, Button, Checkbox, Responsive, Card, Image, Sidebar, Segment } from 'semantic-ui-react';
 
 import BaristaHeader from './BaristaHeader';
 import AddItem from './AddItem';
-import EditItem from './EditItem';
-import { getAllItems, changeStock } from '../Axios/axios_getter';
 import * as inventory from '../Assets/inventory.png';
+
+import { changeStock, deleteItem, loadInventory, checkAdmin } from '../Axios/axios_getter';
 
 class BaristaInventory extends React.Component {
   constructor(props) {
@@ -17,64 +17,76 @@ class BaristaInventory extends React.Component {
   }
 
   state = {
+    admin: false,
+    deniedActive: false,
     addActive: false,
     editActive: false,
-    selected: null,
+    deleteConfirm: false,
+    toDelete: null,
     loading: false,
     drinks: [],
     food: [],
-    add: []
+    add: [],
+    transitionAdd: false,
+    transitionDelete: false,
   }
 
   componentDidMount = () => {
     this.setState({ loading: true });
+    checkAdmin(JSON.parse(localStorage.getItem('token')))
+      .then(res => {
+        this.setState({ admin: res.status });
+      });
     setTimeout(this.getItems, 1000);
+    this.intervalId = setInterval(this.getItems, 10000);
+  }
+
+  componentWillUnmount = () => {
+    clearInterval(this.intervalId);
+  }
+
+  toggleOnAdd = () => {
+    this.setState({ transitionAdd: true });
+    this.timeoutAdd = setTimeout(() => {this.setState({ transitionAdd: false })}, 3000);
+  }
+
+  toggleOnDelete = () => {
+    this.setState({ transitionDelete: true });
+    this.timeoutDelete = setTimeout(() => {this.setState({ transitionDelete: false })}, 3000);
   }
 
   getItems = async () => {
-    await getAllItems()
+    await loadInventory(JSON.parse(localStorage.getItem('token')))
       .then(menu => {
-        let allItems = new Map();
+        let allItems = [];
+        let drinks = [];
+        let food = [];
         let addons = [];
         for (let i = 0; i < menu.length; i++) {
           let current = menu[i];
-          // if item is add-on, handle it differently
-          if (current.category === 'Add') {
+          if (current.category === 'Drink' && !allItems.includes(current.item)) {
             let newItem = {
               name: current.item,
-              price: current.price,
+              availability: current.availability
+            }
+            drinks.push(newItem);
+            allItems.push(current.item)
+          }
+          else if (current.category === 'Food' && !allItems.includes(current.item)) {
+            let newItem = {
+              name: current.item,
+              availability: current.availability
+            }
+            food.push(newItem);
+            allItems.push(current.item)
+          }
+          else if (current.category === 'Add' && !allItems.includes(current.item)) {
+            let newItem = {
+              name: current.item,
               availability: current.availability
             }
             addons.push(newItem);
-          }
-          // if item is already in dict, add the new size and price
-          if (allItems.has(current.item)) {
-            let sp = [current.size, current.price];
-            let temp = allItems.get(current.item);
-            temp.sp.push(sp);
-            allItems.set(current.item, temp);
-          }
-          // otherwise add a completely new item
-          else {
-            let newItem = {
-              name: current.item,
-              sp: [[current.size, current.price]],
-              description: current.description,
-              category: current.category,
-              availability: current.availability
-            }
-            allItems.set(current.item, newItem);
-          }
-        }
-        // separate items into drinks or food
-        let drinks = [];
-        let food = [];
-        for (const [key, value] of allItems) {
-          if (allItems.get(key).category === 'Drink') {
-            drinks.push(allItems.get(key));
-          }
-          if (allItems.get(key).category === 'Food') {
-            food.push(allItems.get(key));
+            allItems.push(current.item)
           }
         }
         this.setState({ drinks: drinks });
@@ -87,7 +99,12 @@ class BaristaInventory extends React.Component {
 
   handleAddClick = async () => {
     this.setState({ loading: true });
-    await this.setState({ addActive: true });
+    if (this.state.admin === 'False') {
+      this.setState({ deniedActive: true });
+    }
+    else {
+      await this.setState({ addActive: true });
+    }
     this.setState({ loading: false });
   }
 
@@ -97,17 +114,34 @@ class BaristaInventory extends React.Component {
     this.setState({ loading: false });
   }
 
-  handleEditClick = async (item) => {
+  handleDeleteClick = async (item) => {
     this.setState({ loading: true });
-    await this.setState({ selected: item });
-    await this.setState({ editActive: true });
+    if (this.state.admin === 'False') {
+      this.setState({ deniedActive: true });
+    }
+    else {
+      await this.setState({ toDelete: item });
+      await this.setState({ deleteConfirm: true });
+    }
+      this.setState({ loading: false });
+  }
+
+  deleteItemSubmit = async () => {
+    this.setState({ loading: true });
+    await deleteItem(this.state.toDelete, JSON.parse(localStorage.getItem('token')));
+    this.setState({ toDelete: null });
+    this.setState({ deleteConfirm: false });
+    await this.getItems();
+    this.toggleOnDelete();
     this.setState({ loading: false });
   }
 
-  handleEditClose = async () => {
-    this.setState({ loading: true });
-    await this.setState({ editActive: false });
-    this.setState({ loading: false });
+  deleteItemClose = () => {
+    this.setState({ deleteConfirm: false });
+  }
+
+  handleCloseDenied = () => {
+    this.setState({ deniedActive: false });
   }
 
   handleDrinksMenuClick = (e) => {
@@ -122,13 +156,9 @@ class BaristaInventory extends React.Component {
     window.scrollTo({top: this.addonsRef.current.offsetTop + 183, left: 0, behavior: 'smooth'});
   }
 
-  handleFeedback = (e) => {
-    // link to feedback form
-  }
-
   handleStockChange = (item) => {
     this.setState({ loading: true });
-    changeStock(item)
+    changeStock(item, JSON.parse(localStorage.getItem('token')))
       .then(availability => {
         if (availability.category === "Drink") {
           for (let i = 0; i < this.state.drinks.length; i++) {
@@ -165,75 +195,14 @@ class BaristaInventory extends React.Component {
 
   render() {
 
-    return (
-      <React.Fragment>
-        <BaristaHeader history={this.props.history} />
-        <Dimmer active={this.state.loading} inverted page>
-          <Loader inverted>Loading</Loader>
-        </Dimmer>
-        <Dimmer active={this.state.addActive} onClickOutside={this.handleAddClose} page>
-          <Container style={{ width: '720px' }}>
-            <AddItem handleAddClose={this.handleAddClose}/>
-          </Container>
-        </Dimmer>
-        <Dimmer active={this.state.editActive} onClickOutside={this.handleEditClose} page>
-          <Container style={{ width: '720px' }}>
-            <EditItem handleEditClose={this.handleEditClose} item={this.state.selected}/>
-          </Container>
-        </Dimmer>
-        <Menu vertical secondary fixed='left' color='grey' size='massive' style={{ 'zIndex': '1' }}>
-          <div style={{ height: '30vh' }} />
-          <Menu.Item onClick={this.handleAddClick}>
-            <div style={{ height: '2vh' }} />
-            <Container textAlign='center'>
-              <Header as='h2' style={{fontFamily:'Avenir'}}>
-                <Icon name='plus' />
-                ADD ITEM
-              </Header>
-            </Container>
-            <div style={{ height: '2vh' }} />
-          </Menu.Item>
-          <Menu.Item onClick={this.handleDrinksMenuClick}>
-            <div style={{ height: '2vh' }} />
-            <Container textAlign='center'>
-              <Header as='h2' style={{fontFamily:'Avenir'}}>
-                <Icon name='coffee' />
-                DRINKS
-              </Header>
-            </Container>
-            <div style={{ height: '2vh' }} />
-          </Menu.Item>
-
-          <Menu.Item onClick={this.handleFoodMenuClick}>
-            <div style={{ height: '2vh' }} />
-            <Container textAlign='center' style={{fontFamily:'Avenir'}}>
-              <Header as='h2'>
-                <Icon name='utensils' />
-                FOOD
-              </Header>
-            </Container>
-            <div style={{ height: '2vh' }} />
-          </Menu.Item>
-
-          <Menu.Item onClick={this.handleAddOnsMenuClick}>
-            <div style={{ height: '2vh' }} />
-            <Container textAlign='center' style={{fontFamily:'Avenir'}}>
-              <Header as='h2'>
-                <Icon name='plus square outline' />
-                ADD-ONS
-              </Header>
-            </Container>
-            <div style={{ height: '2vh' }} />
-          </Menu.Item>
-        </Menu>
-        {/* Main Content */}
+    let content =
         <Grid stackable>
           <Grid.Row>
             <Grid.Column width='4' />
             <Grid.Column width='9'>
               <Grid divided='vertically'>
                 <Grid.Row>
-                  <Image src={inventory} style = {{paddingLeft:'1em', marginTop:'-8%'}}/>
+                  <Image src={inventory} style = {{marginTop:'-8%'}}/>
                 </Grid.Row>
                 <Grid.Row>
                   <Grid.Column width='1' />
@@ -243,7 +212,10 @@ class BaristaInventory extends React.Component {
                       {/* Drinks Section */}
                       <div ref={this.drinkRef}></div>
                       <Grid.Row >
-                        <Header style={{fontFamily:'Avenir', fontSize:'2em'}}>DRINKS</Header>
+                        <Grid.Column width='1' />
+                        <Grid.Column width='15'>
+                          <Header style={{ 'fontSize': '2em' }}>DRINKS</Header>
+                        </Grid.Column>
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column width='1' />
@@ -251,16 +223,15 @@ class BaristaInventory extends React.Component {
                           <Grid divided='vertically'>
                             {this.state.drinks.map(drink => {
                               return (
-                                <Grid.Row>
-                                  <Grid.Column width='8'>
+                                <Grid.Row key={drink.name}>
+                                  <Grid.Column width='7'>
                                     <h2>{drink.name}</h2>
                                   </Grid.Column>
-                                  <Grid.Column width='4'>
-                                    {/* the default should be whatever is in the database */}
+                                  <Grid.Column width='6'>
                                     <Checkbox toggle checked={drink.availability} label='In Stock' onClick={() => this.handleStockChange(drink.name)}/>
                                   </Grid.Column>
-                                  <Grid.Column width='4'>
-                                    <Button circular onClick={() => this.handleEditClick(drink)} basic color='black'>Edit Details</Button>
+                                  <Grid.Column width='3'>
+                                    <Button circular onClick={() => this.handleDeleteClick(drink.name)} basic color='black'>Delete Item</Button>
                                   </Grid.Column>
                                 </Grid.Row>
                               )
@@ -272,7 +243,10 @@ class BaristaInventory extends React.Component {
                       {/* Food Section */}
                       <div ref={this.foodRef}></div>
                       <Grid.Row>
-                        <Header style={{fontFamily:'Avenir', fontSize:'2em' }}>FOOD</Header>
+                        <Grid.Column width='1' />
+                        <Grid.Column width='15'>
+                          <Header style={{ 'fontSize': '2em' }}>FOOD</Header>
+                        </Grid.Column>
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column width='1' />
@@ -280,16 +254,15 @@ class BaristaInventory extends React.Component {
                           <Grid divided='vertically'>
                             {this.state.food.map(food => {
                               return (
-                                <Grid.Row>
-                                  <Grid.Column width='8'>
+                                <Grid.Row key={food.name}>
+                                  <Grid.Column width='7'>
                                     <h2>{food.name}</h2>
                                   </Grid.Column>
-                                  <Grid.Column width='4'>
-                                    {/* the default should be whatever is in the database */}
+                                  <Grid.Column width='6'>
                                     <Checkbox toggle checked={food.availability} label='In Stock' onClick={() => this.handleStockChange(food.name)}/>
                                   </Grid.Column>
-                                  <Grid.Column width='4'>
-                                    <Button circular onClick={() => this.handleEditClick(food)} basic color='black'>Edit Details</Button>
+                                  <Grid.Column width='3'>
+                                    <Button circular onClick={() => this.handleDeleteClick(food.name)} basic color='black'>Delete Item</Button>
                                   </Grid.Column>
                                 </Grid.Row>
                               )
@@ -299,7 +272,10 @@ class BaristaInventory extends React.Component {
                       </Grid.Row>
                       <div ref={this.addonsRef}></div>
                       <Grid.Row>
-                        <Header style={{fontFamily:'Avenir', fontSize: '2em'}}>ADD-ONS</Header>
+                        <Grid.Column width='1' />
+                        <Grid.Column width='15'>
+                          <Header style={{ 'fontSize': '2em' }}>ADD-ONS</Header>
+                        </Grid.Column>
                       </Grid.Row>
                       <Grid.Row>
                         <Grid.Column width='1' />
@@ -307,17 +283,15 @@ class BaristaInventory extends React.Component {
                           <Grid divided='vertically'>
                             {this.state.add.map(addon => {
                               return (
-                                <Grid.Row>
-                                  <Grid.Column width='8'>
+                                <Grid.Row key={addon.name}>
+                                  <Grid.Column width='7'>
                                     <h2>{addon.name}</h2>
                                   </Grid.Column>
-                                  <Grid.Column width='4'>
-                                    {/* the default should be whatever is in the database */}
+                                  <Grid.Column width='6'>
                                     <Checkbox toggle checked={addon.availability} label='In Stock' onClick={() => this.handleStockChange(addon.name)}/>
                                   </Grid.Column>
-                                  <Grid.Column width='4'>
-                                    <Button circular onClick={() => this.handleEditClick(addon)} basic color='black'
-                                      style={{fontFamily:'Avenir'}}>Edit Details</Button>
+                                  <Grid.Column width='3'>
+                                    <Button circular onClick={() => this.handleDeleteClick(addon.name)} basic color='black'>Delete Item</Button>
                                   </Grid.Column>
                                 </Grid.Row>
                               )
@@ -334,7 +308,110 @@ class BaristaInventory extends React.Component {
             </Grid.Column>
             <Grid.Column width='1' />
           </Grid.Row>
-        </Grid>
+        </Grid>;
+
+    return (
+      <React.Fragment>
+        <Sidebar as={Header} direction='top' width='very wide' visible={this.state.transitionAdd} animation='overlay' style={{ 'zIndex': '3' }}>
+          <div style={{ height: '5vh' }} />
+          <Segment raised textAlign='center' style={{color: 'white', fontFamily:'Avenir', background: '#EDAC86'}}>
+            Item added to the menu!
+          </Segment>
+        </Sidebar>
+        <Sidebar as={Header} direction='top' width='very wide' visible={this.state.transitionDelete} animation='overlay' style={{ 'zIndex': '3' }}>
+          <div style={{ height: '5vh' }} />
+          <Segment raised textAlign='center' style={{color: 'white', fontFamily:'Avenir', background: '#EDAC86'}}>
+            Item deleted from the menu!
+          </Segment>
+        </Sidebar>
+        <Dimmer active={this.state.loading} inverted page>
+          <Loader inverted>Loading</Loader>
+        </Dimmer>
+        <Modal open={this.state.addActive} style={{'maxHeight': 'calc(100vh - 210px)', 'overflowY': 'auto'}}>
+          <Container style={{ width: '720px' }}>
+            <AddItem handleAddClose={this.handleAddClose} inventoryRefresh={this.getItems} toggleOnAdd={this.toggleOnAdd} />
+          </Container>
+        </Modal>
+        {/* Pop up to confirm item deletion */}
+        <Dimmer active={this.state.deleteConfirm} onClickOutside={this.deleteItemClose} page>
+          <Container style={{ width: '720px' }}>
+            <Card fluid>
+              <Card.Content>
+                <Header as='h3' color='grey'>Are you sure you want to permanently delete this item from the menu?</Header>
+              </Card.Content>
+              <Button.Group>
+                <Button onClick={this.deleteItemClose}>Cancel</Button>
+                <Button negative onClick={this.deleteItemSubmit}>Delete</Button>
+              </Button.Group>
+            </Card>
+          </Container>
+        </Dimmer>
+        <Dimmer active={this.state.deniedActive} onClickOutside={this.handleCloseDenied} page>
+          <Container style={{ width: '720px' }}>
+            <Card fluid>
+              <Card.Content>
+                <Header as='h3' color='grey'>Access denied</Header>
+              </Card.Content>
+              <Button onClick={this.handleCloseDenied}>
+                Close Window
+              </Button>
+            </Card>
+          </Container>
+        </Dimmer>
+        <BaristaHeader history={this.props.history} />
+        <Responsive minWidth={Responsive.onlyTablet.minWidth}>
+        <div style={{ height: '12vh' }} />
+          <Menu vertical secondary fixed='left' color='grey' size='massive' style={{ 'zIndex': '1' }}>
+            <div style={{ height: '30vh' }} />
+            <Menu.Item onClick={this.handleAddClick}>
+              <div style={{ height: '2vh' }} />
+              <Container textAlign='center'>
+                <Header as='h2'>
+                  <Icon name='plus' />
+                  ADD ITEM
+                </Header>
+              </Container>
+              <div style={{ height: '2vh' }} />
+            </Menu.Item>
+            <Menu.Item onClick={this.handleDrinksMenuClick}>
+              <div style={{ height: '2vh' }} />
+              <Container textAlign='center'>
+                <Header as='h2'>
+                  <Icon name='coffee' />
+                  DRINKS
+                </Header>
+              </Container>
+              <div style={{ height: '2vh' }} />
+            </Menu.Item>
+
+            <Menu.Item onClick={this.handleFoodMenuClick}>
+              <div style={{ height: '2vh' }} />
+              <Container textAlign='center'>
+                <Header as='h2'>
+                  <Icon name='utensils' />
+                  FOOD
+                </Header>
+              </Container>
+              <div style={{ height: '2vh' }} />
+            </Menu.Item>
+
+            <Menu.Item onClick={this.handleAddOnsMenuClick}>
+              <div style={{ height: '2vh' }} />
+              <Container textAlign='center'>
+                <Header as='h2'>
+                  <Icon name='plus square outline' />
+                  ADD-ONS
+                </Header>
+              </Container>
+              <div style={{ height: '2vh' }} />
+            </Menu.Item>
+          </Menu>
+          {content}
+        </Responsive>
+        <Responsive {...Responsive.onlyMobile}>
+        <div style={{ height: '7vh' }} />
+          {content}
+        </Responsive>
       </React.Fragment>
     );
   }

@@ -105,7 +105,7 @@ class ItemPopUp extends React.Component {
                   <Form>
                     {item.sp.map(sizePrice => {
                       return (
-                        <Form.Field>
+                        <Form.Field key={sizePrice[0]}>
                           <Radio
                             id={sizePrice[0]}
                             label={sizePrice[0] + " ($" + Number(sizePrice[1]).toFixed(2) + ")"}
@@ -131,7 +131,7 @@ class ItemPopUp extends React.Component {
                   <Form>
                     {this.props.item.addons.map(add => {
                       return (
-                        <Form.Field>
+                        <Form.Field key={add.name}>
                           <Checkbox
                             disabled={!add.availability}
                             id={add.name}
@@ -157,8 +157,7 @@ class ItemPopUp extends React.Component {
                   <Header as='h3' color='grey'>{"$" + this.state.totalPrice.toFixed(2)}</Header>
                 </Grid.Column>
                 <Grid.Column width='4' textAlign='center' verticalAlign='middle'>
-                  <Button circular style={{backgroundColor: '#EDAC86'}}
-                    onClick={() => this.props.handleItemSubmit(this.state.finalOrder)}>
+                  <Button style={{backgroundColor: '#EDAC86'}} onClick={() => this.props.handleItemSubmit(this.state.finalOrder)}>
                     ADD ITEM
                   </Button>
                 </Grid.Column>

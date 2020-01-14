@@ -2,7 +2,7 @@ import React from 'react';
 import { Header, Grid, Divider, Dimmer, Loader } from 'semantic-ui-react';
 
 import BaristaHeader from './BaristaHeader';
-import { getDayHistory, getAllHistory } from '../Axios/axios_getter';
+import { getDayHistory } from '../Axios/axios_getter';
 
 class BaristaHistory extends React.Component {
 
@@ -10,19 +10,23 @@ class BaristaHistory extends React.Component {
     dayHistory: [],
     allHistory: [],
     showAll: false,
-    loading: false
+    loading: false,
+    intervalId: null
   }
 
   componentDidMount = () => {
     this.setState({ loading: true });
     setTimeout(this.getDayHistory, 1000);
-    this.getAllHistory();
-    setInterval(this.getDayHistory, 10000);
-    setInterval(this.getAllHistory, 10000);
+    let intervalId = setInterval(this.getDayHistory, 10000);
+    this.setState({ intervalId: intervalId });
+  }
+
+  componentWillUnmount = () => {
+    clearInterval(this.state.intervalId);
   }
 
   getDayHistory = async () => {
-    await getDayHistory()
+    await getDayHistory(JSON.parse(localStorage.getItem('token')))
       .then(dayHistory => {
         this.setState({ dayHistory: dayHistory });
       })
@@ -33,17 +37,6 @@ class BaristaHistory extends React.Component {
     this.setState({ loading: false });
   }
 
-  getAllHistory = async () => {
-    await getAllHistory()
-      .then(allHistory => {
-        this.setState({ allHistory: allHistory });
-      })
-      .catch(error => {
-        console.log(error);
-        this.setState({ allHistory: [] });
-      });
-  }
-
     render() {
 
       const { dayHistory, allHistory, showAll } = this.state;
@@ -52,14 +45,14 @@ class BaristaHistory extends React.Component {
 
       let history = (historyType.length === 0) ?
       <Header as='h3'>
-        :)
+        No Orders!
       </Header> :
 
       <React.Fragment>
         {historyType.map(history => {
           let paymentType = (history.payment) ? "Student Charge" : "In-Store";
           return (
-            <Grid.Row>
+            <Grid.Row verticalAlign='middle'>
               <Grid.Column width='2' verticalAlign='middle' style={{textAlign:'center'}}>
                 <p>{history.time}</p>
               </Grid.Column>
@@ -73,13 +66,13 @@ class BaristaHistory extends React.Component {
                   )
                 })}
               </Grid.Column>
-              <Grid.Column width='2' verticalAlign='middle'>
+              <Grid.Column width='2'>
                 <h3>{'$' + history.cost.toFixed(2)}</h3>
               </Grid.Column>
-              <Grid.Column verticalAlign='middle' width='2'>
+              <Grid.Column width='2'>
                 <h3>{history.netid}</h3>
               </Grid.Column>
-              <Grid.Column verticalAlign='middle' width='2'>
+              <Grid.Column width='2'>
                 <p>{paymentType}</p>
               </Grid.Column>
             </Grid.Row>
@@ -91,14 +84,19 @@ class BaristaHistory extends React.Component {
         return (
             <React.Fragment>
               <BaristaHeader history={this.props.history} />
+              <div style={{ height: '12vh' }} />
               <Dimmer active={this.state.loading} inverted page>
                 <Loader inverted>Loading</Loader>
               </Dimmer>
-              <Grid stackable divided='vertically'>
+              <Grid stackable divided='vertically' textAlign='center'>
+                <Grid.Row>
+                  <Grid.Column>
+                    <h1 style={{ fontFamily:'Didot', fontStyle:'italic' }}>Order History</h1>
+                  </Grid.Column>
+                </Grid.Row>
                 {history}
               </Grid>
             </React.Fragment>
-
         );
     }
 }

@@ -60,26 +60,14 @@ class EditItem extends React.Component {
                             </Form.Field>
                           : null}
                         </Form>
-                        <br />
-                        <br />
-                        <Button fluid style={{backgroundColor:'#C96148', color:'white', fontFamily:'Avenir'}} floated='right'>Remove Item</Button>
                       </Grid.Column>
                     </Grid.Row>
                   </Grid>
                 </Card.Content>
-                <Card.Content style={{paddingLeft:'9.5%', paddingRight:'10%'}}>
-                  <Grid columns={6} equal>
-                    <Grid.Row>
-                    <Grid.Column width='1'/>
-                    <Grid.Column width = '3'>
-                      <Button fluid style={{backgroundColor:'#d3d3d3', color:'black', fontFamily:'Avenir'}}>Cancel</Button>
-                    </Grid.Column>
-                    <Grid.Column width='8' />
-                    <Grid.Column width = '3'>
-                      <Button fluid position='right' style={{backgroundColor:'#85a290', color:'white', fontFamily:'Avenir'}}>Update</Button>
-                    </Grid.Column>
-                    </Grid.Row>
-                  </Grid>
+                <Card.Content>
+                  <Button circular basic color='green'>Update</Button>
+                  <Button circular basic color='grey'>Cancel</Button>
+                  <Button circular basic color='red' floated='right'>Remove</Button>
                 </Card.Content>
               </Card>
             </React.Fragment>
