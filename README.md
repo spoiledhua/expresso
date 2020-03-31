@@ -70,3 +70,6 @@ Customers can click on any item on the menu to render a popup with more details,
 
 #### Tablet and Mobile
 Expresso is mobile-friendly—we anticipated that most of our users would place orders through their phones. It is also tablet-friendly since the Coffee Club anticipates providing tablets for baristas to handle orders.
+
+## Additional Information
+To learn more about Expresso and see additional details about its functionality from a customer's point of view, navigate to the User's Guide our team wrote [here](https://github.com/spoiledhua/expresso/blob/master/UsersGuide.pdf). To learn about the technical implementation, navigate to the Programmer's Guide we put together [here](https://github.com/spoiledhua/expresso/blob/master/ProgrammersGuide.pdf).
