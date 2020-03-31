@@ -16,7 +16,7 @@ Expresso was developed in Princeton University's COS 333: Advanced Programming T
 
 ## My Contribution
 
-I led the frontend team and developed most of the frontend, using React. You can navigate quickly to the general React code in the 'frontend' folder [here](https://github.com/spoiledhua/expresso/tree/master/frontend/src), and to the components I built in the 'Components' folder [here](https://github.com/spoiledhua/expresso/tree/master/frontend/src/Components).
+I led the frontend team and developed most of the frontend, using React. This repository is duplicated from the original repository my team and I worked on (which is a private repository). You can navigate quickly to the general React code in the 'frontend' folder [here](https://github.com/spoiledhua/expresso/tree/master/frontend/src), and to the components I built in the 'Components' folder [here](https://github.com/spoiledhua/expresso/tree/master/frontend/src/Components).
 
 ## Demo
 
