@@ -53,20 +53,20 @@ Expresso's main features include:
 #### Dual Interface
 Customers and baristas have completely different interfaces: Customers can view the menu, add items to their cart, place orders, view order history, send feedback, and more. Baristas can view the queue of orders, complete orders, view order history, change inventory, and more.
 
-#### Secure Login:
+#### Secure Login
 Customers must login with a valid PUID to view the menu and place orders, and can choose to stay logged in. Baristas must login with a valid username and password to use the barista interface. An admin login also exists and allows more privileges on the barista interface.
 
-#### Online and In-person Payment:
+#### Online and In-person Payment
 Customers can either pay for their order online using their PUID, which will directly charge their Princeton financial account to save time and allow them to grab-and-go, or pay in person at the register. They make this selection before placing their order. (Trivia: We're the first group in COS 333 history to integrate PUID payment into our project.)
 
-#### Delayed Ordering:
+#### Delayed Ordering
 Customers can either place their order immediately, or select a valid time during Coffee Club hours to place a delayed order. This order will not pop up on the barista interface until the selected time.
 
-#### Notifications:
+#### Notifications
 Customers will receive a notification via email after they place an order with details about the order.
 
-#### Menu:
+#### Menu
 Customers can click on any item on the menu to render a popup with more details, along with any add-ons they'd like to make. Baristas can toggle any item's availability on and off which will affect item status on the customer menu, and can enable/disable ordering at any time. Admins can add and remove items from the menu.
 
-#### Tablet and Mobile:
+#### Tablet and Mobile
 Expresso is mobile-friendly—we anticipated that most of our users would place orders through their phones. It is also tablet-friendly since the Coffee Club anticipates providing tablets for baristas to handle orders.
