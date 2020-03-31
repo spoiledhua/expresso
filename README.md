@@ -24,22 +24,43 @@ The web app is live [here](http://coffeeclub.princeton.edu/landing). Anyone can 
 
 ## Screen Captures
 
+### Landing Interface
 
+<img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/landing_page.png" width="49%" height="49%" /> <img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/sidebar.png" width="49%" height="49%" />
+
+<img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/about_page.png" width="49%" height="49%" /> <img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/location_page.png" width="49.5%" height="49.5%" />
+
+### Customer Interface
+
+<img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/menu_page.png" width="49%" height="49%" /> <img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/order_page.png" width="49%" height="49%" />
+
+<img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/FAQ_page.png" width="49%" height="49%" /> <img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/contact_page.png" width="49%" height="49%" />
+
+### Barista Interface
+
+<img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/barista_page.png" width="49%" height="49%" /> <img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/screen_captures/inventory_page.png" width="49%" height="49%" />
 
 ## Features
 
 Expresso's main features include:
 
-<b>Dual Interface:</b> Customers and baristas have completely different interfaces: Customers can view the menu, add items to their cart, place orders, view order history, send feedback, and more. Baristas can view the queue of orders, complete orders, view order history, change inventory, and more.
+#### Dual Interface
+Customers and baristas have completely different interfaces: Customers can view the menu, add items to their cart, place orders, view order history, send feedback, and more. Baristas can view the queue of orders, complete orders, view order history, change inventory, and more.
 
-<b>Secure Login:</b> Customers must login with a valid PUID to view the menu and place orders, and can choose to stay logged in. Baristas must login with a valid username and password to use the barista interface. An admin login also exists and allows more privileges on the barista interface.
+#### Secure Login:
+Customers must login with a valid PUID to view the menu and place orders, and can choose to stay logged in. Baristas must login with a valid username and password to use the barista interface. An admin login also exists and allows more privileges on the barista interface.
 
-<b>Online and In-person Payment:</b> Customers can either pay for their order online using their PUID, which will directly charge their Princeton financial account to save time and allow them to grab-and-go, or pay in person at the register. They make this selection before placing their order. (Trivia: We're the first group in COS 333 history to integrate PUID payment into our project.)
+#### Online and In-person Payment:
+Customers can either pay for their order online using their PUID, which will directly charge their Princeton financial account to save time and allow them to grab-and-go, or pay in person at the register. They make this selection before placing their order. (Trivia: We're the first group in COS 333 history to integrate PUID payment into our project.)
 
-<b>Delayed Ordering:</b> Customers can either place their order immediately, or select a valid time during Coffee Club hours to place a delayed order. This order will not pop up on the barista interface until the selected time.
+#### Delayed Ordering:
+Customers can either place their order immediately, or select a valid time during Coffee Club hours to place a delayed order. This order will not pop up on the barista interface until the selected time.
 
-<b>Notifications:</b> Customers will receive a notification via email after they place an order with details about the order.
+#### Notifications:
+Customers will receive a notification via email after they place an order with details about the order.
 
-<b>Menu:</b> Customers can click on any item on the menu to render a popup with more details, along with any add-ons they'd like to make. Baristas can toggle any item's availability on and off which will affect item status on the customer menu, and can enable/disable ordering at any time. Admins can add and remove items from the menu.
+#### Menu:
+Customers can click on any item on the menu to render a popup with more details, along with any add-ons they'd like to make. Baristas can toggle any item's availability on and off which will affect item status on the customer menu, and can enable/disable ordering at any time. Admins can add and remove items from the menu.
 
-<b>Tablet and Mobile:</b> Expresso is mobile-friendly—we anticipated that most of our users would place orders through their phones. It is also tablet-friendly since the Coffee Club anticipates providing tablets for baristas to handle orders.
+#### Tablet and Mobile:
+Expresso is mobile-friendly—we anticipated that most of our users would place orders through their phones. It is also tablet-friendly since the Coffee Club anticipates providing tablets for baristas to handle orders.
