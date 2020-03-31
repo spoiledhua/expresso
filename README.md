@@ -1,4 +1,10 @@
-# Expresso: An Online Ordering App
+<p align="center">
+  <img src="https://raw.githubusercontent.com/spoiledhua/expresso/master/frontend/src/Assets/coffeesteam.gif" width="12%" height="12%" />
+</p>
+
+<h1 align="center">
+  Expresso: An Online Ordering App
+</h1>
 
 ## Introduction
 
